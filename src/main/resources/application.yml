@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: runningService
+
+  datasource:
+    url: ENC(5ytcBWBvZiDQ+3s4ATlSW3M+DkdhbmFkeJ6dDGUPcFfTUpMfE5wLebK5A2RFOU9SWmPFRIzaRls=)
+    username: ENC(I7Q/hHFeGv4D1Z9ZuRCBYGmSIBfZYVoG)
+    password: ENC(rltfHiZll9jHiF5laY2UCyNQhA5FSD9I)
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+jasypt:
+  encryptor:
+    property:
+      bean: jasyptStringEncryptor
+    password: ${SECRET_KEY}
+
+aes:
+  password: ENC(bNFHIaK7GMWsLENBY2YeuUQd9IIMQCA5yLT/gqCM1/tcJgffgMTIakFH/KdD1iBHe4TuI+QLSQ8=)
+  salt: ENC(PSCfb8OV0WUrPUPcr1DUvWUKjSp16Rz4PDy8TRy10zv75240HhTP/g==)
+
+jwt:
+  secret: ENC(vujfcECDx3dhsf/tAiuUjfdL//SvziutrLQxXL4WGmGWV+6Ytv3gFSukbwpPZdqPHbnoFTY9uf4=)
