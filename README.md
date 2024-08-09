@@ -18,4 +18,4 @@
 - PostgreSQL
 
 - lombok
-- SpringDevTools
+  - SpringDevTools
