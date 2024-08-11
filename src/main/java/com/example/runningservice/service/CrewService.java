@@ -1,6 +1,7 @@
 package com.example.runningservice.service;
 
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
+import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
@@ -66,6 +67,25 @@ public class CrewService {
         } else { // 크루 이미지가 없으면 기본 이미지로 사용
             return s3FileUtil.getImgUrl("crew-default");
         }
+    }
+
+    /**
+     * 크루 정보 수정 :: 크루 db 수정 - 이미지 s3 저장 - 수정된 크루 정보 리턴
+     */
+    @Transactional
+    public CrewData updateCrew(Update updateCrew) {
+        CrewEntity crewEntity = crewRepository.findById(updateCrew.getCrewId())
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
+
+        crewEntity.updateFromDto(updateCrew);
+
+        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getCrewId(),
+            updateCrew.getCrewImage()));
+
+        return CrewData.fromEntityAndLeaderNameAndOccupancy(
+            crewEntity,
+            crewEntity.getMember().getNickName(),
+            getCrewOccupancy(updateCrew.getCrewId()));
     }
 
     /**
