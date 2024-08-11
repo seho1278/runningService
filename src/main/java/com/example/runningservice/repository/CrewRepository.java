@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CrewRepository extends JpaRepository<CrewEntity, Long> {
 
-    boolean existsByCrewName(String crewName);
 }
