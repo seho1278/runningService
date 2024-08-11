@@ -57,4 +57,18 @@ public class CrewRequestDto {
             this.leaderId = userId;
         }
     }
+
+    @Getter
+    @Setter
+    @SuperBuilder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Update extends Base {
+
+        private Long crewId;
+
+        public void setUpdateCrewId(Long crewId) {
+            this.crewId = crewId;
+        }
+    }
 }
