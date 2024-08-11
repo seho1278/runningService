@@ -30,10 +30,3 @@ aes:
 
 jwt:
   secret: ENC(vujfcECDx3dhsf/tAiuUjfdL//SvziutrLQxXL4WGmGWV+6Ytv3gFSukbwpPZdqPHbnoFTY9uf4=)
-
-aws:
-  s3:
-    accessKey: ${AWS_ACCESS_KEY}
-    secretKey: ${AWS_SECRET_KEY}
-    region: ap-northeast-2
-    bucketName: running-service

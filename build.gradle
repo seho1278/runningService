@@ -54,10 +54,6 @@ dependencies {
     //jasypt
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
-
-    // image server :: s3
-    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.757')
-    implementation 'com.amazonaws:aws-java-sdk-s3'
 }
 
 tasks.named('test') {
