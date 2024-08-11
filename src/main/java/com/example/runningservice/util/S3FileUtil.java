@@ -3,8 +3,6 @@ package com.example.runningservice.util;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.example.runningservice.exception.CustomException;
-import com.example.runningservice.exception.ErrorCode;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +42,7 @@ public class S3FileUtil {
                 multipartFile.getInputStream(),
                 objectMetadata);
         } catch (IOException e) {
-            throw new CustomException(ErrorCode.FAILED_UPLOAD_IMAGE);
+            throw new RuntimeException("이미지 업로드 실패");
         }
 
         amazonS3Client.putObject(putObjectRequest);
