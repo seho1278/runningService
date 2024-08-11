@@ -67,4 +67,11 @@ public class CrewService {
             return s3FileUtil.getImgUrl("crew-default");
         }
     }
+
+    /**
+     * 크루의 현재 크루원 수 조회
+     */
+    private int getCrewOccupancy(Long crewId) {
+        return crewMemberRepository.countByCrew_CrewIdAndStatus(crewId, JoinStatus.APPROVED);
+    }
 }
