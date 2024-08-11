@@ -62,10 +62,4 @@ public class TestMemberProfile {
         assertEquals(Gender.MALE, memberResponseDto.getGender());
         assertEquals(List.of(Role.ROLE_USER), memberResponseDto.getRoles());
     }
-
-    @Test
-    public void updateMemberProfile() {
-        // given
-    }
-
 }
