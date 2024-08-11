@@ -27,7 +27,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @Table(name = "crew_member", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"user_id", "crew_id"})
+    @UniqueConstraint(columnNames = {"member_id", "crew_id"})
 })
 @EntityListeners(AuditingEntityListener.class)
 public class CrewMemberEntity {
@@ -36,7 +36,7 @@ public class CrewMemberEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private MemberEntity member;
     @ManyToOne
     @JoinColumn(name = "crew_id")
