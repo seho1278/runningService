@@ -27,6 +27,7 @@ public class CrewService {
     private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
     private final S3FileUtil s3FileUtil;
+    private final String DEFAULT_IMAGE_NAME = "crew-default";
 
     /**
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
@@ -65,7 +66,7 @@ public class CrewService {
 
             return s3FileUtil.getImgUrl(fileName);
         } else { // 크루 이미지가 없으면 기본 이미지로 사용
-            return s3FileUtil.getImgUrl("crew-default");
+            return s3FileUtil.getImgUrl(DEFAULT_IMAGE_NAME);
         }
     }
 
