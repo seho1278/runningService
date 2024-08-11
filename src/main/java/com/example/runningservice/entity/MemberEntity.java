@@ -91,4 +91,24 @@ public class MemberEntity extends BaseEntity {
             .roles(roles)
             .build();
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public void setBirthYear(Integer birthYear) {
+        this.birthYear = birthYear;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public void setActivityRegion(Region activityRegion) {
+        this.activityRegion = activityRegion;
+    }
 }
