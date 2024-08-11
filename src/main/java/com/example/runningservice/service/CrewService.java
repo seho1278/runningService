@@ -95,4 +95,41 @@ public class CrewService {
     private int getCrewOccupancy(Long crewId) {
         return crewMemberRepository.countByCrew_CrewIdAndStatus(crewId, JoinStatus.APPROVED);
     }
+
+    /**
+     * 크루 삭제 :: 크루 이미지 삭제 - 크루원 삭제 - 크루 삭제
+     */
+    @Transactional
+    public CrewData deleteCrew(Long crewId) {
+        CrewEntity crewEntity = crewRepository.findById(crewId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
+
+        // 삭제하기 전에 리턴하기 위한 데이터를 미리 저장해둔다.
+        CrewData crewData = CrewData.fromEntityAndLeaderNameAndOccupancy(
+            crewEntity,
+            crewEntity.getMember().getNickName(),
+            getCrewOccupancy(crewId));
+
+        // 이미지가 디폴트가 아닌 경우에만 삭제
+        String fileName = findLastPath(crewEntity.getCrewImage());
+        if (!fileName.equals(DEFAULT_IMAGE_NAME)) {
+            s3FileUtil.deleteObject(fileName);
+        }
+
+        // 크루원 삭제
+        crewMemberRepository.deleteAllByCrew_CrewId(crewId);
+
+        crewRepository.delete(crewEntity);
+
+        return crewData;
+    }
+
+    /**
+     * url의 가장 끝 path를 리턴한다.
+     */
+    private String findLastPath(String url) {
+        String[] paths = url.split("/");
+
+        return paths[paths.length - 1];
+    }
 }

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Long> {
 
     int countByCrew_CrewIdAndStatus(Long crewId, JoinStatus status);
+
+    void deleteAllByCrew_CrewId(Long crewId);
 }

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -43,5 +44,13 @@ public class CrewController {
         request.setUpdateCrewId(crewId);
 
         return ResponseEntity.ok(crewService.updateCrew(request));
+    }
+
+    /**
+     * 크루 삭제
+     */
+    @DeleteMapping("/{crewId}")
+    public ResponseEntity<CrewData> deleteCrew(@PathVariable("crewId") Long crewId) {
+        return ResponseEntity.ok(crewService.deleteCrew(crewId));
     }
 }
