@@ -1,6 +1,5 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.dto.crew.CrewRequestDto.Create;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import jakarta.persistence.Entity;
@@ -53,25 +52,4 @@ public class CrewEntity {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    public void updateCrewImageUrl(String imageUrl) {
-        this.crewImage = imageUrl;
-    }
-
-    @Builder
-    public static CrewEntity toEntity(Create dto, MemberEntity memberEntity) {
-        return CrewEntity.builder()
-            .member(memberEntity)
-            .crewName(dto.getCrewName())
-            .description(dto.getDescription())
-            .crewCapacity(dto.getCrewCapacity())
-            .activityRegion(dto.getActivityRegion())
-            .waitingAllowed(dto.getWaitingAllowed())
-            .runRecordOpen(dto.getRunRecordOpen())
-            .minAge(dto.getMinAge())
-            .maxAge(dto.getMaxAge())
-            .gender(dto.getGender())
-            .leaderRequired(dto.getLeaderRequired())
-            .build();
-    }
 }
