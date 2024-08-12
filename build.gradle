@@ -66,8 +66,9 @@ dependencies {
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 
     // image server :: s3
-    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.757')
-    implementation 'com.amazonaws:aws-java-sdk-s3'
+    implementation platform('software.amazon.awssdk:bom:2.21.1')
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:sts'
 }
 
 tasks.named('test') {
