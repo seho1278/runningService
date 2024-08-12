@@ -36,37 +36,37 @@ public class MemberController {
 
     // 사용자 정보 조회
     @GetMapping("/{user_id}/profile")
-    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable Long user_id) {
-        return ResponseEntity.ok(memberService.getMemberProfile(user_id));
+    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("user_id") Long userId) {
+        return ResponseEntity.ok(memberService.getMemberProfile(userId));
     }
 
     // 사용자 정보 수정
     @PutMapping("/{user_id}/profile")
     public ResponseEntity<MemberResponseDto> updateMemberProfile(
-        @PathVariable Long user_id, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) {
-        return ResponseEntity.ok(memberService.updateMemberProfile(user_id, updateMemberRequestDto));
+        @PathVariable("user_id") Long userId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) {
+        return ResponseEntity.ok(memberService.updateMemberProfile(userId, updateMemberRequestDto));
     }
     
     // 비밀번호 변경
     @PutMapping("/{user_id}/password")
     public ResponseEntity<?> updateMemberPassword(
-        @PathVariable Long user_id, @RequestBody @Valid PasswordRequestDto passwordRequestDto) {
-        memberService.updateMemberPassword(user_id, passwordRequestDto);
+        @PathVariable("user_id") Long userId, @RequestBody @Valid PasswordRequestDto passwordRequestDto) {
+        memberService.updateMemberPassword(userId, passwordRequestDto);
         return ResponseEntity.ok().build();
     }
     
     //사용자 프로필 공개여부 설정
     @PutMapping("/{user_id}/profile-visibility")
     public ResponseEntity<?> updateMemberProfileVisibility(
-        @PathVariable Long user_id, @RequestBody @Valid ProfileVisibilityRequestDto profileVisibilityRequestDto) {
-        memberService.updateProfileVisibility(user_id, profileVisibilityRequestDto);
+        @PathVariable("user_id") Long userId, @RequestBody @Valid ProfileVisibilityRequestDto profileVisibilityRequestDto) {
+        memberService.updateProfileVisibility(userId, profileVisibilityRequestDto);
         return ResponseEntity.ok().build();
     }
     
     // 회원 탈퇴
     @DeleteMapping("/{user_id}")
-    public ResponseEntity<?> deleteMember(@PathVariable Long user_id, String password) {
-        memberService.deleteMember(user_id, password);
+    public ResponseEntity<?> deleteMember(@PathVariable("user_id") Long userId, @RequestBody DeleteRequestDto deleteRequestDto) {
+        memberService.deleteMember(userId, deleteRequestDto);
         return ResponseEntity.ok().build();
     }
 

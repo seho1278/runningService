@@ -5,8 +5,9 @@ import com.example.runningservice.enums.Region;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateMemberRequestDto {
     private String nickName;
     private Gender gender;

@@ -92,23 +92,17 @@ public class MemberEntity extends BaseEntity {
             .build();
     }
 
-    public void setPassword(String password) {
+    public void updatePassword(String password) {
         this.password = password;
     }
 
-    public void setNickName(String nickName) {
+    public void updateMemberProfile(
+        String nickName, Integer birthYear, Gender gender, Region activityRegion) {
         this.nickName = nickName;
-    }
-
-    public void setBirthYear(Integer birthYear) {
         this.birthYear = birthYear;
-    }
-
-    public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public void setActivityRegion(Region activityRegion) {
         this.activityRegion = activityRegion;
     }
+
+
 }

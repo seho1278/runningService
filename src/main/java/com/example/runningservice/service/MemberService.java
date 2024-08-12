@@ -57,10 +57,12 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        memberEntity.setNickName(updateMemberRequestDto.getNickName());
-        memberEntity.setGender(updateMemberRequestDto.getGender());
-        memberEntity.setBirthYear(updateMemberRequestDto.getBirthYear());
-        memberEntity.setActivityRegion(updateMemberRequestDto.getActivityRegion());
+        memberEntity.updateMemberProfile(
+            updateMemberRequestDto.getNickName(),
+            updateMemberRequestDto.getBirthYear(),
+            updateMemberRequestDto.getGender(),
+            updateMemberRequestDto.getActivityRegion()
+            );
 
         memberRepository.save(memberEntity);
 
@@ -87,7 +89,7 @@ public class MemberService {
 
             // 새 비밀번호 암호화하여 저장
             String encryptedNewPassword = aesUtil.encrypt(passwordRequestDto.getNewPassword());
-            memberEntity.setPassword(encryptedNewPassword);
+            memberEntity.updatePassword(encryptedNewPassword);
             memberRepository.save(memberEntity);
 
 
@@ -106,13 +108,13 @@ public class MemberService {
     }
 
     // 회원 탈퇴
-    public void deleteMember(Long user_id, String password) {
+    public void deleteMember(Long user_id, DeleteRequestDto deleteRequestDto) {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         try {
             // 저장된 비밀번호화 입력한 oldPassword가 일치하는지 확인
-            if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
+            if (!passwordEncoder.matches(deleteRequestDto.getPassword(), memberEntity.getPassword())) {
                 throw new CustomException(ErrorCode.INVALID_PASSWORD);
             }
             // 회원 탈퇴
