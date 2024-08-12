@@ -2,10 +2,12 @@ package com.example.runningservice.dto;
 
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
+import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.example.runningservice.exception.CustomException;
+import com.example.runningservice.exception.ErrorCode;
+import com.example.runningservice.util.AESUtil;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberResponseDto {
     private Long id;
     private String email;
@@ -23,4 +27,26 @@ public class MemberResponseDto {
     private Integer birthYear;
     private Gender gender;
     private List<Role> roles;
+
+    private Region activityRegion;
+
+    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) {
+        String decryptedPhoneNumber = "";
+        try {
+            decryptedPhoneNumber = aesUtil.decrypt(memberEntity.getPhoneNumber());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return MemberResponseDto.builder()
+                    .id(memberEntity.getId())
+                    .email(memberEntity.getEmail())
+                    .phoneNumber(decryptedPhoneNumber)
+                    .name(memberEntity.getName())
+                    .nickName(memberEntity.getNickName())
+                    .birthYear(memberEntity.getBirthYear())
+                    .gender(memberEntity.getGender())
+                    .roles(memberEntity.getRoles())
+                    .activityRegion(memberEntity.getActivityRegion())
+                    .build();
+    }
 }

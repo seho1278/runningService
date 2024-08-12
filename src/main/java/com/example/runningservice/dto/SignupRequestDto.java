@@ -11,16 +11,18 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignupRequestDto {
 
     //이메일 형식
@@ -33,10 +35,6 @@ public class SignupRequestDto {
     @NotBlank
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,50}$")
     private String password;
-
-    @NotBlank
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,50}$")
-    private String confirmPassword;
 
     //숫자만 포함
     @NotBlank
@@ -58,7 +56,7 @@ public class SignupRequestDto {
     @ValidYear
     private Integer birthYear;
     private Region activityRegion;
-    private MultipartFile profileImage; // 프로필 이미지 추가
+//    private MultipartFile profileImage; // 프로필 이미지 추가
 
     public MemberEntity toEntity(PasswordEncoder passwordEncoder, AESUtil aesUtil) throws Exception {
         return MemberEntity.builder()
@@ -71,7 +69,7 @@ public class SignupRequestDto {
             .birthYear(birthYear)
             .gender(gender)
             .activityRegion(activityRegion)
-            .roles(List.of(Role.ROLE_USER))
+            .roles(new ArrayList<>(List.of(Role.ROLE_USER)))
             .build();
     }
 }

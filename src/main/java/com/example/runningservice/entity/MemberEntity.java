@@ -18,6 +18,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +38,9 @@ public class MemberEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
+    private String verificationCode;
     private boolean emailVerified;
+    private LocalDateTime verifiedAt;
     private String password;
     private String phoneNumber;
     private String name;
@@ -56,6 +60,7 @@ public class MemberEntity extends BaseEntity {
     @Builder
     MemberEntity(
             String email,
+            String verificationCode,
             boolean emailVerified,
             String password,
             String phoneNumber,
@@ -67,6 +72,7 @@ public class MemberEntity extends BaseEntity {
             List<Role> roles
     ) {
         this.email = email;
+        this.verificationCode = verificationCode;
         this.emailVerified = emailVerified;
         this.password = password;
         this.phoneNumber = phoneNumber;
@@ -75,7 +81,7 @@ public class MemberEntity extends BaseEntity {
         this.birthYear = birthYear;
         this.gender = gender;
         this.activityRegion = activityRegion;
-        this.roles = roles != null ? roles : List.of(Role.ROLE_USER);
+        this.roles = roles == null ? new ArrayList<>() : roles;
     }
 
     public MemberResponseDto toResponseDto(AESUtil aesUtil) throws Exception {
@@ -91,4 +97,26 @@ public class MemberEntity extends BaseEntity {
             .roles(roles)
             .build();
     }
+
+    public void markEmailVerified() {
+        this.emailVerified = true;
+        this.verifiedAt = LocalDateTime.now();
+    }
+
+    public void saveVerificationCode(String code) {
+        this.verificationCode = code;
+    }
+  
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateMemberProfile(
+        String nickName, Integer birthYear, Gender gender, Region activityRegion) {
+        this.nickName = nickName;
+        this.birthYear = birthYear;
+        this.gender = gender;
+        this.activityRegion = activityRegion;
+    }
+
 }
