@@ -33,6 +33,16 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'com.mashape.unirest:unirest-java:1.4.9'
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
+
+    //jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+
+    //open feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
+    implementation 'io.github.openfeign.form:feign-form:3.8.0'
+    implementation 'io.github.openfeign:feign-core:13.3'
 
     //lombok
     annotationProcessor 'org.projectlombok:lombok'
