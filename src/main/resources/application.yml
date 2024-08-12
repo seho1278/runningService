@@ -39,8 +39,8 @@ jwt:
   secret: ENC(vujfcECDx3dhsf/tAiuUjfdL//SvziutrLQxXL4WGmGWV+6Ytv3gFSukbwpPZdqPHbnoFTY9uf4=)
 
 mailgun:
-  domain: sandbox487fddc4a905404a93cc9c549a8b6f1d.mailgun.org
-  api-key: 49ee2915069e0c9a40745377a595ebdc-a26b1841-599e2ac5
+  domain: ENC(d2mRT2EIISaUsreQyOzXsTUMlpfbmx/dIAY9RHP0yPccGY2XecumaB1LgoWxpZAZ9+i/e/uDuEGbouY0YnPNpw==)
+  api-key: ENC(g+JyCVEQcZPt7OT8/HK6oXZ6HpE/blrkUdG7LwrIZZlKyhEf77c9THtfdp5bzDvf67SqeEQ4U1T3722TfIqFhA==)
 
 logging:
   level:
