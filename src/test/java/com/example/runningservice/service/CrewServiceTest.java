@@ -169,4 +169,50 @@ class CrewServiceTest {
         verify(s3FileUtil, times(0)).putObject(any(), any());
         verify(s3FileUtil, times(1)).getImgUrl("crew-default");
     }
+
+    @Test
+    @DisplayName("크루 삭제 - 사용자 이미지")
+    public void deleteCrew_WithImage() {
+        // given
+        Long crewId = 1L;
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder()
+            .crewId(crewId)
+            .member(memberEntity)
+            .crewImage("a/b/crew-1")
+            .build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+
+        // when
+        CrewData response = crewService.deleteCrew(crewId);
+
+        // then
+        assertEquals(crewEntity.getCrewId(), response.getCrewId());
+        verify(s3FileUtil, times(1)).deleteObject("crew-1");
+    }
+
+    @Test
+    @DisplayName("크루 삭제 - 기본 이미지")
+    public void deleteCrew_WithoutImage() {
+        // given
+        Long crewId = 1L;
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder()
+            .crewId(crewId)
+            .member(memberEntity)
+            .crewImage("a/b/crew-default")
+            .build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+
+        // when
+        CrewData response = crewService.deleteCrew(crewId);
+
+        // then
+        assertEquals(crewEntity.getCrewId(), response.getCrewId());
+        verify(s3FileUtil, times(0)).deleteObject(anyString());
+    }
 }
