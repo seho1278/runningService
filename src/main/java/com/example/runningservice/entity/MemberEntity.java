@@ -106,5 +106,17 @@ public class MemberEntity extends BaseEntity {
     public void saveVerificationCode(String code) {
         this.verificationCode = code;
     }
+  
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateMemberProfile(
+        String nickName, Integer birthYear, Gender gender, Region activityRegion) {
+        this.nickName = nickName;
+        this.birthYear = birthYear;
+        this.gender = gender;
+        this.activityRegion = activityRegion;
+    }
 
 }
