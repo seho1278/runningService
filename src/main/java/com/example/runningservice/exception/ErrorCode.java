@@ -21,7 +21,8 @@ public enum ErrorCode {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "인증되지 않은 이메일 입니다."),
     // 추가
     ENCRYPTION_ERROR(HttpStatus.BAD_REQUEST, ""),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다.");
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+    NOT_FOUND_CREW(HttpStatus.BAD_REQUEST, "크루를 찾을 수 없습니다.");
 
     private HttpStatus httpStatus;
     private String message;

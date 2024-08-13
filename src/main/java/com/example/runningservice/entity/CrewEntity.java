@@ -1,6 +1,7 @@
 package com.example.runningservice.entity;
 
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
+import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import jakarta.persistence.Entity;
@@ -73,5 +74,17 @@ public class CrewEntity {
             .gender(dto.getGender())
             .leaderRequired(dto.getLeaderRequired())
             .build();
+    }
+
+    public void updateFromDto(Update updateCrew) {
+        this.description = updateCrew.getDescription();
+        this.activityRegion = updateCrew.getActivityRegion();
+        this.crewCapacity = updateCrew.getCrewCapacity();
+        this.runRecordOpen = updateCrew.getRunRecordOpen();
+        this.waitingAllowed = updateCrew.getWaitingAllowed();
+        this.leaderRequired = updateCrew.getLeaderRequired();
+        this.minAge = updateCrew.getMinAge();
+        this.maxAge = updateCrew.getMaxAge();
+        this.gender = updateCrew.getGender();
     }
 }
