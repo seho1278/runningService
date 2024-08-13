@@ -1,6 +1,20 @@
 spring:
   application:
     name: runningService
+
+  profiles:
+    active: oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            provider: google
+            client-id: google-client-id
+            client-secret: google-client-secret
+            redirect-uri: http://localhost:8080/login/oauth
+            authorization-grant-type: authorization_code
+            
   cloud:
     openfeign:
       okhttp:
@@ -8,6 +22,7 @@ spring:
       autoconfiguration:
         jackson:
           enabled: true
+
   datasource:
     url: ENC(5ytcBWBvZiDQ+3s4ATlSW3M+DkdhbmFkeJ6dDGUPcFfTUpMfE5wLebK5A2RFOU9SWmPFRIzaRls=)
     username: ENC(I7Q/hHFeGv4D1Z9ZuRCBYGmSIBfZYVoG)
@@ -39,6 +54,10 @@ jwt:
   secret: ENC(vujfcECDx3dhsf/tAiuUjfdL//SvziutrLQxXL4WGmGWV+6Ytv3gFSukbwpPZdqPHbnoFTY9uf4=)
 
 
+url:
+  access-token: http://localhost:8080/oauth/token
+  profile: http://localhost:8080/user/profile
+
 aws:
   s3:
     accessKey: ${AWS_ACCESS_KEY}
@@ -53,3 +72,4 @@ mailgun:
 logging:
   level:
     root: info
+
