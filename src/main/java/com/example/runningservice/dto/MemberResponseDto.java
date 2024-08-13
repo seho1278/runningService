@@ -30,17 +30,12 @@ public class MemberResponseDto {
 
     private Region activityRegion;
 
-    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) {
-        String decryptedPhoneNumber = "";
-        try {
-            decryptedPhoneNumber = aesUtil.decrypt(memberEntity.getPhoneNumber());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) throws Exception {
+
         return MemberResponseDto.builder()
                     .id(memberEntity.getId())
                     .email(memberEntity.getEmail())
-                    .phoneNumber(decryptedPhoneNumber)
+                    .phoneNumber(aesUtil.decrypt(memberEntity.getPhoneNumber()))
                     .name(memberEntity.getName())
                     .nickName(memberEntity.getNickName())
                     .birthYear(memberEntity.getBirthYear())
