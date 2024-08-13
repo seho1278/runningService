@@ -94,9 +94,10 @@ public class MemberService {
             .append("http://localhost:8080/user/signup/email-verify?email=").append(email)
             .append("&code=").append(code);
         return new String(sb);
+    }
 
     // 사용자 정보 조회
-    public MemberResponseDto getMemberProfile(Long user_id) {
+    public MemberResponseDto getMemberProfile(Long user_id) throws Exception {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
@@ -106,7 +107,7 @@ public class MemberService {
     // 사용자 정보 수정
     @Transactional
     public MemberResponseDto updateMemberProfile(
-        Long user_id, UpdateMemberRequestDto updateMemberRequestDto) {
+        Long user_id, UpdateMemberRequestDto updateMemberRequestDto) throws Exception {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
@@ -152,12 +153,22 @@ public class MemberService {
     }
     
     // 사용자 프로필 공개여부 설정
-    public void updateProfileVisibility(
+    public ProfileVisibilityResponseDto updateProfileVisibility(
         Long user_id, ProfileVisibilityRequestDto profileVisibilityRequestDto) {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
         
         // 프로필 공개여부 설정
+        memberEntity.updateProfileVisibility(
+            profileVisibilityRequestDto.getUserName(),
+            profileVisibilityRequestDto.getPhoneNumber(),
+            profileVisibilityRequestDto.getGender(),
+            profileVisibilityRequestDto.getBirthYear()
+        );
+
+        memberRepository.save(memberEntity);
+
+        return ProfileVisibilityResponseDto.of(memberEntity);
     }
 
     // 회원 탈퇴

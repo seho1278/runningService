@@ -1,9 +1,7 @@
 package com.example.runningservice.entity;
 
 import com.example.runningservice.dto.MemberResponseDto;
-import com.example.runningservice.enums.Gender;
-import com.example.runningservice.enums.Region;
-import com.example.runningservice.enums.Role;
+import com.example.runningservice.enums.*;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.converter.GenderConverter;
 import jakarta.persistence.CollectionTable;
@@ -56,6 +54,26 @@ public class MemberEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private List<Role> roles;
+
+    // 프로필 공개
+    @Column(name = "username_visibility")
+    private Visibility nameVisibility;
+    @Column(name = "phone_number_visibility")
+    private Visibility phoneNumberVisibility;
+    @Column(name = "gender_visibility")
+    private Visibility genderVisibility;
+    @Column(name = "birth_year_visibility")
+    private Visibility birthYearVisibility;
+
+    // 알림 설정
+    @Column(name = "post_noti")
+    private Notification postNoti;
+    @Column(name = "reply_noti")
+    private Notification replyNoti;
+    @Column(name = "mention_noti")
+    private Notification mentionNoti;
+    @Column(name = "chatting_noti")
+    private Notification chattingNoti;
 
     @Builder
     MemberEntity(
@@ -119,4 +137,11 @@ public class MemberEntity extends BaseEntity {
         this.activityRegion = activityRegion;
     }
 
+    public void updateProfileVisibility(
+        int nameVisibility, int phoneNumberVisibility, int genderVisibility, int birthYearVisibility) {
+        this.nameVisibility = Visibility.fromCode(nameVisibility);
+        this.phoneNumberVisibility = Visibility.fromCode(phoneNumberVisibility);
+        this.genderVisibility = Visibility.fromCode(genderVisibility);
+        this.birthYearVisibility = Visibility.fromCode(birthYearVisibility);
+    }
 }
