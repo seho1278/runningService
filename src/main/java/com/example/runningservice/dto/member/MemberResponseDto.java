@@ -1,15 +1,12 @@
-package com.example.runningservice.dto;
+package com.example.runningservice.dto.member;
 
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
-import com.example.runningservice.exception.CustomException;
-import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.util.AESUtil;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -29,6 +26,7 @@ public class MemberResponseDto {
     private List<Role> roles;
 
     private Region activityRegion;
+    private String imageUrl;
 
     public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) {
         String decryptedPhoneNumber = "";
@@ -47,6 +45,7 @@ public class MemberResponseDto {
                     .gender(memberEntity.getGender())
                     .roles(memberEntity.getRoles())
                     .activityRegion(memberEntity.getActivityRegion())
+                    .imageUrl(memberEntity.getProfileImageUrl())
                     .build();
     }
 }

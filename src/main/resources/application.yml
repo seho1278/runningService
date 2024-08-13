@@ -41,15 +41,14 @@ jwt:
 
 aws:
   s3:
-    accessKey: ${AWS_ACCESS_KEY}
-    secretKey: ${AWS_SECRET_KEY}
-    region: ap-northeast-2
-    bucketName: running-service
+    region: ENC(psk5C0nSk1GQPjS6B93mgpT/poUDVkBi)
+    bucketName: ENC(jZdTJvbbCltjdX3lsuC85xGMwnbayMQU)
+    roleArn: ENC(itgAU5raT4FloGKQIkdq81aO8izs5lfRJ9Ri3H7aNKdiARVq+R9klghOjG7W1pErPL61M2UmocK19uIYwSdR+w==)
     
 mailgun:
-  domain: ENC(d2mRT2EIISaUsreQyOzXsTUMlpfbmx/dIAY9RHP0yPccGY2XecumaB1LgoWxpZAZ9+i/e/uDuEGbouY0YnPNpw==)
-  api-key: ENC(g+JyCVEQcZPt7OT8/HK6oXZ6HpE/blrkUdG7LwrIZZlKyhEf77c9THtfdp5bzDvf67SqeEQ4U1T3722TfIqFhA==)
+  domain: ENC(eMYABA7cAqLNfBLBQDsTxdybOO13Yaxf63CYoa3zhM9nqx4lD2nb0z4ngzRytDESUu4nOGODJPIWCG/yxrmocA==)
+  api-key: ENC(5FEZpLoUqdCk0Y9tG2+IqomYebASi1MDTzcIW4wYqDeTMFQNqnJrnQW6U3UGueKjBsLMrn7Lg1wlBqHFJwYvUw==)
 
 logging:
   level:
-    root: info
+    root: debug
