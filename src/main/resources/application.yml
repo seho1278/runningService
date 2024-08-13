@@ -1,6 +1,7 @@
 spring:
   application:
     name: runningService
+
   profiles:
     active: oauth
   security:
@@ -13,6 +14,14 @@ spring:
             client-secret: google-client-secret
             redirect-uri: http://localhost:8080/login/oauth
             authorization-grant-type: authorization_code
+            
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+      autoconfiguration:
+        jackson:
+          enabled: true
 
   datasource:
     url: ENC(5ytcBWBvZiDQ+3s4ATlSW3M+DkdhbmFkeJ6dDGUPcFfTUpMfE5wLebK5A2RFOU9SWmPFRIzaRls=)
@@ -27,8 +36,9 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   mvc:
-    pathmatch:
+    path-match:
       matching-strategy: ant_path_matcher
+
 
 jasypt:
   encryptor:
@@ -43,6 +53,23 @@ aes:
 jwt:
   secret: ENC(vujfcECDx3dhsf/tAiuUjfdL//SvziutrLQxXL4WGmGWV+6Ytv3gFSukbwpPZdqPHbnoFTY9uf4=)
 
+
 url:
   access-token: http://localhost:8080/oauth/token
   profile: http://localhost:8080/user/profile
+
+aws:
+  s3:
+    accessKey: ${AWS_ACCESS_KEY}
+    secretKey: ${AWS_SECRET_KEY}
+    region: ap-northeast-2
+    bucketName: running-service
+    
+mailgun:
+  domain: ENC(d2mRT2EIISaUsreQyOzXsTUMlpfbmx/dIAY9RHP0yPccGY2XecumaB1LgoWxpZAZ9+i/e/uDuEGbouY0YnPNpw==)
+  api-key: ENC(g+JyCVEQcZPt7OT8/HK6oXZ6HpE/blrkUdG7LwrIZZlKyhEf77c9THtfdp5bzDvf67SqeEQ4U1T3722TfIqFhA==)
+
+logging:
+  level:
+    root: info
+
