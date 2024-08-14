@@ -53,6 +53,7 @@ dependencies {
 
     //database
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
 
     //envers
     implementation 'org.springframework.data:spring-data-envers:3.3.2'
