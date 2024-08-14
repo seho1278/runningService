@@ -6,7 +6,6 @@ import com.example.runningservice.enums.Role;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -100,7 +99,7 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String email, String token) {
-        boolean equals = extractAllClaims(token).getSubject().equals(email);
+        boolean equals = extractEmail(token).equals(email);
         log.debug("user email equals token owner email: {}", equals);
         return equals && !isTokenExpired(token);
     }

@@ -20,6 +20,7 @@ import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.security.CustomUserDetails;
 import com.example.runningservice.security.CustomUserDetailsService;
 import com.example.runningservice.util.JwtUtil;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,9 @@ class AuthServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private Principal principal;
 
     @Test
     void testAuthenticate_success() throws Exception {
@@ -169,6 +173,7 @@ class AuthServiceTest {
     void testRefreshToken_success() throws Exception {
         //given
         String refreshToken = "refresh-token";
+        String principalEmail = "test@example.com";
 
         when(blackList.isListed(refreshToken)).thenReturn(false);
         when(jwtUtil.isTokenExpired(refreshToken)).thenReturn(false);
@@ -177,9 +182,9 @@ class AuthServiceTest {
         List<GrantedAuthority> authorities = new ArrayList<>();
         when(jwtUtil.generateToken("test@example.com", authorities)).thenReturn("access-token");
         when(jwtUtil.generateRefreshToken("test@example.com", authorities)).thenReturn("refresh-token");
-
+        when(principal.getName()).thenReturn(principalEmail);
         //when
-        JwtResponse jwtResponse = authService.refreshToken(refreshToken);
+        JwtResponse jwtResponse = authService.refreshToken(refreshToken, principal);
         //then
         assertNotNull(jwtResponse);
         assertEquals("refresh-token", jwtResponse.getRefreshJwt());
@@ -195,7 +200,7 @@ class AuthServiceTest {
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            authService.refreshToken(refreshToken);
+            authService.refreshToken(refreshToken, principal);
         });
 
         assertEquals(ErrorCode.INVALID_REFRESH_TOKEN, exception.getErrorCode());
@@ -207,15 +212,37 @@ class AuthServiceTest {
     void testRefreshToken_TokenExpired() {
         // Given
         String refreshToken = "expired-refresh-token";
+        String principalEmail = "test@example.com";
         when(blackList.isListed(refreshToken)).thenReturn(false);
+        when(principal.getName()).thenReturn(principalEmail);
+        when(jwtUtil.validateToken(principalEmail, refreshToken)).thenCallRealMethod();
+        when(jwtUtil.extractEmail(refreshToken)).thenReturn(principalEmail);
         when(jwtUtil.isTokenExpired(refreshToken)).thenReturn(true);
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            authService.refreshToken(refreshToken);
+            authService.refreshToken(refreshToken, principal);
         });
 
-        assertEquals(ErrorCode.TOKEN_EXPIRED, exception.getErrorCode());
-        verify(jwtUtil).isTokenExpired(refreshToken);
+        assertEquals(ErrorCode.INVALID_TOKEN, exception.getErrorCode());
+    }
+
+
+    @Test
+    void testRefreshToken_EmailMisMatch() {
+        // Given
+        String refreshToken = "expired-refresh-token";
+        String principalEmail = "test@example.com";
+        when(blackList.isListed(refreshToken)).thenReturn(false);
+        when(principal.getName()).thenReturn(principalEmail);
+        when(jwtUtil.validateToken(principalEmail, refreshToken)).thenCallRealMethod();
+        when(jwtUtil.extractEmail(refreshToken)).thenReturn("diffrent-email");
+
+        // When & Then
+        CustomException exception = assertThrows(CustomException.class, () -> {
+            authService.refreshToken(refreshToken, principal);
+        });
+
+        assertEquals(ErrorCode.INVALID_TOKEN, exception.getErrorCode());
     }
 }

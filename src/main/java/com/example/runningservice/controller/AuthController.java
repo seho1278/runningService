@@ -3,6 +3,7 @@ package com.example.runningservice.controller;
 import com.example.runningservice.dto.JwtResponse;
 import com.example.runningservice.dto.LoginRequestDto;
 import com.example.runningservice.service.AuthService;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,10 @@ public class AuthController {
 
     @PostMapping("/token/refresh")
     public ResponseEntity<JwtResponse> refreshToken(
-        @RequestHeader(name = "Authorization") String refreshToken) throws Exception {
+        @RequestHeader(name = "Authorization") String refreshToken, Principal principal)
+        throws Exception {
         refreshToken = refreshToken.replace("Bearer ", "");
-        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+        return ResponseEntity.ok(authService.refreshToken(refreshToken, principal));
     }
 
 }

@@ -6,6 +6,7 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.security.CustomUserDetailsService;
 import com.example.runningservice.util.JwtUtil;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -48,23 +49,24 @@ public class AuthService {
         log.debug("Authorities : {}", authorities);
         // 회원권한 & email로 accessToken, refreshToken 발행
         final String accessJwt = jwtUtil.generateToken(userDetails.getUsername(), authorities);
-        final String refreshJwt = jwtUtil.generateRefreshToken(userDetails.getUsername(), authorities);
+        final String refreshJwt = jwtUtil.generateRefreshToken(userDetails.getUsername(),
+            authorities);
 
         return new JwtResponse(accessJwt, refreshJwt);
     }
 
-    public JwtResponse refreshToken(String refreshToken) throws Exception {
+    public JwtResponse refreshToken(String refreshToken, Principal principal) {
         //refresh token 이 블랙리스트에 있는지 확인
         if (blackList.isListed(refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         //토큰 유효성 검사(올바른 서명 & 유효기간)
-        if (jwtUtil.isTokenExpired(refreshToken)) {
-            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        String email = principal.getName();
+        if (!jwtUtil.validateToken(email, refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         // 새로운 accessToken, refreshToken 생성
-        String email = jwtUtil.extractEmail(refreshToken);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
         List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
         final String newAccessToken = jwtUtil.generateToken(email, authorities);
