@@ -1,6 +1,10 @@
 package com.example.runningservice.controller;
 
 import com.example.runningservice.dto.*;
+import com.example.runningservice.dto.member.MemberResponseDto;
+import com.example.runningservice.dto.member.PasswordRequestDto;
+import com.example.runningservice.dto.member.ProfileVisibilityRequestDto;
+import com.example.runningservice.dto.member.UpdateMemberRequestDto;
 import com.example.runningservice.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,34 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-
-    @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(
-        @RequestBody @Valid SignupRequestDto signupRequestDto) throws Exception {
-        // 프로필 이미지 처리
-//        if (signupRequestDto.getProfileImage() != null && !signupRequestDto.getProfileImage()
-//            .isEmpty()) {
-////            String imageUrl = userService.saveProfileImage(signupRequestDto.getProfileImage());
-//            // 사용자 정보 저장 시 이미지 URL도 저장
-//        } else {
-////            String defaultImageUrl = userService.getDefaultProfileImageUrl();
-//            // 사용자 정보 저장 시 기본 이미지 URL 저장
-//        }
-
-        // 사용자 정보 저장 로직
-        return ResponseEntity.ok(memberService.signup(signupRequestDto));
-    }
-
-    @PostMapping("/signup/email-send")
-    ResponseEntity<?> sendVerifyEmail(@RequestParam String email) {
-        memberService.sendEmail(email);
-        return ResponseEntity.ok().build();
-    }
-  
-    @PutMapping("/signup/email-verify")
-    ResponseEntity<Boolean> verifyUser(@RequestParam String email, @RequestParam String code) {
-        return ResponseEntity.ok(memberService.verifyUser(email, code));
-    }
 
     // 사용자 정보 조회
     @GetMapping("/{user_id}/profile")

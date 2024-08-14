@@ -1,15 +1,18 @@
 package com.example.runningservice.security;
 
+import com.example.runningservice.service.OAuth2Service;
 import com.example.runningservice.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,20 +28,39 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final OAuth2Service oAuth2Service;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
                 request -> request.requestMatchers(
-                    "/", "/login/**", "/user/signup/**", "/api.mailgun.net/v3/**", "/token/refresh/**", "/h2-console/**")
-                    .permitAll().requestMatchers("/logout")
+                        "/",
+                        "/login/**",
+                        "/user/signup/**",
+                        "/api.mailgun.net/v3/**",
+                        "/token/refresh/**",
+                        "/h2-console/**",
+                        "/logout",
+                        "/css/**",
+                        "images/**",
+                        "/js/**",
+                        "/posts/**",
+                        "/comments/**")
+                    .permitAll().requestMatchers(
+                        "/posts/new",
+                        "/comments/save")
                     .hasAnyAuthority("ROLE_USER")
                     .anyRequest().authenticated())
-            .csrf(AbstractHttpConfigurer::disable).sessionManagement(
+            .csrf(AbstractHttpConfigurer::disable)
+            .headers((headerConfig) -> headerConfig.frameOptions(FrameOptionsConfig::disable))
+            .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable);
+            .logout( // 로그아웃 성공 시 / 주소로 이동
+                (logoutConfig) -> logoutConfig.logoutSuccessUrl("/"))
+            // OAuth2 로그인 기능에 대한 여러 설정
+            .oauth2Login(Customizer.withDefaults());
         return http.build();
     }
 

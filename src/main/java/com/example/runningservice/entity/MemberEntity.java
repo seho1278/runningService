@@ -1,8 +1,10 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.dto.MemberResponseDto;
-import com.example.runningservice.enums.*;
-import com.example.runningservice.util.AESUtil;
+import com.example.runningservice.enums.Gender;
+import com.example.runningservice.enums.Notification;
+import com.example.runningservice.enums.Region;
+import com.example.runningservice.enums.Role;
+import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.util.converter.GenderConverter;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -17,31 +19,37 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.envers.AuditOverride;
 
 @Entity(name = "member")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @AuditOverride(forClass = BaseEntity.class)
 public class MemberEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String email;
     private String verificationCode;
     private boolean emailVerified;
     private LocalDateTime verifiedAt;
+    @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
     private String phoneNumber;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String nickName;
     private Integer birthYear;
     //성별값을 코드로 변환
@@ -55,6 +63,7 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "role")
     private List<Role> roles;
 
+    private String profileImageUrl;  // 프로필 이미지 URL 추가
     // 프로필 공개
     @Column(name = "username_visibility")
     private Visibility nameVisibility;
@@ -75,47 +84,6 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "chatting_noti")
     private Notification chattingNoti;
 
-    @Builder
-    MemberEntity(
-            String email,
-            String verificationCode,
-            boolean emailVerified,
-            String password,
-            String phoneNumber,
-            String name,
-            String nickName,
-            Integer birthYear,
-            Gender gender,
-            Region activityRegion,
-            List<Role> roles
-    ) {
-        this.email = email;
-        this.verificationCode = verificationCode;
-        this.emailVerified = emailVerified;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.name = name;
-        this.nickName = nickName;
-        this.birthYear = birthYear;
-        this.gender = gender;
-        this.activityRegion = activityRegion;
-        this.roles = roles == null ? new ArrayList<>() : roles;
-    }
-
-    public MemberResponseDto toResponseDto(AESUtil aesUtil) throws Exception {
-        return MemberResponseDto.builder()
-            .id(id)
-            .email(email)
-            .emailVerified(emailVerified)
-            .phoneNumber(aesUtil.decrypt(phoneNumber))
-            .name(name)
-            .nickName(nickName)
-            .birthYear(birthYear)
-            .gender(gender)
-            .roles(roles)
-            .build();
-    }
-
     public void markEmailVerified() {
         this.emailVerified = true;
         this.verifiedAt = LocalDateTime.now();
@@ -135,6 +103,10 @@ public class MemberEntity extends BaseEntity {
         this.birthYear = birthYear;
         this.gender = gender;
         this.activityRegion = activityRegion;
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void updateProfileVisibility(

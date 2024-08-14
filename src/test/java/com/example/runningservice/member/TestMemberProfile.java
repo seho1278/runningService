@@ -1,6 +1,18 @@
 package com.example.runningservice.member;
 
-import com.example.runningservice.dto.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.example.runningservice.dto.DeleteRequestDto;
+import com.example.runningservice.dto.ProfileVisibilityResponseDto;
+import com.example.runningservice.dto.member.MemberResponseDto;
+import com.example.runningservice.dto.member.PasswordRequestDto;
+import com.example.runningservice.dto.member.ProfileVisibilityRequestDto;
+import com.example.runningservice.dto.member.UpdateMemberRequestDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
@@ -9,20 +21,14 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.MemberService;
 import com.example.runningservice.util.AESUtil;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TestMemberProfile {

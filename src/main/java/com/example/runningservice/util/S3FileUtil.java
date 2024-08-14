@@ -60,8 +60,4 @@ public class S3FileUtil {
     /**
      * 버킷에서 파일명의 데이터를 삭제한다.
      */
-    public void deleteObject(String fileName) {
-
-        amazonS3Client.deleteObject(bucketName, fileName);
-    }
 }
