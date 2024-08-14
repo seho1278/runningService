@@ -39,7 +39,6 @@ spring:
     path-match:
       matching-strategy: ant_path_matcher
 
-
 jasypt:
   encryptor:
     property:
@@ -64,8 +63,8 @@ aws:
     roleArn: ENC(itgAU5raT4FloGKQIkdq81aO8izs5lfRJ9Ri3H7aNKdiARVq+R9klghOjG7W1pErPL61M2UmocK19uIYwSdR+w==)
     
 mailgun:
-  domain: ENC(d2mRT2EIISaUsreQyOzXsTUMlpfbmx/dIAY9RHP0yPccGY2XecumaB1LgoWxpZAZ9+i/e/uDuEGbouY0YnPNpw==)
-  api-key: ENC(g+JyCVEQcZPt7OT8/HK6oXZ6HpE/blrkUdG7LwrIZZlKyhEf77c9THtfdp5bzDvf67SqeEQ4U1T3722TfIqFhA==)
+  domain: ENC(zPmaD0glNj5N1aCws5wE7zrwzIzdVqGk7sQ8g4kgtEYaSS9FQlDmrM2SuOXnLQ1/V/KUJbCCH1/4pFNzZoIrvQ==)
+  api-key: ENC(wQtu6ruB7EvprF3yegJ9Bo/BJs7CbsAP9VznEeabsnYwiMAVHXZGmcUP4MGLSF1N9KaL0CWy8Gk0x4fsBPlGjw==)
 
 logging:
   level:

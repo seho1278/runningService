@@ -3,8 +3,13 @@ package com.example.runningservice.util;
 import static io.jsonwebtoken.Jwts.SIG.HS256;
 
 import com.example.runningservice.enums.Role;
+import com.example.runningservice.exception.CustomException;
+import com.example.runningservice.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import java.util.Base64;
 import java.util.Date;
@@ -59,12 +64,24 @@ public class JwtUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        log.debug("token: {}", token);
-        return Jwts.parser()
-            .verifyWith(SECRET_KEY)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
+        log.debug("extract token: {}", token);
+        try {
+            log.debug("token: {}", token);
+            return Jwts.parser()
+                .verifyWith(SECRET_KEY)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        } catch (SignatureException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        } catch (MalformedJwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
     }
 
     public boolean isTokenExpired(String token) {
@@ -84,7 +101,7 @@ public class JwtUtil {
 
     public boolean validateToken(String email, String token) {
         boolean equals = extractAllClaims(token).getSubject().equals(email);
-        log.debug("equals: {}", equals);
+        log.debug("user email equals token owner email: {}", equals);
         return equals && !isTokenExpired(token);
     }
 

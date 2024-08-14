@@ -1,5 +1,6 @@
 package com.example.runningservice.security;
 
+import com.example.runningservice.service.LogoutService;
 import com.example.runningservice.service.OAuth2Service;
 import com.example.runningservice.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class SecurityConfig {
     private final OAuth2Service oAuth2Service;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService) throws Exception {
         http.authorizeHttpRequests(
                 request -> request.requestMatchers(
                         "/",
@@ -58,7 +59,10 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .logout( // 로그아웃 성공 시 / 주소로 이동
-                (logoutConfig) -> logoutConfig.logoutSuccessUrl("/"))
+                (logoutConfig) -> logoutConfig
+                    .logoutUrl("/logout")
+                    .addLogoutHandler(logoutService)
+                    .logoutSuccessUrl("/"))
             // OAuth2 로그인 기능에 대한 여러 설정
             .oauth2Login(Customizer.withDefaults());
         return http.build();
