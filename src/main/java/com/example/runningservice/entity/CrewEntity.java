@@ -36,7 +36,7 @@ public class CrewEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long crewId;
     @ManyToOne
-    @JoinColumn(name = "leader_id")
+    @JoinColumn(name = "member_id")
     private MemberEntity member;
     private String crewName;
     private String crewImage;
@@ -44,7 +44,6 @@ public class CrewEntity {
     private Integer crewCapacity;
     @Enumerated(EnumType.STRING)
     private Region activityRegion;
-    private Boolean waitingAllowed;
     private Boolean runRecordOpen;
     private Integer minAge;
     private Integer maxAge;
@@ -67,7 +66,6 @@ public class CrewEntity {
             .description(dto.getDescription())
             .crewCapacity(dto.getCrewCapacity())
             .activityRegion(dto.getActivityRegion())
-            .waitingAllowed(dto.getWaitingAllowed())
             .runRecordOpen(dto.getRunRecordOpen())
             .minAge(dto.getMinAge())
             .maxAge(dto.getMaxAge())
@@ -81,7 +79,6 @@ public class CrewEntity {
         this.activityRegion = updateCrew.getActivityRegion();
         this.crewCapacity = updateCrew.getCrewCapacity();
         this.runRecordOpen = updateCrew.getRunRecordOpen();
-        this.waitingAllowed = updateCrew.getWaitingAllowed();
         this.leaderRequired = updateCrew.getLeaderRequired();
         this.minAge = updateCrew.getMinAge();
         this.maxAge = updateCrew.getMaxAge();
