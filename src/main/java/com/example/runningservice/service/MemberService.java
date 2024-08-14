@@ -26,8 +26,8 @@ public class MemberService {
     private final AESUtil aesUtil;
 
     // 사용자 정보 조회
-    public MemberResponseDto getMemberProfile(Long userId){
-        MemberEntity memberEntity = memberRepository.findById(userId)
+    public MemberResponseDto getMemberProfile(Long user_id) throws Exception {
+        MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         return MemberResponseDto.of(memberEntity, aesUtil);
@@ -35,17 +35,14 @@ public class MemberService {
 
     // 사용자 정보 수정
     @Transactional
-    public MemberResponseDto updateMemberProfile (
-        Long user_id, UpdateMemberRequestDto updateMemberRequestDto){
+    public MemberResponseDto updateMemberProfile(Long user_id,
+        UpdateMemberRequestDto updateMemberRequestDto) throws Exception {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        memberEntity.updateMemberProfile(
-            updateMemberRequestDto.getNickName(),
-            updateMemberRequestDto.getBirthYear(),
-            updateMemberRequestDto.getGender(),
-            updateMemberRequestDto.getActivityRegion()
-        );
+        memberEntity.updateMemberProfile(updateMemberRequestDto.getNickName(),
+            updateMemberRequestDto.getBirthYear(), updateMemberRequestDto.getGender(),
+            updateMemberRequestDto.getActivityRegion());
 
         memberRepository.save(memberEntity);
 
@@ -54,8 +51,7 @@ public class MemberService {
 
     // 비밀번호 변경
     @Transactional
-    public void updateMemberPassword (
-        Long user_id, PasswordRequestDto passwordRequestDto){
+    public void updateMemberPassword(Long user_id, PasswordRequestDto passwordRequestDto) {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
@@ -84,16 +80,25 @@ public class MemberService {
     }
 
     // 사용자 프로필 공개여부 설정
-    public void updateProfileVisibility (
-        Long user_id, ProfileVisibilityRequestDto profileVisibilityRequestDto){
+    public ProfileVisibilityResponseDto updateProfileVisibility(Long user_id,
+        ProfileVisibilityRequestDto profileVisibilityRequestDto) {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         // 프로필 공개여부 설정
+        memberEntity.updateProfileVisibility(
+            profileVisibilityRequestDto.getUserName(),
+            profileVisibilityRequestDto.getPhoneNumber(),
+            profileVisibilityRequestDto.getGender(),
+            profileVisibilityRequestDto.getBirthYear());
+
+        memberRepository.save(memberEntity);
+
+        return ProfileVisibilityResponseDto.of(memberEntity);
     }
 
     // 회원 탈퇴
-    public void deleteMember (Long user_id, DeleteRequestDto deleteRequestDto){
+    public void deleteMember(Long user_id, DeleteRequestDto deleteRequestDto) {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 

@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileVisibilityRequestDto {
-    private String userName;
-    private String phoneNumber;
-    private Gender gender;
-    private String birthYear;
+    private int userName;
+    private int phoneNumber;
+    private int gender;
+    private int birthYear;
 }

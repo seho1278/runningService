@@ -23,8 +23,10 @@ public class S3FileUtil {
 
     @Value("${aws.s3.region}")
     private String region;
+
     @Value("${aws.s3.bucketName}")
     private String bucketName;
+
     /**
      * fileName을 이용해 이미지 url을 조회한다.
      */
@@ -54,4 +56,8 @@ public class S3FileUtil {
             throw new CustomException(ErrorCode.FAILED_UPLOAD_IMAGE);
         }
     }
+
+    /**
+     * 버킷에서 파일명의 데이터를 삭제한다.
+     */
 }

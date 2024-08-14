@@ -1,8 +1,10 @@
 package com.example.runningservice.entity;
 
 import com.example.runningservice.enums.Gender;
+import com.example.runningservice.enums.Notification;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
+import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.util.converter.GenderConverter;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -17,10 +19,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -64,6 +64,25 @@ public class MemberEntity extends BaseEntity {
     private List<Role> roles;
 
     private String profileImageUrl;  // 프로필 이미지 URL 추가
+    // 프로필 공개
+    @Column(name = "username_visibility")
+    private Visibility nameVisibility;
+    @Column(name = "phone_number_visibility")
+    private Visibility phoneNumberVisibility;
+    @Column(name = "gender_visibility")
+    private Visibility genderVisibility;
+    @Column(name = "birth_year_visibility")
+    private Visibility birthYearVisibility;
+
+    // 알림 설정
+    @Column(name = "post_noti")
+    private Notification postNoti;
+    @Column(name = "reply_noti")
+    private Notification replyNoti;
+    @Column(name = "mention_noti")
+    private Notification mentionNoti;
+    @Column(name = "chatting_noti")
+    private Notification chattingNoti;
 
     public void markEmailVerified() {
         this.emailVerified = true;
@@ -90,4 +109,11 @@ public class MemberEntity extends BaseEntity {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public void updateProfileVisibility(
+        int nameVisibility, int phoneNumberVisibility, int genderVisibility, int birthYearVisibility) {
+        this.nameVisibility = Visibility.fromCode(nameVisibility);
+        this.phoneNumberVisibility = Visibility.fromCode(phoneNumberVisibility);
+        this.genderVisibility = Visibility.fromCode(genderVisibility);
+        this.birthYearVisibility = Visibility.fromCode(birthYearVisibility);
+    }
 }

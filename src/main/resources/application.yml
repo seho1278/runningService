@@ -1,6 +1,20 @@
 spring:
   application:
     name: runningService
+
+  profiles:
+    active: oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            provider: google
+            client-id: google-client-id
+            client-secret: google-client-secret
+            redirect-uri: http://localhost:8080/login/oauth
+            authorization-grant-type: authorization_code
+            
   cloud:
     openfeign:
       okhttp:
@@ -8,6 +22,7 @@ spring:
       autoconfiguration:
         jackson:
           enabled: true
+
   datasource:
     url: ENC(5ytcBWBvZiDQ+3s4ATlSW3M+DkdhbmFkeJ6dDGUPcFfTUpMfE5wLebK5A2RFOU9SWmPFRIzaRls=)
     username: ENC(I7Q/hHFeGv4D1Z9ZuRCBYGmSIBfZYVoG)
@@ -38,6 +53,9 @@ aes:
 jwt:
   secret: ENC(vujfcECDx3dhsf/tAiuUjfdL//SvziutrLQxXL4WGmGWV+6Ytv3gFSukbwpPZdqPHbnoFTY9uf4=)
 
+url:
+  access-token: http://localhost:8080/oauth/token
+  profile: http://localhost:8080/user/profile
 
 aws:
   s3:
@@ -46,9 +64,10 @@ aws:
     roleArn: ENC(itgAU5raT4FloGKQIkdq81aO8izs5lfRJ9Ri3H7aNKdiARVq+R9klghOjG7W1pErPL61M2UmocK19uIYwSdR+w==)
     
 mailgun:
-  domain: ENC(eMYABA7cAqLNfBLBQDsTxdybOO13Yaxf63CYoa3zhM9nqx4lD2nb0z4ngzRytDESUu4nOGODJPIWCG/yxrmocA==)
-  api-key: ENC(5FEZpLoUqdCk0Y9tG2+IqomYebASi1MDTzcIW4wYqDeTMFQNqnJrnQW6U3UGueKjBsLMrn7Lg1wlBqHFJwYvUw==)
+  domain: ENC(d2mRT2EIISaUsreQyOzXsTUMlpfbmx/dIAY9RHP0yPccGY2XecumaB1LgoWxpZAZ9+i/e/uDuEGbouY0YnPNpw==)
+  api-key: ENC(g+JyCVEQcZPt7OT8/HK6oXZ6HpE/blrkUdG7LwrIZZlKyhEf77c9THtfdp5bzDvf67SqeEQ4U1T3722TfIqFhA==)
 
 logging:
   level:
-    root: debug
+    root: info
+

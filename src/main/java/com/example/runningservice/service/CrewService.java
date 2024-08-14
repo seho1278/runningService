@@ -1,6 +1,7 @@
 package com.example.runningservice.service;
 
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
+import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
@@ -26,6 +27,7 @@ public class CrewService {
     private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
     private final S3FileUtil s3FileUtil;
+    private final String DEFAULT_IMAGE_NAME = "crew-default";
 
     /**
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
@@ -64,7 +66,70 @@ public class CrewService {
 
             return s3FileUtil.getImgUrl(fileName);
         } else { // 크루 이미지가 없으면 기본 이미지로 사용
-            return s3FileUtil.getImgUrl("crew-default");
+            return s3FileUtil.getImgUrl(DEFAULT_IMAGE_NAME);
         }
+    }
+
+    /**
+     * 크루 정보 수정 :: 크루 db 수정 - 이미지 s3 저장 - 수정된 크루 정보 리턴
+     */
+    @Transactional
+    public CrewData updateCrew(Update updateCrew) {
+        CrewEntity crewEntity = crewRepository.findById(updateCrew.getCrewId())
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
+
+        crewEntity.updateFromDto(updateCrew);
+
+        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getCrewId(),
+            updateCrew.getCrewImage()));
+
+        return CrewData.fromEntityAndLeaderNameAndOccupancy(
+            crewEntity,
+            crewEntity.getMember().getNickName(),
+            getCrewOccupancy(updateCrew.getCrewId()));
+    }
+
+    /**
+     * 크루의 현재 크루원 수 조회
+     */
+    private int getCrewOccupancy(Long crewId) {
+        return crewMemberRepository.countByCrew_CrewIdAndStatus(crewId, JoinStatus.APPROVED);
+    }
+
+    /**
+     * 크루 삭제 :: 크루 이미지 삭제 - 크루원 삭제 - 크루 삭제
+     */
+    @Transactional
+    public CrewData deleteCrew(Long crewId) {
+        CrewEntity crewEntity = crewRepository.findById(crewId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
+
+        // 삭제하기 전에 리턴하기 위한 데이터를 미리 저장해둔다.
+        CrewData crewData = CrewData.fromEntityAndLeaderNameAndOccupancy(
+            crewEntity,
+            crewEntity.getMember().getNickName(),
+            getCrewOccupancy(crewId));
+
+        // 이미지가 디폴트가 아닌 경우에만 삭제
+        String fileName = findLastPath(crewEntity.getCrewImage());
+        if (!fileName.equals(DEFAULT_IMAGE_NAME)) {
+            s3FileUtil.deleteObject(fileName);
+        }
+
+        // 크루원 삭제
+        crewMemberRepository.deleteAllByCrew_CrewId(crewId);
+
+        crewRepository.delete(crewEntity);
+
+        return crewData;
+    }
+
+    /**
+     * url의 가장 끝 path를 리턴한다.
+     */
+    private String findLastPath(String url) {
+        String[] paths = url.split("/");
+
+        return paths[paths.length - 1];
     }
 }

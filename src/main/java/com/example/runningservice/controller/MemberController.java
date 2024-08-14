@@ -10,13 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,14 +22,14 @@ public class MemberController {
 
     // 사용자 정보 조회
     @GetMapping("/{user_id}/profile")
-    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("user_id") Long userId) {
+    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("user_id") Long userId) throws Exception{
         return ResponseEntity.ok(memberService.getMemberProfile(userId));
     }
 
     // 사용자 정보 수정
     @PutMapping("/{user_id}/profile")
     public ResponseEntity<MemberResponseDto> updateMemberProfile(
-        @PathVariable("user_id") Long userId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) {
+        @PathVariable("user_id") Long userId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) throws Exception{
         return ResponseEntity.ok(memberService.updateMemberProfile(userId, updateMemberRequestDto));
     }
     
@@ -49,10 +43,9 @@ public class MemberController {
     
     //사용자 프로필 공개여부 설정
     @PutMapping("/{user_id}/profile-visibility")
-    public ResponseEntity<?> updateMemberProfileVisibility(
+    public ResponseEntity<ProfileVisibilityResponseDto> updateMemberProfileVisibility(
         @PathVariable("user_id") Long userId, @RequestBody @Valid ProfileVisibilityRequestDto profileVisibilityRequestDto) {
-        memberService.updateProfileVisibility(userId, profileVisibilityRequestDto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(memberService.updateProfileVisibility(userId, profileVisibilityRequestDto));
     }
     
     // 회원 탈퇴

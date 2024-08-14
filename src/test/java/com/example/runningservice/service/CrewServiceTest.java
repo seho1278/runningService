@@ -10,7 +10,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.example.runningservice.dto.crew.CrewRequestDto;
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
+import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -113,5 +115,104 @@ class CrewServiceTest {
 
         // when & then
         assertThrows(CustomException.class, () -> crewService.createCrew(newCrew));
+    }
+
+    @Test
+    @DisplayName("크루 수정 - 이미지 O")
+    public void updateCrew_WithImage() {
+        // given
+        Long crewId = 1L;
+        Update update = CrewRequestDto.Update.builder()
+            .crewId(crewId)
+            .crewImage(new MockMultipartFile("file", new byte[]{1, 2, 3}))
+            .build();
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).member(memberEntity).build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+        given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/image");
+        doNothing().when(s3FileUtil).putObject(anyString(), any(MultipartFile.class));
+
+        // when
+        CrewData response = crewService.updateCrew(update);
+
+        // then
+        assertEquals(crewEntity.getCrewId(), response.getCrewId());
+        assertEquals(crewEntity.getCrewImage(), "http://example.com/image");
+        verify(s3FileUtil, times(1)).putObject("crew-" + crewEntity.getCrewId(),
+            update.getCrewImage());
+        verify(s3FileUtil, times(1)).getImgUrl("crew-" + crewEntity.getCrewId());
+    }
+
+    @Test
+    @DisplayName("크루 수정 - 이미지 X")
+    public void updateCrew_WithoutImage() {
+        // given
+        Long crewId = 1L;
+        Update update = CrewRequestDto.Update.builder()
+            .crewId(crewId)
+            .build();
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).member(memberEntity).build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+        given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/default");
+
+        // when
+        CrewData response = crewService.updateCrew(update);
+
+        // then
+        assertEquals(crewEntity.getCrewId(), response.getCrewId());
+        assertEquals(crewEntity.getCrewImage(), "http://example.com/default");
+        verify(s3FileUtil, times(0)).putObject(any(), any());
+        verify(s3FileUtil, times(1)).getImgUrl("crew-default");
+    }
+
+    @Test
+    @DisplayName("크루 삭제 - 사용자 이미지")
+    public void deleteCrew_WithImage() {
+        // given
+        Long crewId = 1L;
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder()
+            .crewId(crewId)
+            .member(memberEntity)
+            .crewImage("a/b/crew-1")
+            .build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+
+        // when
+        CrewData response = crewService.deleteCrew(crewId);
+
+        // then
+        assertEquals(crewEntity.getCrewId(), response.getCrewId());
+        verify(s3FileUtil, times(1)).deleteObject("crew-1");
+    }
+
+    @Test
+    @DisplayName("크루 삭제 - 기본 이미지")
+    public void deleteCrew_WithoutImage() {
+        // given
+        Long crewId = 1L;
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder()
+            .crewId(crewId)
+            .member(memberEntity)
+            .crewImage("a/b/crew-default")
+            .build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+
+        // when
+        CrewData response = crewService.deleteCrew(crewId);
+
+        // then
+        assertEquals(crewEntity.getCrewId(), response.getCrewId());
+        verify(s3FileUtil, times(0)).deleteObject(anyString());
     }
 }
