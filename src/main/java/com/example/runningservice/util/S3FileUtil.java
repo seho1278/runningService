@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 
@@ -61,7 +62,9 @@ public class S3FileUtil {
      * 버킷에서 파일명의 데이터를 삭제한다.
      */
     public void deleteObject(String fileName) {
-
-        amazonS3Client.deleteObject(bucketName, fileName);
+        amazonS3Client.deleteObject(DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(fileName)
+            .build());
     }
 }
