@@ -60,7 +60,7 @@ public class CrewService {
      * s3에 크루 이미지 저장 :: crew-{crewId}로 저장
      */
     private String uploadFileAndReturnFileName(Long crewId, MultipartFile crewImage) {
-        if (crewImage != null) {
+        if (!crewImage.isEmpty()) {
             String fileName = "crew-" + crewId;
             s3FileUtil.putObject(fileName, crewImage);
 
