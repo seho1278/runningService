@@ -110,10 +110,10 @@ public class MemberEntity extends BaseEntity {
     }
 
     public void updateProfileVisibility(
-        int nameVisibility, int phoneNumberVisibility, int genderVisibility, int birthYearVisibility) {
-        this.nameVisibility = Visibility.fromCode(nameVisibility);
-        this.phoneNumberVisibility = Visibility.fromCode(phoneNumberVisibility);
-        this.genderVisibility = Visibility.fromCode(genderVisibility);
-        this.birthYearVisibility = Visibility.fromCode(birthYearVisibility);
+        Visibility nameVisibility, Visibility phoneNumberVisibility, Visibility genderVisibility, Visibility birthYearVisibility) {
+        this.nameVisibility = nameVisibility;
+        this.phoneNumberVisibility = phoneNumberVisibility;
+        this.genderVisibility = genderVisibility;
+        this.birthYearVisibility = birthYearVisibility;
     }
 }

@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class UpdateMemberRequestDto {
     private String nickName;
-    private Gender gender;
+    private int gender;
     private Integer birthYear;
-    private Region activityRegion;
+    private String activityRegion;
     private MultipartFile profileImage;
 }

@@ -1,10 +1,6 @@
 package com.example.runningservice.controller;
 
-import com.example.runningservice.dto.*;
-import com.example.runningservice.dto.member.MemberResponseDto;
-import com.example.runningservice.dto.member.PasswordRequestDto;
-import com.example.runningservice.dto.member.ProfileVisibilityRequestDto;
-import com.example.runningservice.dto.member.UpdateMemberRequestDto;
+import com.example.runningservice.dto.member.*;
 import com.example.runningservice.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
