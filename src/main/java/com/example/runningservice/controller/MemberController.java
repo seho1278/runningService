@@ -22,17 +22,17 @@ public class MemberController {
 
     // 사용자 정보 조회
     @GetMapping("/{user_id}/profile")
-    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("user_id") Long userId) throws Exception{
+    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("user_id") Long userId) throws Exception {
         return ResponseEntity.ok(memberService.getMemberProfile(userId));
     }
 
     // 사용자 정보 수정
     @PutMapping("/{user_id}/profile")
     public ResponseEntity<MemberResponseDto> updateMemberProfile(
-        @PathVariable("user_id") Long userId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) throws Exception{
+        @PathVariable("user_id") Long userId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) throws Exception {
         return ResponseEntity.ok(memberService.updateMemberProfile(userId, updateMemberRequestDto));
     }
-    
+
     // 비밀번호 변경
     @PutMapping("/{user_id}/password")
     public ResponseEntity<?> updateMemberPassword(
@@ -40,14 +40,14 @@ public class MemberController {
         memberService.updateMemberPassword(userId, passwordRequestDto);
         return ResponseEntity.ok().build();
     }
-    
+
     //사용자 프로필 공개여부 설정
     @PutMapping("/{user_id}/profile-visibility")
     public ResponseEntity<ProfileVisibilityResponseDto> updateMemberProfileVisibility(
         @PathVariable("user_id") Long userId, @RequestBody @Valid ProfileVisibilityRequestDto profileVisibilityRequestDto) {
         return ResponseEntity.ok(memberService.updateProfileVisibility(userId, profileVisibilityRequestDto));
     }
-    
+
     // 회원 탈퇴
     @DeleteMapping("/{user_id}")
     public ResponseEntity<?> deleteMember(@PathVariable("user_id") Long userId, @RequestBody DeleteRequestDto deleteRequestDto) {

@@ -10,11 +10,13 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.util.AESUtil;
+import com.example.runningservice.util.S3FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AESUtil aesUtil;
+    private final S3FileUtil s3FileUtil;
 
     // 사용자 정보 조회
     public MemberResponseDto getMemberProfile(Long user_id) throws Exception {
@@ -35,10 +38,20 @@ public class MemberService {
 
     // 사용자 정보 수정
     @Transactional
-    public MemberResponseDto updateMemberProfile(Long user_id,
-        UpdateMemberRequestDto updateMemberRequestDto) throws Exception {
+    public MemberResponseDto updateMemberProfile(
+        Long user_id, UpdateMemberRequestDto updateMemberRequestDto) throws Exception {
+
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        // 프로필 이미지가 있는 경우
+        MultipartFile profileImage = updateMemberRequestDto.getProfileImage();
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String fileName = "user-" + user_id;
+            s3FileUtil.putObject(fileName, profileImage);
+            String imageUrl = s3FileUtil.getImgUrl(fileName);
+            memberEntity.updateProfileImageUrl(imageUrl);
+        }
 
         memberEntity.updateMemberProfile(updateMemberRequestDto.getNickName(),
             updateMemberRequestDto.getBirthYear(), updateMemberRequestDto.getGender(),
@@ -81,7 +94,7 @@ public class MemberService {
 
     // 사용자 프로필 공개여부 설정
     public ProfileVisibilityResponseDto updateProfileVisibility(Long user_id,
-        ProfileVisibilityRequestDto profileVisibilityRequestDto) {
+                                                                ProfileVisibilityRequestDto profileVisibilityRequestDto) {
         MemberEntity memberEntity = memberRepository.findById(user_id)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
