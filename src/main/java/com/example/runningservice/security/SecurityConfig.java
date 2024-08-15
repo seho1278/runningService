@@ -61,8 +61,7 @@ public class SecurityConfig {
             .logout( // 로그아웃 성공 시 / 주소로 이동
                 (logoutConfig) -> logoutConfig
                     .logoutUrl("/logout")
-                    .addLogoutHandler(logoutService)
-                    .logoutSuccessUrl("/"))
+                    .addLogoutHandler(logoutService))
             // OAuth2 로그인 기능에 대한 여러 설정
             .oauth2Login(Customizer.withDefaults());
         return http.build();
