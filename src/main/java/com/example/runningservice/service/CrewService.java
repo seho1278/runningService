@@ -1,8 +1,11 @@
 package com.example.runningservice.service;
 
+import com.example.runningservice.dto.crew.CrewFilterDto;
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
 import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
+import com.example.runningservice.dto.crew.CrewResponseDto.Detail;
+import com.example.runningservice.dto.crew.CrewResponseDto.Summary;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -15,8 +18,13 @@ import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.util.S3FileUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -131,5 +139,75 @@ public class CrewService {
         String[] paths = url.split("/");
 
         return paths[paths.length - 1];
+    }
+
+    /**
+     * 크루 싱세 정보 조회
+     */
+    public Detail getCrew(Long crewId) {
+        CrewEntity crewEntity = crewRepository.findById(crewId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
+
+        Detail detail = Detail.fromEntity(crewEntity);
+        detail.setLeaderName(crewEntity.getMember().getNickName());
+        detail.setCrewOccupancy(getCrewOccupancy(crewId));
+        detail.setRunningCount(0); // TODO: 활동 기능 추가되면 추가
+
+        return detail;
+    }
+
+    /**
+     * 참가 중인 크루 리스트 조회 (내가 만든 크루, 가입한 크루로 필터링하여 조회 가능)
+     */
+    public Summary getParticipateCrewList(CrewFilterDto.Participate participate,
+        Pageable pageable) {
+        Pageable customPageable = PageRequest.of(pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(Sort.Order.desc("member.createdAt")));
+        Summary summaryCrew = new Summary();
+        Page<CrewMemberEntity> crewMemberEntities;
+
+        if (participate.getFilter() != null) {
+            crewMemberEntities = crewMemberRepository.findByMember_IdAndRole(
+                participate.getUserId(), participate.getFilter().getCrewRole(), customPageable);
+        } else { // filter가 없으면 내가 만든/가입한 크루 전체 조회
+            crewMemberEntities = crewMemberRepository.findByMember_Id(
+                participate.getUserId(), customPageable);
+        }
+
+        crewMemberEntities.getContent()
+            .forEach(x -> summaryCrew.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(
+                x.getCrew(), x.getMember().getNickName(), getCrewOccupancy(x.getId()))));
+
+        return summaryCrew;
+    }
+
+    /**
+     * 전체 크루 필터링 조회
+     */
+    @GetMapping
+    public Summary getCrewList(CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
+        Pageable customPageable = PageRequest.of(pageable.getPageNumber(),
+            pageable.getPageSize(),
+            Sort.by(Sort.Order.desc("member.createdAt")));
+
+        Page<CrewEntity> crewList = crewRepository.findCrewList(crewFilter.getActivityRegion(),
+            crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
+            crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired(), customPageable);
+
+        Summary summary = new Summary();
+        for (CrewEntity crewEntity : crewList) {
+            int occupancy = getCrewOccupancy(crewEntity.getCrewId());
+
+            if (crewFilter.getOccupancyStatus() == null ||
+                crewFilter.getOccupancyStatus().validateFullOrAvailable(
+                    crewEntity.getCrewCapacity(), occupancy)) {
+
+                summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
+                    crewEntity.getMember().getNickName(), occupancy));
+            }
+        }
+
+        return summary;
     }
 }
