@@ -209,8 +209,9 @@ public class CrewService {
         for (CrewEntity crewEntity : crewList) {
             int occupancy = getCrewOccupancy(crewEntity.getCrewId());
 
-            if (crewFilter.getOccupancyStatus() == null ||
-                crewFilter.getOccupancyStatus().validateFullOrAvailable(
+            if (crewFilter.getOccupancyStatus() == null || // 인원 상태에 대한 조회 조건이 없거나,
+                crewEntity.getCrewCapacity() == null || // 크루에 정원 제한이 없거나,
+                crewFilter.getOccupancyStatus().validateFullOrAvailable( // 제한 조건에 부합하면 조회할 크루에 추가
                     crewEntity.getCrewCapacity(), occupancy)) {
 
                 summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
