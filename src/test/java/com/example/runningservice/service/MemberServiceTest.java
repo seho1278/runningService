@@ -1,12 +1,12 @@
-package com.example.runningservice.member;
+package com.example.runningservice.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.example.runningservice.dto.DeleteRequestDto;
-import com.example.runningservice.dto.ProfileVisibilityResponseDto;
+import com.example.runningservice.dto.member.DeleteRequestDto;
+import com.example.runningservice.dto.member.ProfileVisibilityResponseDto;
 import com.example.runningservice.dto.member.MemberResponseDto;
 import com.example.runningservice.dto.member.PasswordRequestDto;
 import com.example.runningservice.dto.member.ProfileVisibilityRequestDto;
@@ -17,7 +17,6 @@ import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.repository.MemberRepository;
-import com.example.runningservice.service.MemberService;
 import com.example.runningservice.util.AESUtil;
 import java.util.List;
 import java.util.Optional;
@@ -27,13 +26,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
-public class TestMemberProfile {
+public class MemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
@@ -51,7 +49,7 @@ public class TestMemberProfile {
     private MemberService memberService;
 
     @Test
-    public void testGetMemberProfile() throws Exception {
+    public void testGetMemberProfile_success() throws Exception {
         // given
         Long userId = 1L;
         String encryptedPhoneNumber = aesUtil.encrypt("01012341234");
@@ -67,13 +65,15 @@ public class TestMemberProfile {
             .roles(List.of(Role.ROLE_USER))
             .build();
 
-        // when
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
+        when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
         when(aesUtil.decrypt(encryptedPhoneNumber)).thenReturn("01012341234");
 
+        // when
         MemberResponseDto memberResponseDto = memberService.getMemberProfile(userId);
 
         // then
+        verify(memberRepository, times(1)).findMemberById(userId);
+
         assertNotNull(memberResponseDto);
         assertEquals(userId, memberResponseDto.getId());
         assertEquals("test@naver.com", memberResponseDto.getEmail());
@@ -86,7 +86,7 @@ public class TestMemberProfile {
     }
 
     @Test
-    public void testUpdateMemberProfile() throws Exception {
+    public void testUpdateMemberProfile_success() throws Exception {
         // given
         Long userId = 1L;
 
@@ -103,7 +103,7 @@ public class TestMemberProfile {
             .profileImageUrl(oldImageUrl)
             .build();
 
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
+        when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
         when(memberRepository.save(any(MemberEntity.class))).thenReturn(mockMemberEntity);
 
         MultipartFile profileImage = mock(MultipartFile.class);
@@ -111,8 +111,8 @@ public class TestMemberProfile {
         UpdateMemberRequestDto updateMemberRequestDto = UpdateMemberRequestDto.builder()
             .nickName("test22")
             .birthYear(1996)
-            .gender(Gender.FEMALE)
-            .activityRegion(Region.CHUNGBUK)
+            .gender(1)
+            .activityRegion("SEOUL")
             .profileImage(profileImage)
             .build();
 
@@ -122,18 +122,18 @@ public class TestMemberProfile {
         MemberResponseDto memberResponseDto = memberService.updateMemberProfile(userId, updateMemberRequestDto);
 
         // then
-        verify(memberRepository, times(1)).findById(userId);
+        verify(memberRepository, times(1)).findMemberById(userId);
         verify(memberRepository, times(1)).save(mockMemberEntity);
 
         assertEquals("test22", memberResponseDto.getNickName());
         assertEquals(1996, memberResponseDto.getBirthYear());
         assertEquals(Gender.FEMALE, memberResponseDto.getGender());
-        assertEquals(Region.CHUNGBUK, memberResponseDto.getActivityRegion());
+        assertEquals(Region.SEOUL, memberResponseDto.getActivityRegion());
         assertEquals(imageUrl, memberResponseDto.getImageUrl());
     }
 
     @Test
-    public void testUpdatePassword() throws Exception {
+    public void testUpdatePassword_success() throws Exception {
         // given
         Long userId = 1L;
 
@@ -145,16 +145,16 @@ public class TestMemberProfile {
         PasswordRequestDto passwordRequestDto = new PasswordRequestDto(
             "oldPassword", "newPassword", "newPassword");
 
-        // when
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
+        when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
         when(passwordEncoder.matches(passwordRequestDto.getOldPassword(), mockMemberEntity.getPassword()))
             .thenReturn(true);
         when(aesUtil.encrypt(passwordRequestDto.getNewPassword())).thenReturn("encryptedNewPassword");
 
+        // when
         memberService.updateMemberPassword(userId, passwordRequestDto);
 
         // then
-        verify(memberRepository, times(1)).findById(userId);
+        verify(memberRepository, times(1)).findMemberById(userId);
         verify(passwordEncoder, times(1)).matches(passwordRequestDto.getOldPassword(), "encryptedOldPassword");
         verify(aesUtil, times(1)).encrypt(passwordRequestDto.getNewPassword());
         verify(memberRepository, times(1)).save(mockMemberEntity);
@@ -162,7 +162,7 @@ public class TestMemberProfile {
     }
 
     @Test
-    public void testDeleteMemberProfile() {
+    public void testDeleteMemberProfile_success() {
         // given
         Long userId = 1L;
 
@@ -173,21 +173,21 @@ public class TestMemberProfile {
 
         DeleteRequestDto deleteRequestDto = new DeleteRequestDto("oldPassword");
 
-        // when
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
+        when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
         when(passwordEncoder.matches(deleteRequestDto.getPassword(), mockMemberEntity.getPassword()))
             .thenReturn(true);
 
+        // when
         memberService.deleteMember(userId, deleteRequestDto);
 
         // then
-        verify(memberRepository, times(1)).findById(userId);
+        verify(memberRepository, times(1)).findMemberById(userId);
         verify(passwordEncoder, times(1)).matches(deleteRequestDto.getPassword(), mockMemberEntity.getPassword());
         verify(memberRepository, times(1)).delete(mockMemberEntity);
     }
 
     @Test
-    public void testUpdateVisibility() {
+    public void testUpdateVisibility_success() {
         // given
         Long userId = 1L;
 
@@ -201,14 +201,14 @@ public class TestMemberProfile {
 
         ProfileVisibilityRequestDto profileVisibilityRequestDto = new ProfileVisibilityRequestDto(0, 0, 1, 1);
 
-        // when
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
+        when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
         when(memberRepository.save(any(MemberEntity.class))).thenReturn(mockMemberEntity);
 
+        // when
         ProfileVisibilityResponseDto profileVisibilityResponseDto = memberService.updateProfileVisibility(userId, profileVisibilityRequestDto);
 
         // then
-        verify(memberRepository, times(1)).findById(userId);
+        verify(memberRepository, times(1)).findMemberById(userId);
         verify(memberRepository, times(1)).save(mockMemberEntity);
 
         assertEquals(Visibility.PUBLIC, profileVisibilityResponseDto.getUserName());
