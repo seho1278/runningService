@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -31,6 +32,15 @@ public class GlobalExceptionHandler {
                 .field(fieldError.getField())
                 .build());
         }
+      
+        // 클래스 레벨 에러 처리
+        for (ObjectError globalError : bindingResult.getGlobalErrors()) {
+            response.addErrorMessage(NotValidResponseDto.Message.builder()
+                .message(globalError.getDefaultMessage())
+                .field(globalError.getObjectName())
+                .build());
+        }
+
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(response);
