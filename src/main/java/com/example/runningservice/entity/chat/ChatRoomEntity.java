@@ -1,6 +1,8 @@
 package com.example.runningservice.entity.chat;
 
 import com.example.runningservice.entity.BaseEntity;
+import com.example.runningservice.entity.CrewEntity;
+import com.example.runningservice.enums.ChatRoom;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @AllArgsConstructor
@@ -23,16 +23,19 @@ public class ChatRoomEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String roomName;
-    private String roomType;
-
-    @ElementCollection
-    private Set<String> sessions = new HashSet<>();
-
+    private ChatRoom roomType;
     private LocalDateTime lastReadAt;
 
-    public ChatRoomEntity(String roomName, String roomType) {
+    @ManyToOne
+    @JoinColumn(name = "crew_id")
+    private CrewEntity crew;
+
+
+    @Builder
+    public ChatRoomEntity(String roomName, ChatRoom roomType, CrewEntity crew) {
         this.roomName = roomName;
         this.roomType = roomType;
+        this.crew = crew;
     }
 
 }

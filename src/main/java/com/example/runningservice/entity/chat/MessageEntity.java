@@ -1,6 +1,7 @@
 package com.example.runningservice.entity.chat;
 
 import com.example.runningservice.entity.BaseEntity;
+import com.example.runningservice.enums.Message;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +22,7 @@ public class MessageEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Message messageType;
     private String content;
     private String imageUrl;
 

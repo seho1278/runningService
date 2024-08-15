@@ -1,34 +1,40 @@
 package com.example.runningservice.security;
 
-import com.example.runningservice.entity.MemberEntity;
+import com.example.runningservice.enums.Role;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Component
 public class CustomUserDetails implements UserDetails {
 
-    private MemberEntity memberEntity;
+    private String email;
+    private String password;
+    private List<Role> roles;
 
     @Override
     public String getPassword() {
-        return memberEntity.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return memberEntity.getEmail();
+        return email;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return memberEntity.getRoles().stream()
-            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+        return roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.name()))
             .collect(Collectors.toList());
     }
 
