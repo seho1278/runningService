@@ -1,8 +1,10 @@
 package com.example.runningservice.exception;
 
+import com.example.runningservice.dto.CustomErrorResponseDto;
 import com.example.runningservice.dto.NotValidResponseDto;
 import com.example.runningservice.dto.UnexpectedErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -30,6 +32,7 @@ public class GlobalExceptionHandler {
                 .field(fieldError.getField())
                 .build());
         }
+      
         // 클래스 레벨 에러 처리
         for (ObjectError globalError : bindingResult.getGlobalErrors()) {
             response.addErrorMessage(NotValidResponseDto.Message.builder()
@@ -58,5 +61,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(response);
+    }
+
+    // CustomException 예외 처리 핸들러
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<CustomErrorResponseDto> handleCustomException(CustomException ex) {
+        ErrorCode errorCode = ex.getErrorCode();
+        CustomErrorResponseDto errorResponse = new CustomErrorResponseDto(
+            errorCode.name(),
+            errorCode.getMessage()
+        );
+        return ResponseEntity
+            .status(errorCode.getHttpStatus())
+            .body(errorResponse);
     }
 }
