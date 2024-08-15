@@ -6,6 +6,7 @@ import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
+import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.exception.CustomException;
@@ -13,6 +14,7 @@ import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
+import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class CrewService {
     private final MemberRepository memberRepository;
     private final S3FileUtil s3FileUtil;
     private final String DEFAULT_IMAGE_NAME = "crew-default";
+    private final ChatRoomService chatRoomService;
 
     /**
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
@@ -49,6 +52,13 @@ public class CrewService {
             .role(CrewRole.LEADER)
             .status(JoinStatus.APPROVED)
             .build());
+        
+        // crew 채팅방 생성
+        chatRoomService.createChatRoom(crewEntity.getCrewId(),
+            crewEntity.getCrewName(), ChatRoom.CREW);
+        // crew staff 채팅방 생성
+        chatRoomService.createChatRoom(crewEntity.getCrewId(),
+            crewEntity.getCrewName() + "_Staff", ChatRoom.CREW_STAFF);
 
         return CrewData.fromEntityAndLeaderNameAndOccupancy(
             crewEntity,
