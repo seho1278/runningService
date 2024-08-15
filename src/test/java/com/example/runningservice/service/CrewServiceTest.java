@@ -28,6 +28,7 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
+import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
 import java.lang.reflect.Field;
@@ -58,6 +59,8 @@ class CrewServiceTest {
     private CrewMemberRepository crewMemberRepository;
     @Mock
     private S3FileUtil s3FileUtil;
+    @Mock
+    private ChatRoomService chatRoomService;
     @InjectMocks
     private CrewService crewService;
 
@@ -293,7 +296,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -322,7 +325,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -354,7 +357,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
