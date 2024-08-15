@@ -1,6 +1,7 @@
 package com.example.runningservice.exception;
 
 import com.example.runningservice.dto.NotValidResponseDto;
+import com.example.runningservice.dto.UnexpectedErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,23 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
+            .body(response);
+    }
+
+    // 예기치 않은 모든 예외를 처리하는 핸들러
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<UnexpectedErrorResponseDto> handleUnexpectedException(Exception e) {
+        // 에러 로그를 기록
+        log.error("Unexpected error occurred: {}", e.getMessage(), e);
+
+        // UnexpectedErrorResponseDto를 통해 클라이언트에게 오류 메시지 반환
+        UnexpectedErrorResponseDto response = UnexpectedErrorResponseDto.builder()
+            .message("서버 내부 오류가 발생했습니다. 관리자에게 문의하세요.")
+            .build();
+
+        // 500 Internal Server Error 상태로 응답을 반환
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(response);
     }
 }

@@ -1,6 +1,16 @@
 package com.example.runningservice.member;
 
-import com.example.runningservice.dto.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import com.example.runningservice.dto.DeleteRequestDto;
+import com.example.runningservice.dto.ProfileVisibilityResponseDto;
+import com.example.runningservice.dto.member.MemberResponseDto;
+import com.example.runningservice.dto.member.PasswordRequestDto;
+import com.example.runningservice.dto.member.ProfileVisibilityRequestDto;
+import com.example.runningservice.dto.member.UpdateMemberRequestDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
@@ -9,20 +19,18 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.MemberService;
 import com.example.runningservice.util.AESUtil;
+import java.util.List;
+import java.util.Optional;
+
+import com.example.runningservice.util.S3FileUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class TestMemberProfile {
@@ -35,6 +43,9 @@ public class TestMemberProfile {
 
     @Mock
     private AESUtil aesUtil;
+
+    @Mock
+    private S3FileUtil s3FileUtil;
 
     @InjectMocks
     private MemberService memberService;
@@ -75,9 +86,13 @@ public class TestMemberProfile {
     }
 
     @Test
-    public void testUpdateMemberProfile() throws Exception{
+    public void testUpdateMemberProfile() throws Exception {
         // given
         Long userId = 1L;
+
+        String fileName = "user-" + userId;
+        String oldImageUrl = "http://example.s3.region.amazonaws.com/oldImage";
+        String imageUrl = s3FileUtil.getImgUrl(fileName);
 
         MemberEntity mockMemberEntity = MemberEntity.builder()
             .id(userId)
@@ -85,30 +100,36 @@ public class TestMemberProfile {
             .birthYear(1998)
             .gender(Gender.MALE)
             .activityRegion(Region.BUSAN)
+            .profileImageUrl(oldImageUrl)
             .build();
+
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
+        when(memberRepository.save(any(MemberEntity.class))).thenReturn(mockMemberEntity);
+
+        MultipartFile profileImage = mock(MultipartFile.class);
 
         UpdateMemberRequestDto updateMemberRequestDto = UpdateMemberRequestDto.builder()
             .nickName("test22")
             .birthYear(1996)
             .gender(Gender.FEMALE)
             .activityRegion(Region.CHUNGBUK)
+            .profileImage(profileImage)
             .build();
 
-        // when
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMemberEntity));
-        when(memberRepository.save(any(MemberEntity.class))).thenReturn(mockMemberEntity);
+        when(s3FileUtil.getImgUrl(fileName)).thenReturn(imageUrl);
 
+        // when
         MemberResponseDto memberResponseDto = memberService.updateMemberProfile(userId, updateMemberRequestDto);
 
         // then
-        assertNotNull(updateMemberRequestDto);
-        assertEquals("test22", updateMemberRequestDto.getNickName());
-        assertEquals(1996, updateMemberRequestDto.getBirthYear());
-        assertEquals(Gender.FEMALE, updateMemberRequestDto.getGender());
-        assertEquals(Region.CHUNGBUK, updateMemberRequestDto.getActivityRegion());
-
         verify(memberRepository, times(1)).findById(userId);
         verify(memberRepository, times(1)).save(mockMemberEntity);
+
+        assertEquals("test22", memberResponseDto.getNickName());
+        assertEquals(1996, memberResponseDto.getBirthYear());
+        assertEquals(Gender.FEMALE, memberResponseDto.getGender());
+        assertEquals(Region.CHUNGBUK, memberResponseDto.getActivityRegion());
+        assertEquals(imageUrl, memberResponseDto.getImageUrl());
     }
 
     @Test

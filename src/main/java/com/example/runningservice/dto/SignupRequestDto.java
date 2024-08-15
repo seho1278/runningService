@@ -5,6 +5,7 @@ import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
 import com.example.runningservice.util.AESUtil;
+import com.example.runningservice.util.validator.PasswordMatches;
 import com.example.runningservice.util.validator.ValidYear;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@PasswordMatches
 public class SignupRequestDto {
 
     //이메일 형식
@@ -33,15 +35,19 @@ public class SignupRequestDto {
 
     //영문+숫자+특수문자 포함, 8~50자
     @NotBlank
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,50}$")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,50}$", message = "비밀번호는 영문, 숫자, 특수문자를 포함하여 8 ~ 50자 이내여야 합니다.")
     private String password;
+
+    //영문+숫자+특수문자 포함, 8~50자
+    @NotBlank
+    private String confirmPassword;
 
     //숫자만 포함
     @NotBlank
-    @Pattern(regexp = "^01[016789]\\d{7,8}$")
+    @Pattern(regexp = "^01[016789]\\d{7,8}$", message = "휴대전화번호 형식이 올바르지 않습니다.")
     private String phoneNumber;
 
-    @NotBlank
+    @NotBlank(message = "이름을 입력해주세요.")
     @Size(min = 2, max = 12)
     private String name;
 
@@ -52,11 +58,10 @@ public class SignupRequestDto {
 
     private Gender gender;
 
-    @Min(1900)  // 최소 연도 설정
     @ValidYear
     private Integer birthYear;
     private Region activityRegion;
-//    private MultipartFile profileImage; // 프로필 이미지 추가
+    private MultipartFile profileImage; // 프로필 이미지 추가
 
     public MemberEntity toEntity(PasswordEncoder passwordEncoder, AESUtil aesUtil) throws Exception {
         return MemberEntity.builder()
