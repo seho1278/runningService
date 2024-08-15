@@ -4,6 +4,8 @@ import com.example.runningservice.dto.crew.CrewRequestDto.Create;
 import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
+import com.example.runningservice.util.converter.GenderConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -36,7 +38,7 @@ public class CrewEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long crewId;
     @ManyToOne
-    @JoinColumn(name = "leader_id")
+    @JoinColumn(name = "member_id")
     private MemberEntity member;
     private String crewName;
     private String crewImage;
@@ -44,10 +46,10 @@ public class CrewEntity {
     private Integer crewCapacity;
     @Enumerated(EnumType.STRING)
     private Region activityRegion;
-    private Boolean waitingAllowed;
     private Boolean runRecordOpen;
     private Integer minAge;
     private Integer maxAge;
+    @Convert(converter = GenderConverter.class)
     private Gender gender;
     private Boolean leaderRequired;
     @CreatedDate
@@ -67,7 +69,6 @@ public class CrewEntity {
             .description(dto.getDescription())
             .crewCapacity(dto.getCrewCapacity())
             .activityRegion(dto.getActivityRegion())
-            .waitingAllowed(dto.getWaitingAllowed())
             .runRecordOpen(dto.getRunRecordOpen())
             .minAge(dto.getMinAge())
             .maxAge(dto.getMaxAge())
@@ -81,7 +82,6 @@ public class CrewEntity {
         this.activityRegion = updateCrew.getActivityRegion();
         this.crewCapacity = updateCrew.getCrewCapacity();
         this.runRecordOpen = updateCrew.getRunRecordOpen();
-        this.waitingAllowed = updateCrew.getWaitingAllowed();
         this.leaderRequired = updateCrew.getLeaderRequired();
         this.minAge = updateCrew.getMinAge();
         this.maxAge = updateCrew.getMaxAge();

@@ -10,7 +10,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.example.runningservice.dto.crew.CrewRequestDto;
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
 import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
@@ -21,6 +20,7 @@ import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.util.S3FileUtil;
+import java.lang.reflect.Field;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,13 +48,19 @@ class CrewServiceTest {
 
     @Test
     @DisplayName("크루 생성 - 이미지 O")
-    void createCrew_WithImage() {
+    void createCrew_WithImage() throws Exception {
         // given
         Long leaderId = 1L;
-        Create create = Create.builder()
-            .leaderId((leaderId))
-            .crewImage(new MockMultipartFile("file", new byte[]{1, 2, 3}))
-            .build();
+
+        Create create = new Create(null, null, null, null, null, null,
+            null, null, null, null);
+        Field f1 = Create.class.getDeclaredField("leaderId");
+        f1.setAccessible(true);
+        f1.set(create, leaderId);
+
+        Field f2 = Create.class.getSuperclass().getDeclaredField("crewImage");
+        f2.setAccessible(true);
+        f2.set(create, new MockMultipartFile("file", new byte[]{1, 2, 3}));
 
         MemberEntity memberEntity = MemberEntity.builder().id(leaderId).build();
         CrewEntity crewEntity = CrewEntity.toEntity(create, memberEntity);
@@ -77,12 +83,19 @@ class CrewServiceTest {
 
     @Test
     @DisplayName("크루 생성 - 이미지 X")
-    public void createCrew_WithoutImage() {
+    public void createCrew_WithoutImage() throws Exception {
         // given
         Long leaderId = 1L;
-        Create newCrew = Create.builder()
-            .leaderId(leaderId)
-            .build();
+
+        Create newCrew = new Create(null, null, null, null, null, null,
+            null, null, null, null);
+        Field f1 = Create.class.getDeclaredField("leaderId");
+        f1.setAccessible(true);
+        f1.set(newCrew, leaderId);
+
+        Field f2 = Create.class.getSuperclass().getDeclaredField("crewImage");
+        f2.setAccessible(true);
+        f2.set(newCrew, new MockMultipartFile("file", new byte[0]));
 
         MemberEntity memberEntity = new MemberEntity();
         CrewEntity crewEntity = CrewEntity.toEntity(newCrew, memberEntity);
@@ -104,12 +117,15 @@ class CrewServiceTest {
 
     @Test
     @DisplayName("크루 생성 (실패) - 사용자 없음")
-    public void createCrew_UserNotFound() {
+    public void createCrew_UserNotFound() throws Exception {
         // given
         Long leaderId = 1L;
-        Create newCrew = Create.builder()
-            .leaderId(leaderId)
-            .build();
+
+        Create newCrew = new Create(null, null, null, null, null, null,
+            null, null, null, null);
+        Field f1 = Create.class.getDeclaredField("leaderId");
+        f1.setAccessible(true);
+        f1.set(newCrew, leaderId);
 
         given(memberRepository.findById(leaderId)).willReturn(Optional.empty());
 
@@ -119,13 +135,19 @@ class CrewServiceTest {
 
     @Test
     @DisplayName("크루 수정 - 이미지 O")
-    public void updateCrew_WithImage() {
+    public void updateCrew_WithImage() throws Exception {
         // given
         Long crewId = 1L;
-        Update update = CrewRequestDto.Update.builder()
-            .crewId(crewId)
-            .crewImage(new MockMultipartFile("file", new byte[]{1, 2, 3}))
-            .build();
+
+        Update update = new Update(null, null, null, null, null
+            , null, null, null, null);
+        Field f1 = Update.class.getDeclaredField("crewId");
+        f1.setAccessible(true);
+        f1.set(update, crewId);
+
+        Field f2 = Update.class.getSuperclass().getDeclaredField("crewImage");
+        f2.setAccessible(true);
+        f2.set(update, new MockMultipartFile("file", new byte[]{1, 2, 3}));
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
         CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).member(memberEntity).build();
@@ -147,12 +169,19 @@ class CrewServiceTest {
 
     @Test
     @DisplayName("크루 수정 - 이미지 X")
-    public void updateCrew_WithoutImage() {
+    public void updateCrew_WithoutImage() throws Exception {
         // given
         Long crewId = 1L;
-        Update update = CrewRequestDto.Update.builder()
-            .crewId(crewId)
-            .build();
+
+        Update update = new Update(null, null, null, null, null
+            , null, null, null, null);
+        Field f1 = Update.class.getDeclaredField("crewId");
+        f1.setAccessible(true);
+        f1.set(update, crewId);
+
+        Field f2 = Update.class.getSuperclass().getDeclaredField("crewImage");
+        f2.setAccessible(true);
+        f2.set(update, new MockMultipartFile("file", new byte[0]));
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
         CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).member(memberEntity).build();
