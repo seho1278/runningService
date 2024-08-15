@@ -3,6 +3,7 @@ package com.example.runningservice.dto.crew;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.util.validator.UniqueCrewName;
+import com.example.runningservice.util.validator.YearRange;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CrewRequestDto {
 
     @Getter
+    @YearRange(minYear = "minAge", maxYear = "maxAge")
     public static class Base {
 
         @NotBlank(message = "크루 소개를 입력해 주세요.")
