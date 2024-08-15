@@ -2,7 +2,6 @@ package com.example.runningservice.dto.crew;
 
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.enums.Gender;
-import com.example.runningservice.enums.Region;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -40,7 +39,7 @@ public class CrewResponseDto {
         private String leader;
         private Integer crewCapacity;
         private Integer crewOccupancy;
-        private Region activityRegion;
+        private String activityRegion;
 
         public static CrewData fromEntityAndLeaderNameAndOccupancy(CrewEntity crewEntity,
             String nickname,
@@ -53,7 +52,7 @@ public class CrewResponseDto {
                 .crewImage(crewEntity.getCrewImage())
                 .crewCapacity(crewEntity.getCrewCapacity())
                 .crewOccupancy(occupancy)
-                .activityRegion(crewEntity.getActivityRegion())
+                .activityRegion(crewEntity.getActivityRegion().getRegionName())
                 .build();
         }
     }
@@ -75,7 +74,7 @@ public class CrewResponseDto {
                 .crewImage(crewEntity.getCrewImage())
                 .description(crewEntity.getDescription())
                 .crewCapacity(crewEntity.getCrewCapacity())
-                .activityRegion(crewEntity.getActivityRegion())
+                .activityRegion(crewEntity.getActivityRegion().getRegionName())
                 .limit(Limit.builder()
                     .gender(crewEntity.getGender())
                     .leaderRequired(crewEntity.getLeaderRequired())
