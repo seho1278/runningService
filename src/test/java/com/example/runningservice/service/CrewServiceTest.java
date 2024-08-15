@@ -10,17 +10,26 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.example.runningservice.dto.crew.CrewRequestDto;
+import com.example.runningservice.dto.crew.CrewFilterDto.CrewInfo;
+import com.example.runningservice.dto.crew.CrewFilterDto.Participate;
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
 import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
+import com.example.runningservice.dto.crew.CrewResponseDto.Detail;
+import com.example.runningservice.dto.crew.CrewResponseDto.Summary;
 import com.example.runningservice.entity.CrewEntity;
+import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
+import com.example.runningservice.enums.CrewRole;
+import com.example.runningservice.enums.JoinStatus;
+import com.example.runningservice.enums.OccupancyStatus;
+import com.example.runningservice.enums.ParticipateType;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.util.S3FileUtil;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +37,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -214,5 +228,172 @@ class CrewServiceTest {
         // then
         assertEquals(crewEntity.getCrewId(), response.getCrewId());
         verify(s3FileUtil, times(0)).deleteObject(anyString());
+    }
+
+    @Test
+    @DisplayName("크루 상세 조회_성공")
+    public void getCrew() {
+        Long crewId = 1L;
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder()
+            .crewId(crewId)
+            .member(memberEntity)
+            .leaderRequired(true)
+            .runRecordOpen(true)
+            .build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crewId,
+            JoinStatus.APPROVED)).willReturn(999);
+
+        Detail detail = crewService.getCrew(crewId);
+
+        assertEquals(detail.getLeader(), "hi");
+        verify(crewMemberRepository, times(1)).countByCrew_CrewIdAndStatus(
+            crewId, JoinStatus.APPROVED);
+        assertEquals(detail.getCrewOccupancy(), 999);
+    }
+
+    @Test
+    @DisplayName("참가 중인 크루 리스트 조회_Filter 없음")
+    public void getParticipateCrewList_NoFilter() {
+        Participate request = Participate.builder().userId(1L).build();
+        MemberEntity member = MemberEntity.builder().id(1L).build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
+
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("createdAt").descending());
+        List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
+                .crew(crew1)
+                .member(member)
+                .build(),
+            CrewMemberEntity.builder()
+                .crew(crew2)
+                .member(member)
+                .build());
+        Page<CrewMemberEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+
+        given(crewMemberRepository.findByMember_Id(1L, pageable)).willReturn(result);
+
+        Summary summary = crewService.getParticipateCrewList(request, pageable);
+
+        assertEquals(summary.getData().size(), 2);
+        assertEquals(summary.getData().get(0).getCrewId(), 5);
+        assertEquals(summary.getData().get(1).getCrewId(), 10);
+        verify(crewMemberRepository, never()).findByMember_IdAndRole(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("참가 중인 크루 리스트 조회_내가 만든 크루")
+    public void getParticipateCrewList_Host() {
+        Participate request = Participate.builder().userId(1L).filter(ParticipateType.HOST).build();
+        MemberEntity member = MemberEntity.builder().id(1L).build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
+
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("createdAt").descending());
+        List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
+                .crew(crew1)
+                .member(member)
+                .build(),
+            CrewMemberEntity.builder()
+                .crew(crew2)
+                .member(member)
+                .build());
+        Page<CrewMemberEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+
+        given(
+            crewMemberRepository.findByMember_IdAndRole(1L, CrewRole.LEADER, pageable)).willReturn(
+            result);
+
+        Summary summary = crewService.getParticipateCrewList(request, pageable);
+
+        assertEquals(summary.getData().size(), 2);
+        assertEquals(summary.getData().get(0).getCrewId(), 5);
+        assertEquals(summary.getData().get(1).getCrewId(), 10);
+        verify(crewMemberRepository, times(1)).findByMember_IdAndRole(1L, CrewRole.LEADER,
+            pageable);
+    }
+
+    @Test
+    @DisplayName("참가 중인 크루 리스트 조회_가입한 크루")
+    public void getParticipateCrewList_Join() {
+        Participate request = Participate.builder().userId(1L).filter(ParticipateType.JOIN).build();
+        MemberEntity member = MemberEntity.builder().id(1L).build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
+
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("createdAt").descending());
+        List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
+                .crew(crew1)
+                .member(member)
+                .build(),
+            CrewMemberEntity.builder()
+                .crew(crew2)
+                .member(member)
+                .build());
+        Page<CrewMemberEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+
+        given(
+            crewMemberRepository.findByMember_IdAndRole(1L, CrewRole.MEMBER, pageable)).willReturn(
+            result);
+
+        Summary summary = crewService.getParticipateCrewList(request, pageable);
+
+        assertEquals(summary.getData().size(), 2);
+        assertEquals(summary.getData().get(0).getCrewId(), 5);
+        assertEquals(summary.getData().get(1).getCrewId(), 10);
+        verify(crewMemberRepository, times(1)).findByMember_IdAndRole(1L, CrewRole.MEMBER,
+            pageable);
+    }
+
+    @Test
+    @DisplayName("전체 크루 조회_모집 마감 크루")
+    public void getCrewList_Full() {
+        CrewInfo crewInfo = CrewInfo.builder().occupancyStatus(OccupancyStatus.FULL).build();
+        Pageable pageable = PageRequest.of(1, 2);
+        MemberEntity member = MemberEntity.builder().id(1L).build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).member(member).crewCapacity(1).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).member(member).crewCapacity(10).build();
+
+        List<CrewEntity> crewMembers = List.of(crew1, crew2);
+        Page<CrewEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+
+        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew1.getCrewId(),
+            JoinStatus.APPROVED)).willReturn(1);
+        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew2.getCrewId(),
+            JoinStatus.APPROVED)).willReturn(1);
+        given(crewRepository.findCrewList(any(), any(), any(), any(), any(), any(),
+            any())).willReturn(result);
+
+        Summary summary = crewService.getCrewList(crewInfo, pageable);
+
+        assertEquals(summary.getData().size(), 1);
+        assertEquals(summary.getData().get(0).getCrewId(), crew1.getCrewId());
+    }
+
+    @Test
+    @DisplayName("전체 크루 조회")
+    public void getCrewList() {
+        CrewInfo crewInfo = CrewInfo.builder().build();
+        Pageable pageable = PageRequest.of(1, 2);
+        MemberEntity member = MemberEntity.builder().id(1L).build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).member(member).crewCapacity(1).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).member(member).crewCapacity(10).build();
+
+        List<CrewEntity> crewMembers = List.of(crew1, crew2);
+        Page<CrewEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+
+        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew1.getCrewId(),
+            JoinStatus.APPROVED)).willReturn(1);
+        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew2.getCrewId(),
+            JoinStatus.APPROVED)).willReturn(1);
+        given(crewRepository.findCrewList(any(), any(), any(), any(), any(), any(),
+            any())).willReturn(result);
+
+        Summary summary = crewService.getCrewList(crewInfo, pageable);
+
+        assertEquals(summary.getData().size(), 2);
     }
 }
