@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -87,8 +88,8 @@ class AuthServiceTest {
             userDetails);
         when(userDetails.getUsername()).thenReturn("test@example.com");
         when(userDetails.getAuthorities()).thenAnswer(invocation -> authorities);
-        when(jwtUtil.generateToken("test@example.com", authorities)).thenReturn("access-token");
-        when(jwtUtil.generateRefreshToken("test@example.com", authorities)).thenReturn(
+        when(jwtUtil.generateToken("test@example.com", userDetails.getId(), authorities)).thenReturn("access-token");
+        when(jwtUtil.generateRefreshToken("test@example.com", userDetails.getId(), authorities)).thenReturn(
             "refresh-token");
 
         // When
@@ -101,8 +102,8 @@ class AuthServiceTest {
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(customUserDetailsService).loadUserByUsername(anyString());
-        verify(jwtUtil).generateToken(anyString(), anyList());
-        verify(jwtUtil).generateRefreshToken(anyString(), anyList());
+        verify(jwtUtil).generateToken(anyString(), anyLong(), anyList());
+        verify(jwtUtil).generateRefreshToken(anyString(), anyLong(), anyList());
     }
 
     @Test
@@ -180,9 +181,11 @@ class AuthServiceTest {
         when(jwtUtil.extractEmail(refreshToken)).thenReturn("test@example.com");
         when(customUserDetailsService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
         List<GrantedAuthority> authorities = new ArrayList<>();
-        when(jwtUtil.generateToken("test@example.com", authorities)).thenReturn("access-token");
-        when(jwtUtil.generateRefreshToken("test@example.com", authorities)).thenReturn("refresh-token");
+        when(jwtUtil.generateToken("test@example.com", userDetails.getId(), authorities)).thenReturn("access-token");
+        when(jwtUtil.generateRefreshToken("test@example.com", userDetails.getId(), authorities)).thenReturn("refresh-token");
         when(principal.getName()).thenReturn(principalEmail);
+        when(jwtUtil.validateToken(principalEmail, refreshToken)).thenCallRealMethod();
+        when(jwtUtil.isTokenExpired(refreshToken)).thenReturn(false);
         //when
         JwtResponse jwtResponse = authService.refreshToken(refreshToken, principal);
         //then

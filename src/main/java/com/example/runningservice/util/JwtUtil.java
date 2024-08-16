@@ -43,19 +43,20 @@ public class JwtUtil {
         SECRET_KEY = new SecretKeySpec(decodedKey, 0, decodedKey.length, "HmacSHA256");
     }
 
-    public String generateToken(String email, List<GrantedAuthority> authorities) {
-        return createToken(email, authorities, ACCESS_TOKEN_EXPIRATION);
+    public String generateToken(String email, Long userId, List<GrantedAuthority> authorities) {
+        return createToken(email, userId, authorities, ACCESS_TOKEN_EXPIRATION);
     }
 
-    public String generateRefreshToken(String email, List<GrantedAuthority> authorities) {
-        return createToken(email, authorities, REFRESH_TOKEN_EXPIRATION); // 7 days
+    public String generateRefreshToken(String email, Long userId,List<GrantedAuthority> authorities) {
+        return createToken(email, userId, authorities, REFRESH_TOKEN_EXPIRATION); // 7 days
     }
 
-    private String createToken(String username, List<GrantedAuthority> authorities,
+    private String createToken(String username, Long userId, List<GrantedAuthority> authorities,
         long expirationTime) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles",
             authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        claims.put("userId", userId);
         return Jwts.builder().claims(claims).subject(username)
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -66,10 +67,7 @@ public class JwtUtil {
         log.debug("extract token: {}", token);
         try {
             log.debug("token: {}", token);
-            return Jwts.parser()
-                .verifyWith(SECRET_KEY)
-                .build()
-                .parseSignedClaims(token)
+            return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token)
                 .getPayload();
         } catch (SignatureException e) {
             log.error("Invalid JWT signature: {}", e.getMessage());
@@ -93,6 +91,10 @@ public class JwtUtil {
         return extractAllClaims(token).getSubject();
     }
 
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("userId", Long.class);
+    }
+
     public List<Role> extractRoles(String token) {
         List<String> roles = extractAllClaims(token).get("roles", List.class);
         return roles.stream().map(Role::valueOf).collect(Collectors.toList());
@@ -102,6 +104,10 @@ public class JwtUtil {
         boolean equals = extractEmail(token).equals(email);
         log.debug("user email equals token owner email: {}", equals);
         return equals && !isTokenExpired(token);
+    }
+
+    public boolean validateToken(Long id, String token) {
+        return extractUserId(token).equals(id) && !isTokenExpired(token);
     }
 
     public Authentication getAuthentication(String jwt) {

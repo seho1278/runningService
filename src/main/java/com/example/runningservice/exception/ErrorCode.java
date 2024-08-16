@@ -21,7 +21,18 @@ public enum ErrorCode {
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, "인증되지 않은 이메일 입니다."),
     ENCRYPTION_ERROR(HttpStatus.BAD_REQUEST, ""),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
-    NOT_FOUND_CREW(HttpStatus.BAD_REQUEST, "크루를 찾을 수 없습니다.");
+    NOT_FOUND_CREW(HttpStatus.BAD_REQUEST, "크루를 찾을 수 없습니다."),
+    NOT_FOUND_APPLY(HttpStatus.BAD_REQUEST, "해당 신청내역을 찾을 수 없습니다."),
+
+    //크루가입
+    RECORD_OPEN_REQUIRED(HttpStatus.FORBIDDEN, "러닝 기록을 공개해야 합니다."),
+    GENDER_RESTRICTION_NOT_MET(HttpStatus.FORBIDDEN, "성별 제한을 충족하지 못했습니다."),
+    GENDER_REQUIRED(HttpStatus.FORBIDDEN, "가입을 위해 성별 정보가 필요합니다."),
+    AGE_RESTRICTION_NOT_MET(HttpStatus.FORBIDDEN, "나이 제한을 충족하지 못했습니다."),
+    AGE_REQUIRED(HttpStatus.FORBIDDEN, "가입을 위해 연령 정보가 필요합니다."),
+    //권한
+    UNAUTHORIZED_MY_APPLY_ACCESS(HttpStatus.FORBIDDEN, "잘못된 접근입니다. 자신의 가입 신청 내역만 조회할 수 있습니다.");
+
 
     private HttpStatus httpStatus;
     private String message;

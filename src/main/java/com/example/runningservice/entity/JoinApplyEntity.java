@@ -1,9 +1,7 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.JoinStatus;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -11,27 +9,20 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.AuditOverride;
 
+@Entity(name = "join_request")
 @Getter
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
-@Builder
-@Entity
-@Table(name = "crew_member", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"member_id", "crew_id"})
-})
-@EntityListeners(AuditingEntityListener.class)
-public class CrewMemberEntity {
-
+@AllArgsConstructor
+@AuditOverride(forClass = BaseEntity.class)
+public class JoinApplyEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,18 +32,19 @@ public class CrewMemberEntity {
     @ManyToOne
     @JoinColumn(name = "crew_id")
     private CrewEntity crew;
-    @Enumerated(EnumType.STRING)
-    private CrewRole role;
-    @CreatedDate
-    private LocalDateTime joinedAt;
+    @NotNull
     @Enumerated(EnumType.STRING)
     private JoinStatus status;
-
-    public static CrewMemberEntity memberOf(MemberEntity member, CrewEntity crew) {
-        return CrewMemberEntity.builder()
+    private String message;
+    public static JoinApplyEntity of(MemberEntity member, CrewEntity crew, String message) {
+        return JoinApplyEntity.builder()
             .member(member)
             .crew(crew)
-            .role(CrewRole.MEMBER)
+            .message(message)
             .build();
+    }
+
+    public void markStatus(JoinStatus status) {
+        this.status = status;
     }
 }
