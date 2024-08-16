@@ -1,0 +1,45 @@
+package com.example.runningservice.entity;
+
+import com.example.runningservice.enums.Region;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.envers.AuditOverride;
+import org.hibernate.type.SqlTypes;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
+@Entity
+@Table(name = "regular_run_meeting")
+@AuditOverride(forClass = BaseEntity.class)
+public class RegularRunMeetingEntity extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @ManyToOne
+    @JoinColumn(name = "crew_id")
+    private CrewEntity crew;
+    private int count;
+    private int week;
+    @Enumerated(EnumType.STRING)
+    private Region activityRegion;
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> dayOfWeek;
+}
