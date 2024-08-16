@@ -38,8 +38,8 @@ public class CrewEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long crewId;
     @ManyToOne
-    @JoinColumn(name = "member_id")
-    private MemberEntity member;
+    @JoinColumn(name = "leader_id")
+    private MemberEntity leader;
     private String crewName;
     private String crewImage;
     private String description;
@@ -64,7 +64,7 @@ public class CrewEntity {
     @Builder
     public static CrewEntity toEntity(Create dto, MemberEntity memberEntity) {
         return CrewEntity.builder()
-            .member(memberEntity)
+            .leader(memberEntity)
             .crewName(dto.getCrewName())
             .description(dto.getDescription())
             .crewCapacity(dto.getCrewCapacity())

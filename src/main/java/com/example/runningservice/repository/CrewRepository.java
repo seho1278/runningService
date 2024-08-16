@@ -15,14 +15,52 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long> {
 
     boolean existsByCrewName(String crewName);
 
-    @Query("SELECT c FROM CrewEntity c "
+    @Query("SELECT c, m.nickName, COUNT(cm.crew.crewId) AS crewOccupancy "
+        + "FROM CrewEntity c LEFT JOIN CrewMemberEntity cm ON c.crewId = cm.crew.crewId "
+        + "JOIN member m ON c.leader.id = m.id "
         + "WHERE (:region IS NULL OR c.activityRegion = :region) "
         + "AND (:minAge IS NULL OR c.minAge <= :minAge) "
         + "AND (:maxAge IS NULL OR c.maxAge >= :maxAge) "
         + "AND (:gender IS NULL OR c.gender = :gender) "
         + "AND (:runRecordPublic IS NULL OR c.runRecordOpen = :runRecordPublic) "
-        + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) ")
-    Page<CrewEntity> findCrewList(@Param("region") Region activityRegion,
+        + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) "
+        + "GROUP BY c.crewId, c.crewCapacity, c.createdAt, m.nickName "
+        + "HAVING c.crewCapacity <= COUNT(cm.crew.crewId) "
+        + "ORDER BY c.createdAt DESC")
+    Page<Object[]> findFullCrewList(@Param("region") Region activityRegion,
+        @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
+        @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,
+        @Param("leaderRequired") Boolean leaderRequired, Pageable pageable);
+
+    @Query("SELECT c, m.nickName, COUNT(cm.crew.crewId) AS crewOccupancy "
+        + "FROM CrewEntity c LEFT JOIN CrewMemberEntity cm ON c.crewId = cm.crew.crewId "
+        + "JOIN member m ON c.leader.id = m.id "
+        + "WHERE (:region IS NULL OR c.activityRegion = :region) "
+        + "AND (:minAge IS NULL OR c.minAge <= :minAge) "
+        + "AND (:maxAge IS NULL OR c.maxAge >= :maxAge) "
+        + "AND (:gender IS NULL OR c.gender = :gender) "
+        + "AND (:runRecordPublic IS NULL OR c.runRecordOpen = :runRecordPublic) "
+        + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) "
+        + "GROUP BY c.crewId, c.crewCapacity, c.createdAt, m.nickName "
+        + "HAVING c.crewCapacity > COUNT(cm.crew.crewId) "
+        + "ORDER BY c.createdAt DESC")
+    Page<Object[]> findAvailableCrewList(@Param("region") Region activityRegion,
+        @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
+        @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,
+        @Param("leaderRequired") Boolean leaderRequired, Pageable pageable);
+
+    @Query("SELECT c, m.nickName, COUNT(cm.crew.crewId) AS crewOccupancy "
+        + "FROM CrewEntity c LEFT JOIN CrewMemberEntity cm ON c.crewId = cm.crew.crewId "
+        + "JOIN member m ON c.leader.id = m.id "
+        + "WHERE (:region IS NULL OR c.activityRegion = :region) "
+        + "AND (:minAge IS NULL OR c.minAge <= :minAge) "
+        + "AND (:maxAge IS NULL OR c.maxAge >= :maxAge) "
+        + "AND (:gender IS NULL OR c.gender = :gender) "
+        + "AND (:runRecordPublic IS NULL OR c.runRecordOpen = :runRecordPublic) "
+        + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) "
+        + "GROUP BY c.crewId, c.crewCapacity, c.createdAt, m.nickName "
+        + "ORDER BY c.createdAt DESC")
+    Page<Object[]> findAllCrewList(@Param("region") Region activityRegion,
         @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
         @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,
         @Param("leaderRequired") Boolean leaderRequired, Pageable pageable);
