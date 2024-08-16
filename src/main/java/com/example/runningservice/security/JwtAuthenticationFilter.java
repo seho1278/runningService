@@ -42,6 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info(String.format("[%s] -> %s ",
                     jwtUtil.extractEmail(accessJwt), request.getRequestURI())
             );
+            // LoginUserResolver에서 request를 통해 가져오기 위해 토큰에서 id를 가져와 저장한다.
+            request.setAttribute("loginId", jwtUtil.extractUserId(accessJwt));
         }
         log.info("Filtering request token: {}", accessJwt);
         log.info("authentication: {}", SecurityContextHolder.getContext().getAuthentication());

@@ -4,6 +4,7 @@ import com.example.runningservice.dto.JwtResponse;
 import com.example.runningservice.dto.LoginRequestDto;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
+import com.example.runningservice.security.CustomUserDetails;
 import com.example.runningservice.security.CustomUserDetailsService;
 import com.example.runningservice.util.JwtUtil;
 import java.security.Principal;
@@ -16,7 +17,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,16 +41,17 @@ public class AuthService {
         }
 
         // 해당 이메일로 회원정보 가져오기
-        final UserDetails userDetails = customUserDetailsService.loadUserByUsername(
+        final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(
             loginRequestDto.getEmail());
 
         // 회원 권한 가져오기
         List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
         log.debug("Authorities : {}", authorities);
         // 회원권한 & email로 accessToken, refreshToken 발행
-        final String accessJwt = jwtUtil.generateToken(userDetails.getUsername(), authorities);
+        final String accessJwt = jwtUtil.generateToken(userDetails.getUsername(),
+            userDetails.getId(), authorities);
         final String refreshJwt = jwtUtil.generateRefreshToken(userDetails.getUsername(),
-            authorities);
+            userDetails.getId(), authorities);
 
         return new JwtResponse(accessJwt, refreshJwt);
     }
@@ -67,10 +68,10 @@ public class AuthService {
         }
 
         // 새로운 accessToken, refreshToken 생성
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
         List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
-        final String newAccessToken = jwtUtil.generateToken(email, authorities);
-        final String newRefreshToken = jwtUtil.generateRefreshToken(email, authorities);
+        final String newAccessToken = jwtUtil.generateToken(email, userDetails.getId(), authorities);
+        final String newRefreshToken = jwtUtil.generateRefreshToken(email, userDetails.getId(), authorities);
 
         //기존 refreshToken을 blackList에 추가
         blackList.add(refreshToken);

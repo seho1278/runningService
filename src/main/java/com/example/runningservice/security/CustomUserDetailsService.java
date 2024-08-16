@@ -28,7 +28,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.debug("User found: {}", email);
 
-        return new CustomUserDetails(memberEntity.getEmail(), memberEntity.getPassword(),
+        return new CustomUserDetails(memberEntity.getId(), memberEntity.getEmail(), memberEntity.getPassword(),
             memberEntity.getRoles());
     }
 }
