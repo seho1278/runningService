@@ -296,7 +296,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("joinedAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -325,7 +325,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("joinedAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -357,7 +357,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("joinedAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)

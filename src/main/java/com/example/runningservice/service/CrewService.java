@@ -174,7 +174,7 @@ public class CrewService {
         Pageable pageable) {
         Pageable customPageable = PageRequest.of(pageable.getPageNumber(),
             pageable.getPageSize(),
-            Sort.by(Sort.Order.desc("member.createdAt")));
+            Sort.by(Sort.Order.desc("joinedAt")));
         Summary summaryCrew = new Summary();
         Page<CrewMemberEntity> crewMemberEntities;
 
