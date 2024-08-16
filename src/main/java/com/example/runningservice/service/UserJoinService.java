@@ -32,7 +32,6 @@ public class UserJoinService {
     private final CrewMemberRepository crewMemberRepository;
     private final JwtUtil jwtUtil;
 
-    //가입 승인 Off 일 시, 자동 가입되도록 구현해야 함. 가입상태 표시 & 크루원repository에 저장
     @Transactional
     public JoinApplyDto.DetailResponse saveJoinApply(Long crewId,
         JoinApplyDto.Request joinRequestForm) {
