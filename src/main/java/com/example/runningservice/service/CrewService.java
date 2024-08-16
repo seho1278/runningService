@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -61,7 +60,7 @@ public class CrewService {
             .role(CrewRole.LEADER)
             .status(JoinStatus.APPROVED)
             .build());
-        
+
         // crew 채팅방 생성
         chatRoomService.createChatRoom(crewEntity.getCrewId(),
             crewEntity.getCrewName(), ChatRoom.CREW);
@@ -196,7 +195,6 @@ public class CrewService {
     /**
      * 전체 크루 필터링 조회
      */
-    @GetMapping
     public Summary getCrewList(CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
         List<CrewEntity> crewList = crewRepository.findCrewList(crewFilter.getActivityRegion(),
             crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
