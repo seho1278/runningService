@@ -48,4 +48,29 @@ public class RegularRunService {
             .weekdays(regularRunMeetingEntity.getDayOfWeek())
             .build();
     }
+
+    /**
+     * 크루 정기러닝 수정
+     */
+    public RegularRunResponseDto updateRegularRun(Long regularId, RegularRunRequestDto request) {
+        RegularRunMeetingEntity regularRunMeetingEntity = regularRunMeetingRepository
+            .findById(regularId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REGULAR_RUN));
+
+        regularRunMeetingEntity.updateRegularRunInfo(request.getCount(), request.getWeek(),
+            request.getActivityRegion());
+
+        regularRunMeetingEntity.clearDayOfWeek();
+        request.getDayOfWeek().forEach(regularRunMeetingEntity::addDayOfWeek);
+
+        return RegularRunResponseDto.builder()
+            .id(regularRunMeetingEntity.getId())
+            .frequency(Frequency.builder()
+                .times(regularRunMeetingEntity.getCount())
+                .weeks(regularRunMeetingEntity.getWeek())
+                .build())
+            .region(regularRunMeetingEntity.getActivityRegion().getRegionName())
+            .weekdays(regularRunMeetingEntity.getDayOfWeek())
+            .build();
+    }
 }
