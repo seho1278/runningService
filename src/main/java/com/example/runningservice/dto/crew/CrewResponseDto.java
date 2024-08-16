@@ -17,7 +17,7 @@ public class CrewResponseDto {
     @Getter
     public static class Summary {
 
-        List<CrewData> data;
+        private List<CrewData> data;
 
         public Summary() {
             data = new ArrayList<>();
@@ -25,6 +25,10 @@ public class CrewResponseDto {
 
         public void addCrew(CrewData crew) {
             data.add(crew);
+        }
+
+        public int size() {
+            return data.size();
         }
     }
 

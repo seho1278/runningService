@@ -19,6 +19,7 @@ import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -197,13 +198,13 @@ public class CrewService {
      */
     @GetMapping
     public Summary getCrewList(CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
-        Pageable customPageable = PageRequest.of(pageable.getPageNumber(),
-            pageable.getPageSize(),
-            Sort.by(Sort.Order.desc("member.createdAt")));
-
-        Page<CrewEntity> crewList = crewRepository.findCrewList(crewFilter.getActivityRegion(),
+        List<CrewEntity> crewList = crewRepository.findCrewList(crewFilter.getActivityRegion(),
             crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
-            crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired(), customPageable);
+            crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired());
+
+        int startIndex = pageable.getPageSize() * pageable.getPageNumber();
+        int endIndex = startIndex + pageable.getPageSize();
+        int curIndex = 0;
 
         Summary summary = new Summary();
         for (CrewEntity crewEntity : crewList) {
@@ -214,8 +215,14 @@ public class CrewService {
                 crewFilter.getOccupancyStatus().validateFullOrAvailable( // 제한 조건에 부합하면 조회할 크루에 추가
                     crewEntity.getCrewCapacity(), occupancy)) {
 
-                summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
-                    crewEntity.getMember().getNickName(), occupancy));
+                if (curIndex >= startIndex && curIndex < endIndex) {
+                    summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
+                        crewEntity.getMember().getNickName(), occupancy));
+                }
+                curIndex++;
+                if (curIndex >= endIndex) {
+                    break;
+                }
             }
         }
 
