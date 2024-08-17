@@ -6,6 +6,7 @@ import com.example.runningservice.service.RegularRunService;
 import com.example.runningservice.util.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,5 +43,18 @@ public class RegularRunController {
 
         return ResponseEntity.ok(
             regularRunService.updateRegularRun(regularId, request));
+    }
+
+    /**
+     * 크루의 정기러닝 삭제
+     */
+    @CrewRoleCheck(role = {"LEADER","STAFF"})
+    @DeleteMapping("/crew/{crewId}/regular/{regularId}")
+    public ResponseEntity<?> deleteRegularRun(@LoginUser Long loginId,
+        @PathVariable("crewId") Long crewId,
+        @PathVariable("regularId") Long regularId) {
+
+        return ResponseEntity.ok(
+            regularRunService.deleteRegularRun(regularId));
     }
 }

@@ -74,4 +74,27 @@ public class RegularRunService {
             .weekdays(regularRunMeetingEntity.getDayOfWeek())
             .build();
     }
+
+    /**
+     * 크루 정기러닝 삭제
+     */
+    public RegularRunResponseDto deleteRegularRun(Long regularId) {
+        RegularRunMeetingEntity regularRunMeetingEntity = regularRunMeetingRepository
+            .findById(regularId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REGULAR_RUN));
+
+        RegularRunResponseDto response = RegularRunResponseDto.builder()
+            .id(regularRunMeetingEntity.getId())
+            .frequency(Frequency.builder()
+                .times(regularRunMeetingEntity.getCount())
+                .weeks(regularRunMeetingEntity.getWeek())
+                .build())
+            .region(regularRunMeetingEntity.getActivityRegion().getRegionName())
+            .weekdays(regularRunMeetingEntity.getDayOfWeek())
+            .build();
+
+        regularRunMeetingRepository.delete(regularRunMeetingEntity);
+
+        return response;
+    }
 }
