@@ -2,8 +2,10 @@ package com.example.runningservice.dto.crew;
 
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.enums.Gender;
+import com.example.runningservice.enums.Region;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,7 +54,9 @@ public class CrewResponseDto {
                 .crewImage(crewEntity.getCrewImage())
                 .crewCapacity(crewEntity.getCrewCapacity())
                 .crewOccupancy(occupancy)
-                .activityRegion(crewEntity.getActivityRegion().getRegionName())
+                .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
+                    .map(Region::getRegionName)
+                    .orElse(null))
                 .build();
         }
     }
@@ -74,7 +78,9 @@ public class CrewResponseDto {
                 .crewImage(crewEntity.getCrewImage())
                 .description(crewEntity.getDescription())
                 .crewCapacity(crewEntity.getCrewCapacity())
-                .activityRegion(crewEntity.getActivityRegion().getRegionName())
+                .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
+                    .map(Region::getRegionName)
+                    .orElse(null))
                 .limit(Limit.builder()
                     .gender(crewEntity.getGender())
                     .leaderRequired(crewEntity.getLeaderRequired())
