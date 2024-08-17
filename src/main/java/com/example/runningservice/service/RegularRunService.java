@@ -52,6 +52,7 @@ public class RegularRunService {
     /**
      * 크루 정기러닝 수정
      */
+    @Transactional
     public RegularRunResponseDto updateRegularRun(Long regularId, RegularRunRequestDto request) {
         RegularRunMeetingEntity regularRunMeetingEntity = regularRunMeetingRepository
             .findById(regularId)
