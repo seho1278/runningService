@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,15 +111,14 @@ public class RegularRunService {
      */
     @Transactional
     public List<CrewRegularRunResponseDto> getRegularRunList(Pageable pageable) {
-        Page<CrewEntity> crewEntities = crewRepository.findAll(PageRequest.of(
-            pageable.getPageNumber(), pageable.getPageSize()));
-
         // 갯수만큼 크루 ID를 조회하고, 크루 ID에 해당하는 모든 정기러닝 조회
-        List<Long> crewIdList = crewEntities.stream().map(CrewEntity::getCrewId).toList();
-        List<RegularRunMeetingEntity> regularRunEntityList = regularRunMeetingRepository.findByCrewIdIn(
-            crewIdList);
+        Page<CrewEntity> crewEntities = crewRepository.findAll(pageable);
 
-        // 크루별로 합쳐서 보여주기 위해 크루 id를 key로 하는 Map 저장
+        List<Long> crewIdList = crewEntities.stream().map(CrewEntity::getCrewId).toList();
+        List<RegularRunMeetingEntity> regularRunEntityList = regularRunMeetingRepository
+            .findByCrewIdIn(crewIdList);
+
+        // 크루별로 그룹화해서 보여주기 위해 크루 id를 key로 하는 Map 저장
         Map<Long, List<RegularRunResponseDto>> crewRegularMap = new HashMap<>();
 
         for (RegularRunMeetingEntity regularRunMeeting : regularRunEntityList) {
