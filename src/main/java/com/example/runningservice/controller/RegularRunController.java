@@ -21,7 +21,7 @@ public class RegularRunController {
     /**
      * 크루의 정기러닝 생성
      */
-    @CrewRoleCheck(role = "leaderAndStaff")
+    @CrewRoleCheck(role = {"LEADER","STAFF"})
     @PostMapping("/crew/{crewId}/regular")
     public ResponseEntity<?> createRegularRun(@LoginUser Long loginId,
         @PathVariable("crewId") Long crewId,
@@ -33,7 +33,7 @@ public class RegularRunController {
     /**
      * 크루의 정기러닝 수정
      */
-    @CrewRoleCheck(role = "leaderAndStaff")
+    @CrewRoleCheck(role = {"LEADER","STAFF"})
     @PutMapping("/crew/{crewId}/regular/{regularId}")
     public ResponseEntity<?> createRegularRun(@LoginUser Long loginId,
         @PathVariable("crewId") Long crewId,

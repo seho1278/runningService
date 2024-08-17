@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CrewRoleCheck {
 
-    String role();
+    String[] role();
 }

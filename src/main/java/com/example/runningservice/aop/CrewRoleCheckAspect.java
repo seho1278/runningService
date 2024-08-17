@@ -5,6 +5,8 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.CrewMemberRepository;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,10 +31,11 @@ public class CrewRoleCheckAspect {
                 crewId, loginId)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS));
 
-        if (crewRoleCheck.role().equals("leaderAndStaff")) {
-            if (crewMemberEntity.getRole().equals(CrewRole.MEMBER)) {
-                throw new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS);
-            }
+        List<CrewRole> allowList = Arrays.stream(crewRoleCheck.role()).map(CrewRole::valueOf)
+            .toList();
+
+        if (!allowList.contains(crewMemberEntity.getRole())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS);
         }
     }
 }
