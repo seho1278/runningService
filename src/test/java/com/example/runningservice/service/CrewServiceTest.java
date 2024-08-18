@@ -396,33 +396,18 @@ class CrewServiceTest {
 
         given(crewRepository.findFullCrewList(any(), any(), any(), any(), any(), any(),
             any())).willReturn(result);
-        Pageable pageable = PageRequest.of(0, 2);
-        MemberEntity member = MemberEntity.builder().id(1L).build();
-        CrewEntity crew1 = CrewEntity.builder().crewId(5L).member(member).crewCapacity(1).build();
-        CrewEntity crew2 = CrewEntity.builder().crewId(10L).member(member).crewCapacity(10).build();
-
-        List<CrewEntity> crewMembers = List.of(crew1, crew2);
-
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew1.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew2.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewRepository.findCrewList(any(), any(), any(), any(), any(), any()
-            )).willReturn(crewMembers);
 
         crewService.getCrewList(crewInfo, pageable);
 
         verify(crewRepository, times(1)).findFullCrewList(any(), any(), any(), any(), any(), any(),
             any());
-        assertEquals(summary.size(), 1);
-        assertEquals(summary.getData().get(0).getCrewId(), crew1.getCrewId());
     }
 
     @Test
     @DisplayName("전체 크루 조회")
     public void getCrewList() {
         CrewInfo crewInfo = CrewInfo.builder().build();
-        Pageable pageable = PageRequest.of(0, 2);
+        Pageable pageable = PageRequest.of(1, 2);
         MemberEntity member = MemberEntity.builder().id(1L).build();
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).leader(member).crewCapacity(1).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).leader(member).crewCapacity(10).build();
@@ -433,14 +418,6 @@ class CrewServiceTest {
 
         given(crewRepository.findAllCrewList(any(), any(), any(), any(), any(), any(),
             any())).willReturn(result);
-        List<CrewEntity> crewMembers = List.of(crew1, crew2);
-
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew1.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew2.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewRepository.findCrewList(any(), any(), any(), any(), any(), any()
-            )).willReturn(crewMembers);
 
         Summary summary = crewService.getCrewList(crewInfo, pageable);
 

@@ -3,7 +3,8 @@ package com.example.runningservice.repository;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -62,5 +63,5 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long> {
     Page<Object[]> findAllCrewList(@Param("region") Region activityRegion,
         @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
         @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,
-        @Param("leaderRequired") Boolean leaderRequired);
+        @Param("leaderRequired") Boolean leaderRequired, Pageable pageable);
 }

@@ -20,7 +20,6 @@ import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -211,32 +210,6 @@ public class CrewService {
                 crewEntity,
                 leaderNickname,
                 occupancy));
-        List<CrewEntity> crewList = crewRepository.findCrewList(crewFilter.getActivityRegion(),
-            crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
-            crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired());
-
-        int startIndex = pageable.getPageSize() * pageable.getPageNumber();
-        int endIndex = startIndex + pageable.getPageSize();
-        int curIndex = 0;
-
-        Summary summary = new Summary();
-        for (CrewEntity crewEntity : crewList) {
-            int occupancy = getCrewOccupancy(crewEntity.getCrewId());
-
-            if (crewFilter.getOccupancyStatus() == null || // 인원 상태에 대한 조회 조건이 없거나,
-                crewEntity.getCrewCapacity() == null || // 크루에 정원 제한이 없거나,
-                crewFilter.getOccupancyStatus().validateFullOrAvailable( // 제한 조건에 부합하면 조회할 크루에 추가
-                    crewEntity.getCrewCapacity(), occupancy)) {
-
-                if (curIndex >= startIndex && curIndex < endIndex) {
-                    summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
-                        crewEntity.getMember().getNickName(), occupancy));
-                }
-                curIndex++;
-                if (curIndex >= endIndex) {
-                    break;
-                }
-            }
         }
 
         return summary;
