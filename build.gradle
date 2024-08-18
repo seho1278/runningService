@@ -36,6 +36,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.mashape.unirest:unirest-java:1.4.9'
     implementation 'org.apache.commons:commons-lang3:3.16.0'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
 
     //jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
