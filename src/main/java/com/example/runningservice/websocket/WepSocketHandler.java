@@ -18,8 +18,11 @@ public class WepSocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        log.info("payload {}", payload);
         TextMessage textMessage = new TextMessage("Welcome");
         session.sendMessage(textMessage);
+    }
+
+    private void broadcastMessage(String message) {
+
     }
 }
