@@ -18,4 +18,6 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
     Page<CrewMemberEntity> findByMember_IdAndRole(Long memberId, CrewRole role, Pageable pageable);
 
     Page<CrewMemberEntity> findByMember_Id(Long memberId, Pageable pageable);
+
+    Boolean existsByMember_Id(Long memberId);
 }

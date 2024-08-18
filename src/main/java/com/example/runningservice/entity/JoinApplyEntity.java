@@ -47,4 +47,5 @@ public class JoinApplyEntity extends BaseEntity{
     public void markStatus(JoinStatus status) {
         this.status = status;
     }
+    public void updateMessage(String message) { this.message = message; }
 }
