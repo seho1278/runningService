@@ -27,6 +27,8 @@ public enum ErrorCode {
     UNAUTHORIZED_CREW_ACCESS(HttpStatus.FORBIDDEN, "크루 접근 권한이 없습니다."),
 
     //크루가입
+    ALREADY_EXIST_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 가입신청 기록이 있습니다."),
+    ALREADY_CREWMEMBER(HttpStatus.BAD_REQUEST, "이미 크루에 가입된 회원입니다."),
     RECORD_OPEN_REQUIRED(HttpStatus.FORBIDDEN, "러닝 기록을 공개해야 합니다."),
     GENDER_RESTRICTION_NOT_MET(HttpStatus.FORBIDDEN, "성별 제한을 충족하지 못했습니다."),
     GENDER_REQUIRED(HttpStatus.FORBIDDEN, "가입을 위해 성별 정보가 필요합니다."),

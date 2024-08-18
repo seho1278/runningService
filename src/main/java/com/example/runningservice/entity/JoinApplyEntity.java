@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.envers.AuditOverride;
 
-@Entity(name = "join_request")
+@Entity(name = "join_apply")
 @Getter
 @SuperBuilder
 @NoArgsConstructor
@@ -47,4 +47,5 @@ public class JoinApplyEntity extends BaseEntity{
     public void markStatus(JoinStatus status) {
         this.status = status;
     }
+    public void updateMessage(String message) { this.message = message; }
 }

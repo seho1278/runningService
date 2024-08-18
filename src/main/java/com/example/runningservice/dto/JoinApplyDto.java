@@ -27,6 +27,7 @@ public class JoinApplyDto {
         private String crewName;
         private JoinStatus status;
         private LocalDateTime appliedAt;
+        private LocalDateTime updatedAt;
 
         public static SimpleResponse from(
             JoinApplyEntity joinApplyEntity) {
@@ -35,6 +36,7 @@ public class JoinApplyDto {
                 .crewName(joinApplyEntity.getCrew().getCrewName())
                 .status(joinApplyEntity.getStatus())
                 .appliedAt(joinApplyEntity.getCreatedAt())
+                .updatedAt(joinApplyEntity.getUpdatedAt())
                 .build();
         }
     }
@@ -47,6 +49,7 @@ public class JoinApplyDto {
         private JoinStatus status;
         private String applyMessage;
         private LocalDateTime appliedAt;
+        private LocalDateTime updatedAt;
 
         public static DetailResponse from(
             JoinApplyEntity joinApplyEntity) {
@@ -56,6 +59,7 @@ public class JoinApplyDto {
                 .status(joinApplyEntity.getStatus())
                 .applyMessage(joinApplyEntity.getMessage())
                 .appliedAt(joinApplyEntity.getCreatedAt())
+                .updatedAt(joinApplyEntity.getUpdatedAt())
                 .build();
         }
     }
