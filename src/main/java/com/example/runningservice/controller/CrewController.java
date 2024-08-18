@@ -11,6 +11,7 @@ import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.service.CrewService;
+import com.example.runningservice.util.LoginUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +37,9 @@ public class CrewController {
      * 크루 생성
      */
     @PostMapping
-    public ResponseEntity<CrewData> createCrew(
+    public ResponseEntity<CrewData> createCrew(@LoginUser Long userId,
         @Valid CrewRequestDto.Create request) {
-        request.setLoginUserId(1L); // TODO: 현재 로그인 한 사용자 id로 설정
+        request.setLoginUserId(userId);
 
         return ResponseEntity
             .status(HttpStatus.CREATED)

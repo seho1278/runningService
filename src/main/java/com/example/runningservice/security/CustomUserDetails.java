@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomUserDetails implements UserDetails {
 
+    @Getter
+    private Long id;
     private String email;
     private String password;
     private List<Role> roles;

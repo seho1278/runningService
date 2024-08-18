@@ -20,6 +20,7 @@ import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -61,7 +61,7 @@ public class CrewService {
             .role(CrewRole.LEADER)
             .status(JoinStatus.APPROVED)
             .build());
-        
+
         // crew 채팅방 생성
         chatRoomService.createChatRoom(crewEntity.getCrewId(),
             crewEntity.getCrewName(), ChatRoom.CREW);
@@ -174,7 +174,7 @@ public class CrewService {
         Pageable pageable) {
         Pageable customPageable = PageRequest.of(pageable.getPageNumber(),
             pageable.getPageSize(),
-            Sort.by(Sort.Order.desc("member.createdAt")));
+            Sort.by(Sort.Order.desc("joinedAt")));
         Summary summaryCrew = new Summary();
         Page<CrewMemberEntity> crewMemberEntities;
 
@@ -196,7 +196,6 @@ public class CrewService {
     /**
      * 전체 크루 필터링 조회
      */
-    @GetMapping
     public Summary getCrewList(CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
         Page<Object[]> crewList = (crewFilter.getOccupancyStatus() != null) ?
             crewFilter.getOccupancyStatus().getCrewList(crewRepository, crewFilter, pageable) :
@@ -212,6 +211,32 @@ public class CrewService {
                 crewEntity,
                 leaderNickname,
                 occupancy));
+        List<CrewEntity> crewList = crewRepository.findCrewList(crewFilter.getActivityRegion(),
+            crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
+            crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired());
+
+        int startIndex = pageable.getPageSize() * pageable.getPageNumber();
+        int endIndex = startIndex + pageable.getPageSize();
+        int curIndex = 0;
+
+        Summary summary = new Summary();
+        for (CrewEntity crewEntity : crewList) {
+            int occupancy = getCrewOccupancy(crewEntity.getCrewId());
+
+            if (crewFilter.getOccupancyStatus() == null || // 인원 상태에 대한 조회 조건이 없거나,
+                crewEntity.getCrewCapacity() == null || // 크루에 정원 제한이 없거나,
+                crewFilter.getOccupancyStatus().validateFullOrAvailable( // 제한 조건에 부합하면 조회할 크루에 추가
+                    crewEntity.getCrewCapacity(), occupancy)) {
+
+                if (curIndex >= startIndex && curIndex < endIndex) {
+                    summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
+                        crewEntity.getMember().getNickName(), occupancy));
+                }
+                curIndex++;
+                if (curIndex >= endIndex) {
+                    break;
+                }
+            }
         }
 
         return summary;
