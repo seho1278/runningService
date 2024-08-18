@@ -1,4 +1,4 @@
-package com.example.runningservice.dto;
+package com.example.runningservice.dto.googleToken;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,8 +8,9 @@ import lombok.Setter;
 @Setter
 @Builder
 public class GoogleAccessTokenRequestDto {
+    private String code;
     private String client_id;
     private String client_secret;
-    private String code;
     private String redirect_uri;
+    private String grant_type;
 }
