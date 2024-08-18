@@ -5,6 +5,7 @@ import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class CrewResponseDto {
     @Getter
     public static class Summary {
 
-        List<CrewData> data;
+        private List<CrewData> data;
 
         public Summary() {
             data = new ArrayList<>();
@@ -25,6 +26,10 @@ public class CrewResponseDto {
 
         public void addCrew(CrewData crew) {
             data.add(crew);
+        }
+
+        public int size() {
+            return data.size();
         }
     }
 
@@ -40,7 +45,7 @@ public class CrewResponseDto {
         private String leader;
         private Integer crewCapacity;
         private Integer crewOccupancy;
-        private Region activityRegion;
+        private String activityRegion;
 
         public static CrewData fromEntityAndLeaderNameAndOccupancy(CrewEntity crewEntity,
             String nickname,
@@ -53,7 +58,9 @@ public class CrewResponseDto {
                 .crewImage(crewEntity.getCrewImage())
                 .crewCapacity(crewEntity.getCrewCapacity())
                 .crewOccupancy(occupancy)
-                .activityRegion(crewEntity.getActivityRegion())
+                .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
+                    .map(Region::getRegionName)
+                    .orElse(null))
                 .build();
         }
     }
@@ -75,7 +82,9 @@ public class CrewResponseDto {
                 .crewImage(crewEntity.getCrewImage())
                 .description(crewEntity.getDescription())
                 .crewCapacity(crewEntity.getCrewCapacity())
-                .activityRegion(crewEntity.getActivityRegion())
+                .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
+                    .map(Region::getRegionName)
+                    .orElse(null))
                 .limit(Limit.builder()
                     .gender(crewEntity.getGender())
                     .leaderRequired(crewEntity.getLeaderRequired())

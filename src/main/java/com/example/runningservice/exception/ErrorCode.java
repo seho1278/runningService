@@ -23,6 +23,8 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     NOT_FOUND_CREW(HttpStatus.BAD_REQUEST, "크루를 찾을 수 없습니다."),
     NOT_FOUND_APPLY(HttpStatus.BAD_REQUEST, "해당 신청내역을 찾을 수 없습니다."),
+    NOT_FOUND_REGULAR_RUN(HttpStatus.BAD_REQUEST, "정기러닝이 존재하지 않습니다."),
+    UNAUTHORIZED_CREW_ACCESS(HttpStatus.FORBIDDEN, "크루 접근 권한이 없습니다."),
 
     //크루가입
     ALREADY_EXIST_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 가입신청 기록이 있습니다."),
