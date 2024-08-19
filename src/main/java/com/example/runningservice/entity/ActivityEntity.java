@@ -1,13 +1,16 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.dto.activity.ActivityRequestDto.Update;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,4 +44,15 @@ public class ActivityEntity extends BaseEntity {
     private LocalTime endTime;
     private String location;
     private String notes;
+    @OneToMany(mappedBy = "activity", orphanRemoval = true)
+    private List<ParticipantEntity> participant;
+
+    public void update(Update activityDto) {
+        this.title = activityDto.getTitle();
+        this.date = activityDto.getDate();
+        this.startTime = activityDto.getStartTime();
+        this.endTime = activityDto.getEndTime();
+        this.location = activityDto.getLocation();
+        this.notes = activityDto.getMemo();
+    }
 }

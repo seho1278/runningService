@@ -1,6 +1,8 @@
 package com.example.runningservice.service;
 
+import com.example.runningservice.dto.activity.ActivityFilterDto;
 import com.example.runningservice.dto.activity.ActivityRequestDto.Create;
+import com.example.runningservice.dto.activity.ActivityRequestDto.Update;
 import com.example.runningservice.dto.activity.ActivityResponseDto;
 import com.example.runningservice.entity.ActivityEntity;
 import com.example.runningservice.entity.CrewEntity;
@@ -16,8 +18,12 @@ import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,31 +35,32 @@ public class ActivityService {
     private final MemberRepository memberRepository;
     private final RegularRunMeetingRepository regularRunMeetingRepository;
 
-    /**
-     * (정기/번개)러닝 일정 생성
-     */
-    public ActivityResponseDto createActivity(Long userId, Long crewId, Create newActivity) {
+    // 정기 러닝 일정 생성
+    public ActivityResponseDto createRegularActivity(Long userId, Long crewId, Create activity) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         MemberEntity authorEntity = memberRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        // 정기러닝 생성 시 일정에 정기러닝 정보를 설정하고, 번개러닝 생성 시 null로 설정
-        RegularRunMeetingEntity regularEntity =
-            (newActivity.getCategory().equals(ActivityCategory.REGULAR)) ?
-                getRegularActivity(newActivity, crewId, userId) : null;
+        if (hasNotLeaderOfStaffAuthority(crewId, userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REGULAR_ACCESS);
+        }
+
+        RegularRunMeetingEntity regularEntity = regularRunMeetingRepository.findById(
+                activity.getRegularId())
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REGULAR_RUN));
 
         ActivityEntity activityEntity = ActivityEntity.builder()
             .author(authorEntity)
             .crew(crewEntity)
             .regularRun(regularEntity)
-            .title(newActivity.getTitle())
-            .location(newActivity.getLocation())
-            .date(newActivity.getDate())
-            .notes(newActivity.getMemo())
-            .startTime(newActivity.getStartTime())
-            .endTime(newActivity.getEndTime())
+            .title(activity.getTitle())
+            .location(activity.getLocation())
+            .date(activity.getDate())
+            .notes(activity.getMemo())
+            .startTime(activity.getStartTime())
+            .endTime(activity.getEndTime())
             .build();
 
         activityRepository.save(activityEntity);
@@ -61,20 +68,120 @@ public class ActivityService {
         return ActivityResponseDto.fromEntity(activityEntity);
     }
 
-    // 정기러닝 생성 권한 체크 후, 정기러닝 정보 엔티티 가져오기
-    private RegularRunMeetingEntity getRegularActivity(Create newActivity, Long crewId,
-        Long userId) {
+    // 번개 러닝 일정 생성
+    public ActivityResponseDto createOnDemandActivity(Long userId, Long crewId, Create activity) {
+        CrewEntity crewEntity = crewRepository.findById(crewId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
+        MemberEntity authorEntity = memberRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        ActivityEntity activityEntity = ActivityEntity.builder()
+            .author(authorEntity)
+            .crew(crewEntity)
+            .title(activity.getTitle())
+            .location(activity.getLocation())
+            .date(activity.getDate())
+            .notes(activity.getMemo())
+            .startTime(activity.getStartTime())
+            .endTime(activity.getEndTime())
+            .build();
+
+        activityRepository.save(activityEntity);
+
+        return ActivityResponseDto.fromEntity(activityEntity);
+    }
+
+    // 리더 또는 스탭 권한이 없는지 확인한다.
+    private boolean hasNotLeaderOfStaffAuthority(Long crewId, Long userId) {
         CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_CrewIdAndMember_Id(
                 crewId, userId)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS));
 
-        // 정기러닝 생성은 LEADER 또는 STAFF 권한만 가능
-        if (crewMemberEntity.getRole().equals(CrewRole.MEMBER)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS);
+        return !crewMemberEntity.getRole().equals(CrewRole.LEADER) &&
+            !crewMemberEntity.getRole().equals(CrewRole.STAFF);
+    }
+
+    /**
+     * (정기/번개)러닝 일정 수정
+     */
+    @Transactional
+    public ActivityResponseDto updateActivity(Long userId, Long crewId, Long activityId,
+        Update activityDto) {
+        ActivityEntity activityEntity = activityRepository.findById(activityId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACTIVITY));
+
+        if (isRegularRun(activityEntity) && hasNotLeaderOfStaffAuthority(crewId, userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REGULAR_ACCESS);
+        }
+        if (!isRegularRun(activityEntity) && !activityEntity.getAuthor().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACTIVITY);
         }
 
-        return regularRunMeetingRepository.findById(newActivity.getRegularId())
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REGULAR_RUN));
+        activityEntity.update(activityDto);
+
+        return ActivityResponseDto.fromEntity(activityEntity);
+    }
+
+    private boolean isRegularRun(ActivityEntity activityEntity) {
+        return activityEntity.getRegularRun() != null;
+    }
+
+    /**
+     * (정기/번개)러닝 일정 삭제
+     */
+    @Transactional
+    public ActivityResponseDto deleteActivity(Long userId, Long crewId, Long activityId) {
+        ActivityEntity activityEntity = activityRepository.findById(activityId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACTIVITY));
+
+        if (hasNotLeaderOfStaffAuthority(crewId, userId)) { // 리더나 스탭이 아니면 본인 일정만 삭제 가능
+            if (activityEntity.getAuthor().getId().equals(userId)) {
+                throw new CustomException(ErrorCode.UNAUTHORIZED_ACTIVITY);
+            }
+        }
+
+        ActivityResponseDto response = ActivityResponseDto.fromEntity(activityEntity);
+
+        activityRepository.delete(activityEntity);
+
+        return response;
+    }
+
+    /**
+     * 특정 (정기/번개)러닝 일정 조회
+     */
+    public ActivityResponseDto getActivity(Long activityId) {
+        ActivityEntity activityEntity = activityRepository.findById(activityId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACTIVITY));
+
+        return ActivityResponseDto.fromEntity(activityEntity);
+    }
+
+    /**
+     * 크루 (정기/번개)러닝 일정 조회
+     */
+    public List<ActivityResponseDto> getCrewActivity(Long crewId, ActivityFilterDto activityFilter,
+        Pageable pageable) {
+        if (!validateDate(activityFilter.getStartDate(), activityFilter.getEndDate())) {
+            throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
+        }
+
+        List<ActivityEntity> activityPage = (activityFilter.getCategory() != null) ?
+            activityFilter.getCategory().findByCrewIdAndDateBetween(activityRepository, crewId,
+                activityFilter.getStartDate(), activityFilter.getEndDate(), pageable)
+            :
+                ActivityCategory.ALL.findByCrewIdAndDateBetween(activityRepository, crewId,
+                    activityFilter.getStartDate(), activityFilter.getEndDate(), pageable);
+
+        return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
+    }
+
+    // 시작 날짜가 종료 날짜보다 빠른지 체크한다.
+    private boolean validateDate(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null) {
+            return startDate.isBefore(endDate);
+        }
+        return true;
     }
 }

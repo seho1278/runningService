@@ -29,6 +29,7 @@ public class ActivityResponseDto {
     private LocalTime endTime;
     private String notes;
     private String location;
+    private int participant;
 
     public static ActivityResponseDto fromEntity(ActivityEntity activityEntity) {
         return ActivityResponseDto.builder()
@@ -44,6 +45,9 @@ public class ActivityResponseDto {
             .endTime(activityEntity.getEndTime())
             .notes(activityEntity.getNotes())
             .location(activityEntity.getLocation())
+            .participant(
+                (activityEntity.getParticipant() != null) ?
+                    activityEntity.getParticipant().size() : 0)
             .build();
     }
 }

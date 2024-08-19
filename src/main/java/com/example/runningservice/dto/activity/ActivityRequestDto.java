@@ -23,4 +23,18 @@ public class ActivityRequestDto {
         private String memo;
         private String location;
     }
+
+    @Getter
+    public static class Update {
+
+        private String title;
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        private LocalDate date;
+        @JsonFormat(pattern = "HH:mm")
+        private LocalTime startTime;
+        @JsonFormat(pattern = "HH:mm")
+        private LocalTime endTime;
+        private String memo;
+        private String location;
+    }
 }
