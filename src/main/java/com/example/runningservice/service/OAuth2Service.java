@@ -1,8 +1,10 @@
 package com.example.runningservice.service;
 
-import com.example.runningservice.dto.GoogleAccessTokenRequestDto;
-import com.example.runningservice.dto.GoogleAccessTokenResponseDto;
-import com.example.runningservice.dto.GoogleAccountProfileResponseDto;
+
+import com.example.runningservice.dto.googleToken.GoogleAccessTokenRequestDto;
+import com.example.runningservice.dto.googleToken.GoogleAccessTokenResponseDto;
+import com.example.runningservice.dto.googleToken.GoogleAccountProfileResponseDto;
+import com.example.runningservice.util.AESUtil;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -33,22 +35,24 @@ public class OAuth2Service {
     private String profileUrl;
 
     private final RestTemplate restTemplate;
+    private final AESUtil aesUtil;
 
-    public GoogleAccountProfileResponseDto getGoogleAccountProfile(final String code) throws LoginException {
+    public GoogleAccountProfileResponseDto getGoogleAccountProfile(final String code) throws LoginException, Exception {
         final String accessToken = requestGoogleAccessToken(code);
         return requestGoogleAccountProfile(accessToken);
     }
 
-    private String requestGoogleAccessToken(final String code) throws LoginException {
+    private String requestGoogleAccessToken(final String code) throws LoginException, Exception {
         final String decodedCode = URLDecoder.decode(code, StandardCharsets.UTF_8);
         final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         final HttpEntity<GoogleAccessTokenRequestDto> httpEntity = new HttpEntity<>(
             GoogleAccessTokenRequestDto.builder()
-                .client_id(clientId)
-                .client_secret(clientSecret)
-                .code(code)
+                .client_id(aesUtil.decrypt(clientId))
+                .client_secret(aesUtil.decrypt(clientSecret))
+                .code(decodedCode)
                 .redirect_uri(redirectUri)
+                .grant_type(authorizationCode)
                 .build(),
             headers
         );
@@ -57,7 +61,7 @@ public class OAuth2Service {
         ).getBody();
         return Optional.ofNullable(response)
             .orElseThrow(() -> new LoginException("구글로그인을 찾을 수 없습니다."))
-            .getAccessToken();
+            .getAccess_token();
     }
 
     private GoogleAccountProfileResponseDto requestGoogleAccountProfile(final String accessToken) {

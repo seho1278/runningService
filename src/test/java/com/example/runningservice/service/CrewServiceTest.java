@@ -30,8 +30,8 @@ import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
-import java.util.List;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -168,7 +168,7 @@ class CrewServiceTest {
         f2.set(update, new MockMultipartFile("file", new byte[]{1, 2, 3}));
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).member(memberEntity).build();
+        CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).leader(memberEntity).build();
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
         given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/image");
@@ -202,7 +202,7 @@ class CrewServiceTest {
         f2.set(update, new MockMultipartFile("file", new byte[0]));
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).member(memberEntity).build();
+        CrewEntity crewEntity = CrewEntity.builder().crewId(crewId).leader(memberEntity).build();
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
         given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/default");
@@ -226,7 +226,7 @@ class CrewServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
         CrewEntity crewEntity = CrewEntity.builder()
             .crewId(crewId)
-            .member(memberEntity)
+            .leader(memberEntity)
             .crewImage("a/b/crew-1")
             .build();
 
@@ -249,7 +249,7 @@ class CrewServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
         CrewEntity crewEntity = CrewEntity.builder()
             .crewId(crewId)
-            .member(memberEntity)
+            .leader(memberEntity)
             .crewImage("a/b/crew-default")
             .build();
 
@@ -271,7 +271,7 @@ class CrewServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
         CrewEntity crewEntity = CrewEntity.builder()
             .crewId(crewId)
-            .member(memberEntity)
+            .leader(memberEntity)
             .leaderRequired(true)
             .runRecordOpen(true)
             .build();
@@ -296,7 +296,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("joinedAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -325,7 +325,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("joinedAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -357,7 +357,7 @@ class CrewServiceTest {
         CrewEntity crew1 = CrewEntity.builder().crewId(5L).build();
         CrewEntity crew2 = CrewEntity.builder().crewId(10L).build();
 
-        Pageable pageable = PageRequest.of(1, 2, Sort.by("member.createdAt").descending());
+        Pageable pageable = PageRequest.of(1, 2, Sort.by("joinedAt").descending());
         List<CrewMemberEntity> crewMembers = List.of(CrewMemberEntity.builder()
                 .crew(crew1)
                 .member(member)
@@ -386,24 +386,21 @@ class CrewServiceTest {
     public void getCrewList_Full() {
         CrewInfo crewInfo = CrewInfo.builder().occupancyStatus(OccupancyStatus.FULL).build();
         Pageable pageable = PageRequest.of(1, 2);
-        MemberEntity member = MemberEntity.builder().id(1L).build();
-        CrewEntity crew1 = CrewEntity.builder().crewId(5L).member(member).crewCapacity(1).build();
-        CrewEntity crew2 = CrewEntity.builder().crewId(10L).member(member).crewCapacity(10).build();
+        MemberEntity member = MemberEntity.builder().id(1L).nickName("nick").build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).leader(member).crewCapacity(1).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).leader(member).crewCapacity(10).build();
 
-        List<CrewEntity> crewMembers = List.of(crew1, crew2);
-        Page<CrewEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+        List<Object[]> crewMembers = List.of(new Object[]{crew1, member.getNickName(), 1L},
+            new Object[]{crew2, member.getNickName(), 1L});
+        Page<Object[]> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
 
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew1.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew2.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewRepository.findCrewList(any(), any(), any(), any(), any(), any(),
+        given(crewRepository.findFullCrewList(any(), any(), any(), any(), any(), any(),
             any())).willReturn(result);
 
-        Summary summary = crewService.getCrewList(crewInfo, pageable);
+        crewService.getCrewList(crewInfo, pageable);
 
-        assertEquals(summary.getData().size(), 1);
-        assertEquals(summary.getData().get(0).getCrewId(), crew1.getCrewId());
+        verify(crewRepository, times(1)).findFullCrewList(any(), any(), any(), any(), any(), any(),
+            any());
     }
 
     @Test
@@ -412,17 +409,14 @@ class CrewServiceTest {
         CrewInfo crewInfo = CrewInfo.builder().build();
         Pageable pageable = PageRequest.of(1, 2);
         MemberEntity member = MemberEntity.builder().id(1L).build();
-        CrewEntity crew1 = CrewEntity.builder().crewId(5L).member(member).crewCapacity(1).build();
-        CrewEntity crew2 = CrewEntity.builder().crewId(10L).member(member).crewCapacity(10).build();
+        CrewEntity crew1 = CrewEntity.builder().crewId(5L).leader(member).crewCapacity(1).build();
+        CrewEntity crew2 = CrewEntity.builder().crewId(10L).leader(member).crewCapacity(10).build();
 
-        List<CrewEntity> crewMembers = List.of(crew1, crew2);
-        Page<CrewEntity> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
+        List<Object[]> crewMembers = List.of(new Object[]{crew1, member.getNickName(), 1L},
+            new Object[]{crew2, member.getNickName(), 1L});
+        Page<Object[]> result = new PageImpl<>(crewMembers, pageable, crewMembers.size());
 
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew1.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewMemberRepository.countByCrew_CrewIdAndStatus(crew2.getCrewId(),
-            JoinStatus.APPROVED)).willReturn(1);
-        given(crewRepository.findCrewList(any(), any(), any(), any(), any(), any(),
+        given(crewRepository.findAllCrewList(any(), any(), any(), any(), any(), any(),
             any())).willReturn(result);
 
         Summary summary = crewService.getCrewList(crewInfo, pageable);

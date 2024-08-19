@@ -1,14 +1,20 @@
 package com.example.runningservice.repository;
 
 import com.example.runningservice.entity.JoinApplyEntity;
-import java.util.List;
+import com.example.runningservice.enums.JoinStatus;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JoinApplicationRepository extends JpaRepository<JoinApplyEntity, Long> {
-    List<JoinApplyEntity> findAllByMember_Id(Long memberId);
-    Optional<JoinApplyEntity> findByIdAndMember_Email(Long id, String email);
     Optional<JoinApplyEntity> findByIdAndMember_Id(Long id, Long memberId);
+    Optional<JoinApplyEntity> findByIdAndStatus(Long id, JoinStatus status);
+    Boolean existsByMember_IdAndCrew_CrewId(Long memberId, Long crewId);
+    Optional<JoinApplyEntity> findByIdAndStatusAndCrew_CrewId(Long memberId, JoinStatus status, Long crewId);
+    Page<JoinApplyEntity> findAllByMember_Id(Long memberId, Pageable pageable);
+
+    Page<JoinApplyEntity> findAllByMember_IdAndStatus(Long memberId, JoinStatus status, Pageable pageable);
 }
