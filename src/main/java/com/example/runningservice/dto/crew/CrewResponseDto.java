@@ -43,17 +43,15 @@ public class CrewResponseDto {
         private Integer crewOccupancy;
         private String activityRegion;
 
-        public static CrewData fromEntityAndLeaderNameAndOccupancy(CrewEntity crewEntity,
-            String nickname,
-            int occupancy) {
+        public static CrewData fromEntity(CrewEntity crewEntity) {
 
             return CrewData.builder()
                 .crewId(crewEntity.getCrewId())
-                .leader(nickname)
+                .leader(crewEntity.getMember().getNickName())
                 .crewName(crewEntity.getCrewName())
                 .crewImage(crewEntity.getCrewImage())
                 .crewCapacity(crewEntity.getCrewCapacity())
-                .crewOccupancy(occupancy)
+                .crewOccupancy(crewEntity.getCrewMember().size())
                 .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
                     .map(Region::getRegionName)
                     .orElse(null))
@@ -88,15 +86,9 @@ public class CrewResponseDto {
                     .minAge(crewEntity.getMinAge())
                     .runRecordOpen(crewEntity.getRunRecordOpen())
                     .build())
+                .leader(crewEntity.getMember().getNickName())
+                .crewOccupancy(crewEntity.getCrewMember().size())
                 .build();
-        }
-
-        public void setLeaderName(String nickname) {
-            super.leader = nickname;
-        }
-
-        public void setCrewOccupancy(int occupancy) {
-            super.crewOccupancy = occupancy;
         }
 
         public void setRunningCount(int runningCount) {

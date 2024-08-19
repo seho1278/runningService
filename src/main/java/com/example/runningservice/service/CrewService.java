@@ -68,10 +68,7 @@ public class CrewService {
         chatRoomService.createChatRoom(crewEntity.getCrewId(),
             crewEntity.getCrewName() + "_Staff", ChatRoom.CREW_STAFF);
 
-        return CrewData.fromEntityAndLeaderNameAndOccupancy(
-            crewEntity,
-            memberEntity.getNickName(),
-            1);
+        return CrewData.fromEntity(crewEntity);
     }
 
     /**
@@ -101,10 +98,7 @@ public class CrewService {
         crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getCrewId(),
             updateCrew.getCrewImage()));
 
-        return CrewData.fromEntityAndLeaderNameAndOccupancy(
-            crewEntity,
-            crewEntity.getMember().getNickName(),
-            getCrewOccupancy(updateCrew.getCrewId()));
+        return CrewData.fromEntity(crewEntity);
     }
 
     /**
@@ -123,10 +117,7 @@ public class CrewService {
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         // 삭제하기 전에 리턴하기 위한 데이터를 미리 저장해둔다.
-        CrewData crewData = CrewData.fromEntityAndLeaderNameAndOccupancy(
-            crewEntity,
-            crewEntity.getMember().getNickName(),
-            getCrewOccupancy(crewId));
+        CrewData crewData = CrewData.fromEntity(crewEntity);
 
         // 이미지가 디폴트가 아닌 경우에만 삭제
         String fileName = findLastPath(crewEntity.getCrewImage());
@@ -159,8 +150,6 @@ public class CrewService {
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         Detail detail = Detail.fromEntity(crewEntity);
-        detail.setLeaderName(crewEntity.getMember().getNickName());
-        detail.setCrewOccupancy(getCrewOccupancy(crewId));
         detail.setRunningCount(0); // TODO: 활동 기능 추가되면 추가
 
         return detail;
@@ -185,9 +174,9 @@ public class CrewService {
                 participate.getUserId(), customPageable);
         }
 
-        crewMemberEntities.getContent()
-            .forEach(x -> summaryCrew.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(
-                x.getCrew(), x.getMember().getNickName(), getCrewOccupancy(x.getId()))));
+        for (CrewMemberEntity crewMemberEntity : crewMemberEntities) {
+            summaryCrew.addCrew(CrewData.fromEntity(crewMemberEntity.getCrew()));
+        }
 
         return summaryCrew;
     }
@@ -214,8 +203,7 @@ public class CrewService {
                 crewFilter.getOccupancyStatus().validateFullOrAvailable( // 제한 조건에 부합하면 조회할 크루에 추가
                     crewEntity.getCrewCapacity(), occupancy)) {
 
-                summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(crewEntity,
-                    crewEntity.getMember().getNickName(), occupancy));
+                summary.addCrew(CrewData.fromEntity(crewEntity));
             }
         }
 
