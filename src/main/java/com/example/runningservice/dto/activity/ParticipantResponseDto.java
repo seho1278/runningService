@@ -16,5 +16,5 @@ public class ParticipantResponseDto {
     private Long activityId;
     private String nickName;
     private Gender gender;
-    private int birthYear;
+    private Integer birthYear;
 }
