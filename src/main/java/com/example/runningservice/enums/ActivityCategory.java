@@ -12,7 +12,7 @@ public enum ActivityCategory {
         public List<ActivityEntity> findByCrewIdAndDateBetween(
             ActivityRepository activityRepository, Long crewId, LocalDate startDate,
             LocalDate endDate, Pageable pageable) {
-            return activityRepository.findByCrew_CrewIdAndDateBetweenAndRegularRunIsNotNull(crewId,
+            return activityRepository.findByCrew_IdAndDateBetweenAndRegularRunIsNotNull(crewId,
                 startDate, endDate, pageable).getContent();
         }
     },
@@ -21,7 +21,7 @@ public enum ActivityCategory {
         public List<ActivityEntity> findByCrewIdAndDateBetween(
             ActivityRepository activityRepository, Long crewId, LocalDate startDate,
             LocalDate endDate, Pageable pageable) {
-            return activityRepository.findByCrew_CrewIdAndDateBetweenAndRegularRunIsNull(crewId,
+            return activityRepository.findByCrew_IdAndDateBetweenAndRegularRunIsNull(crewId,
                 startDate, endDate, pageable).getContent();
         }
     },
@@ -30,7 +30,7 @@ public enum ActivityCategory {
         public List<ActivityEntity> findByCrewIdAndDateBetween(
             ActivityRepository activityRepository, Long crewId, LocalDate startDate,
             LocalDate endDate, Pageable pageable) {
-            return activityRepository.findByCrew_CrewIdAndDateBetween(crewId, startDate, endDate,
+            return activityRepository.findByCrew_IdAndDateBetween(crewId, startDate, endDate,
                 pageable).getContent();
         }
     };

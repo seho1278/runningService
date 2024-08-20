@@ -10,12 +10,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> {
 
-    Page<ActivityEntity> findByCrew_CrewIdAndDateBetweenAndRegularRunIsNull(Long crewId,
+    Page<ActivityEntity> findByCrew_IdAndDateBetweenAndRegularRunIsNull(Long crewId,
         LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    Page<ActivityEntity> findByCrew_CrewIdAndDateBetweenAndRegularRunIsNotNull(Long crewId,
+    Page<ActivityEntity> findByCrew_IdAndDateBetweenAndRegularRunIsNotNull(Long crewId,
         LocalDate startDate, LocalDate endDate, Pageable pageable);
 
-    Page<ActivityEntity> findByCrew_CrewIdAndDateBetween(Long crewId,
+    Page<ActivityEntity> findByCrew_IdAndDateBetween(Long crewId,
         LocalDate startDate, LocalDate endDate, Pageable pageable);
+
+    int countByCrew_Id(Long crewId);
 }

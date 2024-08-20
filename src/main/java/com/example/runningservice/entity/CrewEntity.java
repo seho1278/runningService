@@ -19,15 +19,15 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.envers.AuditOverride;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "crew")
 @AuditOverride(forClass = BaseEntity.class)
@@ -35,7 +35,7 @@ public class CrewEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long crewId;
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "leader_id")
     private MemberEntity leader;

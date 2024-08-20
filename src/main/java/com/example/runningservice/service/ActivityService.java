@@ -94,7 +94,7 @@ public class ActivityService {
 
     // 리더 또는 스탭 권한이 없는지 확인한다.
     private boolean hasNotLeaderOfStaffAuthority(Long crewId, Long userId) {
-        CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_CrewIdAndMember_Id(
+        CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_IdAndMember_Id(
                 crewId, userId)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS));
 
@@ -136,7 +136,7 @@ public class ActivityService {
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACTIVITY));
 
         if (hasNotLeaderOfStaffAuthority(crewId, userId)) { // 리더나 스탭이 아니면 본인 일정만 삭제 가능
-            if (activityEntity.getAuthor().getId().equals(userId)) {
+            if (!activityEntity.getAuthor().getId().equals(userId)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACTIVITY);
             }
         }
@@ -177,10 +177,10 @@ public class ActivityService {
         return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
     }
 
-    // 시작 날짜가 종료 날짜보다 빠른지 체크한다.
+    // 시작 날짜가 종료 날짜보다 빠르거나 같은지 체크한다.
     private boolean validateDate(LocalDate startDate, LocalDate endDate) {
         if (startDate != null && endDate != null) {
-            return startDate.isBefore(endDate);
+            return startDate.isBefore(endDate) || startDate.isEqual(endDate);
         }
         return true;
     }
