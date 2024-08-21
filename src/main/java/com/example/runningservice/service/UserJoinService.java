@@ -128,7 +128,7 @@ public class UserJoinService {
         Integer minAge = crewEntity.getMinAge();
         Integer maxAge = crewEntity.getMaxAge();
         Long memberId = memberEntity.getId();
-        Long crewId = crewEntity.getCrewId();
+        Long crewId = crewEntity.getId();
         // 나이 제한 있으면 검증
         if (minAge != null || maxAge != null) {
             //나이 검증
@@ -150,7 +150,7 @@ public class UserJoinService {
             throw new CustomException(ErrorCode.ALREADY_CREWMEMBER);
         }
         //이미 신청기록 있다면 신청 불가
-        if (joinApplicationRepository.existsByMember_IdAndCrew_CrewId(memberId, crewId)) {
+        if (joinApplicationRepository.existsByMember_IdAndCrew_Id(memberId, crewId)) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_JOIN_APPLY);
         }
     }

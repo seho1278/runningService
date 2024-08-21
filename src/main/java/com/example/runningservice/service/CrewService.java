@@ -1,11 +1,12 @@
 package com.example.runningservice.service;
 
+import com.example.runningservice.dto.crew.CrewBaseResponseDto;
+import com.example.runningservice.dto.crew.CrewDetailResponseDto;
 import com.example.runningservice.dto.crew.CrewFilterDto;
+import com.example.runningservice.dto.crew.CrewJoinStatusResponseDto;
 import com.example.runningservice.dto.crew.CrewRequestDto.Create;
 import com.example.runningservice.dto.crew.CrewRequestDto.Update;
-import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
-import com.example.runningservice.dto.crew.CrewResponseDto.Detail;
-import com.example.runningservice.dto.crew.CrewResponseDto.Summary;
+import com.example.runningservice.dto.crew.CrewRoleResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -15,16 +16,17 @@ import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
+import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +38,7 @@ public class CrewService {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
+    private final ActivityRepository activityRepository;
     private final S3FileUtil s3FileUtil;
     private final String DEFAULT_IMAGE_NAME = "crew-default";
     private final ChatRoomService chatRoomService;
@@ -44,14 +47,14 @@ public class CrewService {
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
      */
     @Transactional
-    public CrewData createCrew(Create newCrew) {
+    public CrewBaseResponseDto createCrew(Create newCrew) {
         MemberEntity memberEntity = memberRepository.findById(newCrew.getLeaderId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         CrewEntity crewEntity = CrewEntity.toEntity(newCrew, memberEntity);
         crewRepository.save(crewEntity);
 
-        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getCrewId(),
+        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getId(),
             newCrew.getCrewImage()));
 
         crewMemberRepository.save(CrewMemberEntity.builder()
@@ -62,16 +65,13 @@ public class CrewService {
             .build());
 
         // crew 채팅방 생성
-        chatRoomService.createChatRoom(crewEntity.getCrewId(),
+        chatRoomService.createChatRoom(crewEntity.getId(),
             crewEntity.getCrewName(), ChatRoom.CREW);
         // crew staff 채팅방 생성
         chatRoomService.createChatRoom(crewEntity.getCrewId(),
             crewEntity.getCrewName(), ChatRoom.CREW_STAFF);
 
-        return CrewData.fromEntityAndLeaderNameAndOccupancy(
-            crewEntity,
-            memberEntity.getNickName(),
-            1);
+        return CrewBaseResponseDto.fromEntity(crewEntity);
     }
 
     /**
@@ -92,41 +92,28 @@ public class CrewService {
      * 크루 정보 수정 :: 크루 db 수정 - 이미지 s3 저장 - 수정된 크루 정보 리턴
      */
     @Transactional
-    public CrewData updateCrew(Update updateCrew) {
+    public CrewBaseResponseDto updateCrew(Update updateCrew) {
         CrewEntity crewEntity = crewRepository.findById(updateCrew.getCrewId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         crewEntity.updateFromDto(updateCrew);
 
-        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getCrewId(),
+        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getId(),
             updateCrew.getCrewImage()));
 
-        return CrewData.fromEntityAndLeaderNameAndOccupancy(
-            crewEntity,
-            crewEntity.getLeader().getNickName(),
-            getCrewOccupancy(updateCrew.getCrewId()));
-    }
-
-    /**
-     * 크루의 현재 크루원 수 조회
-     */
-    private int getCrewOccupancy(Long crewId) {
-        return crewMemberRepository.countByCrew_CrewIdAndStatus(crewId, JoinStatus.APPROVED);
+        return CrewBaseResponseDto.fromEntity(crewEntity);
     }
 
     /**
      * 크루 삭제 :: 크루 이미지 삭제 - 크루원 삭제 - 크루 삭제
      */
     @Transactional
-    public CrewData deleteCrew(Long crewId) {
+    public CrewBaseResponseDto deleteCrew(Long crewId) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         // 삭제하기 전에 리턴하기 위한 데이터를 미리 저장해둔다.
-        CrewData crewData = CrewData.fromEntityAndLeaderNameAndOccupancy(
-            crewEntity,
-            crewEntity.getLeader().getNickName(),
-            getCrewOccupancy(crewId));
+        CrewBaseResponseDto crewData = CrewBaseResponseDto.fromEntity(crewEntity);
 
         // 이미지가 디폴트가 아닌 경우에만 삭제
         String fileName = findLastPath(crewEntity.getCrewImage());
@@ -135,7 +122,7 @@ public class CrewService {
         }
 
         // 크루원 삭제
-        crewMemberRepository.deleteAllByCrew_CrewId(crewId);
+        crewMemberRepository.deleteAllByCrew_Id(crewId);
 
         crewRepository.delete(crewEntity);
 
@@ -154,64 +141,63 @@ public class CrewService {
     /**
      * 크루 싱세 정보 조회
      */
-    public Detail getCrew(Long crewId) {
+    public CrewDetailResponseDto getCrew(Long crewId) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
-        Detail detail = Detail.fromEntity(crewEntity);
-        detail.setLeaderName(crewEntity.getLeader().getNickName());
-        detail.setCrewOccupancy(getCrewOccupancy(crewId));
-        detail.setRunningCount(0); // TODO: 활동 기능 추가되면 추가
+        CrewDetailResponseDto detail = CrewDetailResponseDto.fromEntity(crewEntity);
+
+        detail.setRunningCount(activityRepository.countByCrew_Id(crewId));
 
         return detail;
     }
 
     /**
-     * 참가 중인 크루 리스트 조회 (내가 만든 크루, 가입한 크루로 필터링하여 조회 가능)
+     * 참가 중인 크루 리스트 조회
      */
-    public Summary getParticipateCrewList(CrewFilterDto.Participate participate,
-        Pageable pageable) {
-        Pageable customPageable = PageRequest.of(pageable.getPageNumber(),
-            pageable.getPageSize(),
-            Sort.by(Sort.Order.desc("joinedAt")));
-        Summary summaryCrew = new Summary();
+    public List<CrewRoleResponseDto> getParticipateCrewList(Long loginId, Pageable pageable) {
         Page<CrewMemberEntity> crewMemberEntities;
+        crewMemberEntities = crewMemberRepository.findByMember_IdOrderByJoinedAt(loginId, pageable);
 
-        if (participate.getFilter() != null) {
-            crewMemberEntities = crewMemberRepository.findByMember_IdAndRole(
-                participate.getUserId(), participate.getFilter().getCrewRole(), customPageable);
-        } else { // filter가 없으면 내가 만든/가입한 크루 전체 조회
-            crewMemberEntities = crewMemberRepository.findByMember_Id(
-                participate.getUserId(), customPageable);
+        List<CrewRoleResponseDto> crewList = new ArrayList<>();
+        for (CrewMemberEntity crewMemberEntity : crewMemberEntities) {
+            crewList.add(CrewRoleResponseDto.fromEntity(
+                crewMemberEntity.getCrew(), crewMemberEntity.getRole()));
         }
 
-        crewMemberEntities.getContent()
-            .forEach(x -> summaryCrew.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(
-                x.getCrew(), x.getMember().getNickName(), getCrewOccupancy(x.getId()))));
-
-        return summaryCrew;
+        return crewList;
     }
 
     /**
      * 전체 크루 필터링 조회
      */
-    public Summary getCrewList(CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
-        Page<Object[]> crewList = (crewFilter.getOccupancyStatus() != null) ?
+    public List<CrewJoinStatusResponseDto> getCrewList(Long loginId,
+        CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
+        Page<CrewEntity> crewEntityList = (crewFilter.getOccupancyStatus() != null) ?
             crewFilter.getOccupancyStatus().getCrewList(crewRepository, crewFilter, pageable) :
             OccupancyStatus.ALL.getCrewList(crewRepository, crewFilter, pageable);
 
-        Summary summary = new Summary();
-        for (Object[] object : crewList) {
-            CrewEntity crewEntity = (CrewEntity) object[0];
-            String leaderNickname = (String) object[1];
-            int occupancy = ((Long) object[2]).intValue();
-
-            summary.addCrew(CrewData.fromEntityAndLeaderNameAndOccupancy(
-                crewEntity,
-                leaderNickname,
-                occupancy));
+        List<CrewJoinStatusResponseDto> crewList = new ArrayList<>();
+        for (CrewEntity crewEntity : crewEntityList.getContent()) {
+            crewList.add(CrewJoinStatusResponseDto.fromEntity(crewEntity,
+                checkJoinedCrew(crewEntity.getCrewMember(), loginId)));
         }
 
-        return summary;
+        return crewList;
+    }
+
+    // 조회한 크루가 가입한 크루인지 확인한다.
+    private boolean checkJoinedCrew(List<CrewMemberEntity> crewMemberList, Long userId) {
+        if (userId == null) {
+            return false;
+        }
+
+        for (CrewMemberEntity crewMemberEntity : crewMemberList) {
+            if (crewMemberEntity.getMember().getId().equals(userId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

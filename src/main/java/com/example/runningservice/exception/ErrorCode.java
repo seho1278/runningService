@@ -25,6 +25,10 @@ public enum ErrorCode {
     NOT_FOUND_APPLY(HttpStatus.BAD_REQUEST, "해당 신청내역을 찾을 수 없습니다."),
     NOT_FOUND_REGULAR_RUN(HttpStatus.BAD_REQUEST, "정기러닝이 존재하지 않습니다."),
     UNAUTHORIZED_CREW_ACCESS(HttpStatus.FORBIDDEN, "크루 접근 권한이 없습니다."),
+    UNAUTHORIZED_REGULAR_ACCESS(HttpStatus.FORBIDDEN, "정기러닝 접근 권한이 없습니다."),
+    NOT_FOUND_ACTIVITY(HttpStatus.BAD_REQUEST, "활동이 존재하지 않습니다."),
+    UNAUTHORIZED_ACTIVITY(HttpStatus.FORBIDDEN, "활동 접근 권한이 없습니다."),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작 날짜가 종료 날짜보다 빨라야 합니다."),
     NOT_FOUND_CHATROOM(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
 
     //크루가입
