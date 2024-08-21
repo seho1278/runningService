@@ -44,7 +44,7 @@ public class SecurityConfig {
                         "/h2-console/**",
                         "/logout",
                         "/css/**",
-                        "images/**",
+                        "/images/**",
                         "/js/**",
                         "/posts/**",
                         "/comments/**")
@@ -54,7 +54,10 @@ public class SecurityConfig {
                         HttpMethod.GET, "**/regular/**")
                     .permitAll().requestMatchers(
                         "/posts/new",
-                        "/comments/save")
+                        "/comments/save",
+                        "/crew/search/**",
+                        "/user/**",
+                        "crew/**")
                     .hasAnyAuthority("ROLE_USER")
                     .anyRequest().authenticated())
             .csrf(AbstractHttpConfigurer::disable)

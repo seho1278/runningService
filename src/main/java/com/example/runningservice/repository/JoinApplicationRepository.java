@@ -17,4 +17,9 @@ public interface JoinApplicationRepository extends JpaRepository<JoinApplyEntity
     Page<JoinApplyEntity> findAllByMember_Id(Long memberId, Pageable pageable);
 
     Page<JoinApplyEntity> findAllByMember_IdAndStatus(Long memberId, JoinStatus status, Pageable pageable);
+    Page<JoinApplyEntity> findAllByCrew_CrewIdAndStatus(Long crewId, JoinStatus status, Pageable pageable);
+
+    Page<JoinApplyEntity> findAllByCrew_CrewId(Long crewId, Pageable pageable);
+
+    Optional<JoinApplyEntity> findByIdAndCrew_CrewId(Long joinApplyId, Long crewId);
 }

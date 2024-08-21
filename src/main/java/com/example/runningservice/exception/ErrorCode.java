@@ -25,6 +25,7 @@ public enum ErrorCode {
     NOT_FOUND_APPLY(HttpStatus.BAD_REQUEST, "해당 신청내역을 찾을 수 없습니다."),
     NOT_FOUND_REGULAR_RUN(HttpStatus.BAD_REQUEST, "정기러닝이 존재하지 않습니다."),
     UNAUTHORIZED_CREW_ACCESS(HttpStatus.FORBIDDEN, "크루 접근 권한이 없습니다."),
+    DECRYPTION_ERROR(HttpStatus.BAD_REQUEST, "복호화 과정 중 에러가 발생하였습니다."),
     UNAUTHORIZED_REGULAR_ACCESS(HttpStatus.FORBIDDEN, "정기러닝 접근 권한이 없습니다."),
     NOT_FOUND_ACTIVITY(HttpStatus.BAD_REQUEST, "활동이 존재하지 않습니다."),
     UNAUTHORIZED_ACTIVITY(HttpStatus.FORBIDDEN, "활동 접근 권한이 없습니다."),

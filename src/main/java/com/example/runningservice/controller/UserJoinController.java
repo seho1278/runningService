@@ -1,8 +1,8 @@
 package com.example.runningservice.controller;
 
-import com.example.runningservice.dto.GetJoinApplicationsDto;
-import com.example.runningservice.dto.JoinApplyDto;
-import com.example.runningservice.dto.JoinApplyDto.SimpleResponse;
+import com.example.runningservice.dto.join.GetApplicantsRequestDto;
+import com.example.runningservice.dto.join.JoinApplyDto;
+import com.example.runningservice.dto.join.JoinApplyDto.SimpleResponse;
 import com.example.runningservice.dto.UpdateJoinApplyDto;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.service.UserJoinService;
@@ -44,7 +44,7 @@ public class UserJoinController {
         @RequestHeader("Authorization") String token, @PathVariable("user_id") Long userId,
         @RequestParam JoinStatus status, Pageable pageable) {
 
-        GetJoinApplicationsDto joinApplicationsDto = GetJoinApplicationsDto.builder()
+        GetApplicantsRequestDto joinApplicationsDto = GetApplicantsRequestDto.builder()
             .status(status)
             .pageable(pageable)
             .build();
