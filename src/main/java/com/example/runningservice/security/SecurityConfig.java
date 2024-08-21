@@ -46,6 +46,7 @@ public class SecurityConfig {
                         "/css/**",
                         "/images/**",
                         "/js/**",
+                        "/region",
                         "/posts/**",
                         "/comments/**")
                     .permitAll().requestMatchers(
