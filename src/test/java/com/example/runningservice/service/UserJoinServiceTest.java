@@ -74,7 +74,7 @@ class UserJoinServiceTest {
         // given
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1996).gender(Gender.MALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName")
             .leaderRequired(false).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -105,7 +105,7 @@ class UserJoinServiceTest {
         // given
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1996).gender(Gender.MALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName")
             .leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -137,7 +137,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1996).gender(Gender.MALE)
             .genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName")
             .gender(Gender.MALE).leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -169,7 +169,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(2005).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.MALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").minAge(20)
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").minAge(20)
             .gender(Gender.MALE).leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -201,7 +201,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.MALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
             .gender(Gender.MALE).leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -233,7 +233,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
             .leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -264,7 +264,7 @@ class UserJoinServiceTest {
         // given
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName")
             .leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -296,7 +296,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.MALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
@@ -318,7 +318,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
@@ -340,7 +340,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(null).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
@@ -408,6 +408,59 @@ class UserJoinServiceTest {
 //        assertEquals("testCrewName", response.getCrewName());
 //        verify(joinApplicationRepository, times(1)).save(any(JoinApplyEntity.class));
 //    }
+    @Test
+    @DisplayName("회원나이 비공개(실패)")
+    void saveJoinApply_whenJoinPossible_MemberPrivate_Fail() {
+        // given
+        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
+            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
+            .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
+            .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
+        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+            () -> userJoinService.saveJoinApply(1L,
+                Request.builder().userId(1L).message("test").build()));
+
+        // then
+        assertEquals(ErrorCode.AGE_REQUIRED, exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("회원나이 비공개 & 나이제한 없음(성공)")
+    void saveJoinApply_whenJoinPossible_MemberAgePrivate_Success() {
+        // given
+        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
+            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
+            .gender(Gender.FEMALE).build();
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName")
+            .leaderRequired(true).build(); // 필드들 초기화
+
+        JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
+            .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
+        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
+            joinApplyEntity);
+
+        // when
+        JoinApplyDto.DetailResponse response = userJoinService.saveJoinApply(1L,
+            Request.builder().userId(1L).message("test").build());
+
+        ArgumentCaptor<JoinApplyEntity> captor = forClass(JoinApplyEntity.class);
+        verify(joinApplicationRepository).save(captor.capture());
+
+        // then
+        assertEquals(JoinStatus.PENDING, captor.getValue().getStatus());
+        assertEquals("testNickName", response.getNickname());
+        assertEquals("testCrewName", response.getCrewName());
+        verify(joinApplicationRepository, times(1)).save(any(JoinApplyEntity.class));
+    }
 
     @Test
     @DisplayName("회원나이 null 성공(나이제한 없음)")
@@ -416,7 +469,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(null).birthYearVisibility(Visibility.PRIVATE)
             .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
+        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName")
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
@@ -450,7 +503,7 @@ class UserJoinServiceTest {
             .pageable(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")))).build();
         JoinApplyEntity entity = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(memberId).nickName("testNick").build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("testCrew").build()).build();
+            .crew(CrewEntity.builder().id(1L).crewName("testCrew").build()).build();
 
         when(jwtUtil.validateToken(memberId, "validToken")).thenReturn(true);
         Page<JoinApplyEntity> page = new PageImpl<>(Collections.singletonList(entity));
@@ -477,7 +530,7 @@ class UserJoinServiceTest {
             .pageable(PageRequest.of(0, 10)).build();
         JoinApplyEntity entity = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(memberId).nickName("testNick").build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("testCrew").build()).build();
+            .crew(CrewEntity.builder().id(1L).crewName("testCrew").build()).build();
 
         when(jwtUtil.validateToken(memberId, "validToken")).thenReturn(true);
         Page<JoinApplyEntity> page = new PageImpl<>(Collections.singletonList(entity));
@@ -528,11 +581,11 @@ class UserJoinServiceTest {
 
         JoinApplyEntity entity1 = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(1L).build())
-            .crew(CrewEntity.builder().crewId(1L).build()).status(JoinStatus.PENDING).build();
+            .crew(CrewEntity.builder().id(1L).build()).status(JoinStatus.PENDING).build();
 
         JoinApplyEntity entity2 = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(1L).build())
-            .crew(CrewEntity.builder().crewId(1L).build()).status(JoinStatus.APPROVED).build();
+            .crew(CrewEntity.builder().id(1L).build()).status(JoinStatus.APPROVED).build();
 
         when(jwtUtil.validateToken(memberId, "validToken")).thenReturn(true);
         Page<JoinApplyEntity> page = new PageImpl<>(List.of(entity1, entity2));
@@ -565,13 +618,13 @@ class UserJoinServiceTest {
 
         JoinApplyEntity entity1 = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(1L).build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("crew1").build())
+            .crew(CrewEntity.builder().id(1L).crewName("crew1").build())
             .status(JoinStatus.APPROVED)  // 이 데이터는 결과에 포함되지 않아야 함
             .build();
 
         JoinApplyEntity entity2 = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(1L).build())
-            .crew(CrewEntity.builder().crewId(2L).crewName("crew2").build())
+            .crew(CrewEntity.builder().id(2L).crewName("crew2").build())
             .status(JoinStatus.PENDING)  // 이 데이터는 결과에 포함되어야 함
             .build();
 
@@ -611,7 +664,7 @@ class UserJoinServiceTest {
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(joinApplyId)
             .member(MemberEntity.builder().id(1L).nickName("testNick").build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("testCrew").build()).build();
+            .crew(CrewEntity.builder().id(1L).crewName("testCrew").build()).build();
         when(joinApplicationRepository.findByIdAndMember_Id(1L, 1L)).thenReturn(
             Optional.of(joinApplyEntity));
 
@@ -637,7 +690,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(2L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(2L).crewName("testCrewName").maxAge(30)
             .leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyDto.Request joinApplyDto = JoinApplyDto.Request.builder().userId(userId)
@@ -645,7 +698,7 @@ class UserJoinServiceTest {
 
         when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
         when(crewRepository.findById(2L)).thenReturn(Optional.of(crewEntity));
-        when(joinApplicationRepository.existsByMember_IdAndCrew_CrewId(userId, crewId)).thenReturn(
+        when(joinApplicationRepository.existsByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             true);
 
         // When
@@ -654,7 +707,7 @@ class UserJoinServiceTest {
 
         //then
         assertEquals(ErrorCode.ALREADY_EXIST_JOIN_APPLY, exception.getErrorCode());
-        verify(joinApplicationRepository, times(1)).existsByMember_IdAndCrew_CrewId(userId, crewId);
+        verify(joinApplicationRepository, times(1)).existsByMember_IdAndCrew_Id(userId, crewId);
     }
 
     @Test
@@ -667,7 +720,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(2L).crewName("testCrewName").maxAge(30)
+        CrewEntity crewEntity = CrewEntity.builder().id(2L).crewName("testCrewName").maxAge(30)
             .leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyDto.Request joinApplyDto = JoinApplyDto.Request.builder().userId(userId)
@@ -698,7 +751,7 @@ class UserJoinServiceTest {
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(joinApplyId)
             .member(MemberEntity.builder().id(userId).build())
-            .crew(CrewEntity.builder().crewId(crewId).build()).status(JoinStatus.PENDING)
+            .crew(CrewEntity.builder().id(crewId).build()).status(JoinStatus.PENDING)
             .message("Old message").build();
 
         UpdateJoinApplyDto updateJoinApplyDto = UpdateJoinApplyDto.builder()
@@ -725,7 +778,7 @@ class UserJoinServiceTest {
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(joinApplyId)
             .member(MemberEntity.builder().id(memberId).nickName("testNIck").build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("testCrew").build())
+            .crew(CrewEntity.builder().id(1L).crewName("testCrew").build())
             .status(JoinStatus.PENDING).build();
 
         when(jwtUtil.extractUserId(token.substring("Bearer ".length()))).thenReturn(memberId);
@@ -748,7 +801,7 @@ class UserJoinServiceTest {
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(joinApplyId)
             .member(MemberEntity.builder().id(memberId).build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("testCrew").build())
+            .crew(CrewEntity.builder().id(1L).crewName("testCrew").build())
             .status(JoinStatus.APPROVED) // 상태가 대기(PENDING)가 아님
             .build();
 
@@ -784,7 +837,7 @@ class UserJoinServiceTest {
         Long memberId = 1L;
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L)
             .member(MemberEntity.builder().id(2L).build())
-            .crew(CrewEntity.builder().crewId(1L).crewName("testCrew").build())
+            .crew(CrewEntity.builder().id(1L).crewName("testCrew").build())
             .status(JoinStatus.APPROVED) // 상태가 대기(PENDING)가 아님
             .build();
 

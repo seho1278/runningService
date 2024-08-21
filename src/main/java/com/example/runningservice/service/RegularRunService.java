@@ -114,7 +114,7 @@ public class RegularRunService {
         // 갯수만큼 크루 ID를 조회하고, 크루 ID에 해당하는 모든 정기러닝 조회
         Page<CrewEntity> crewEntities = crewRepository.findAll(pageable);
 
-        List<Long> crewIdList = crewEntities.stream().map(CrewEntity::getCrewId).toList();
+        List<Long> crewIdList = crewEntities.stream().map(CrewEntity::getId).toList();
         List<RegularRunMeetingEntity> regularRunEntityList = regularRunMeetingRepository
             .findByCrewIdIn(crewIdList);
 
@@ -123,10 +123,10 @@ public class RegularRunService {
 
         for (RegularRunMeetingEntity regularRunMeeting : regularRunEntityList) {
             List<RegularRunResponseDto> crewRegularList = crewRegularMap.getOrDefault(
-                regularRunMeeting.getCrew().getCrewId(), new ArrayList<>());
+                regularRunMeeting.getCrew().getId(), new ArrayList<>());
 
             crewRegularList.add(RegularRunResponseDto.fromEntity(regularRunMeeting));
-            crewRegularMap.put(regularRunMeeting.getCrew().getCrewId(), crewRegularList);
+            crewRegularMap.put(regularRunMeeting.getCrew().getId(), crewRegularList);
         }
 
         List<CrewRegularRunResponseDto> response = new ArrayList<>();
@@ -144,7 +144,7 @@ public class RegularRunService {
      * 특정 크루의 정기러닝 정보 조회
      */
     public CrewRegularRunResponseDto getCrewRegularRunList(Long crewId, Pageable pageable) {
-        Page<RegularRunMeetingEntity> crewEntities = regularRunMeetingRepository.findByCrew_CrewId(
+        Page<RegularRunMeetingEntity> crewEntities = regularRunMeetingRepository.findByCrew_Id(
             crewId, pageable);
 
         return CrewRegularRunResponseDto.builder()
