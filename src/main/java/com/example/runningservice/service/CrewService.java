@@ -66,7 +66,7 @@ public class CrewService {
             crewEntity.getCrewName(), ChatRoom.CREW);
         // crew staff 채팅방 생성
         chatRoomService.createChatRoom(crewEntity.getCrewId(),
-            crewEntity.getCrewName() + "_Staff", ChatRoom.CREW_STAFF);
+            crewEntity.getCrewName(), ChatRoom.CREW_STAFF);
 
         return CrewData.fromEntityAndLeaderNameAndOccupancy(
             crewEntity,
