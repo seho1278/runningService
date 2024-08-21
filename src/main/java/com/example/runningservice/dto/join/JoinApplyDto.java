@@ -1,4 +1,4 @@
-package com.example.runningservice.dto;
+package com.example.runningservice.dto.join;
 
 import com.example.runningservice.entity.JoinApplyEntity;
 import com.example.runningservice.enums.JoinStatus;

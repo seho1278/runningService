@@ -44,8 +44,14 @@ public class JoinApplyEntity extends BaseEntity{
             .build();
     }
 
-    public void markStatus(JoinStatus status) {
-        this.status = status;
+    public void initializeStatusAsPending() {
+        this.status = JoinStatus.PENDING;
+    }
+    public void approveJoin() {
+        this.status = JoinStatus.APPROVED;
+    }
+    public void rejectJoin() {
+        this.status = JoinStatus.REJECTED;
     }
     public void updateMessage(String message) { this.message = message; }
 }

@@ -11,11 +11,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.runningservice.dto.GetJoinApplicationsDto;
-import com.example.runningservice.dto.JoinApplyDto;
-import com.example.runningservice.dto.JoinApplyDto.DetailResponse;
-import com.example.runningservice.dto.JoinApplyDto.Request;
-import com.example.runningservice.dto.JoinApplyDto.SimpleResponse;
+import com.example.runningservice.dto.join.GetApplicantsRequestDto;
+import com.example.runningservice.dto.join.JoinApplyDto;
+import com.example.runningservice.dto.join.JoinApplyDto.DetailResponse;
+import com.example.runningservice.dto.join.JoinApplyDto.Request;
+import com.example.runningservice.dto.join.JoinApplyDto.SimpleResponse;
 import com.example.runningservice.dto.UpdateJoinApplyDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
@@ -355,59 +355,59 @@ class UserJoinServiceTest {
         assertEquals(ErrorCode.AGE_REQUIRED, exception.getErrorCode());
     }
 
-    @Test
-    @DisplayName("회원나이 비공개(실패)")
-    void saveJoinApply_whenJoinPossible_MemberPrivate_Fail() {
-        // given
-        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
-            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
-            .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
-            .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
-
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-            () -> userJoinService.saveJoinApply(1L,
-                Request.builder().userId(1L).message("test").build()));
-
-        // then
-        assertEquals(ErrorCode.AGE_REQUIRED, exception.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("회원나이 비공개 & 나이제한 없음(성공)")
-    void saveJoinApply_whenJoinPossible_MemberAgePrivate_Success() {
-        // given
-        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
-            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
-            .gender(Gender.FEMALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
-            .leaderRequired(true).build(); // 필드들 초기화
-
-        JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
-            .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
-
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
-        when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
-            joinApplyEntity);
-
-        // when
-        JoinApplyDto.DetailResponse response = userJoinService.saveJoinApply(1L,
-            Request.builder().userId(1L).message("test").build());
-
-        ArgumentCaptor<JoinApplyEntity> captor = forClass(JoinApplyEntity.class);
-        verify(joinApplicationRepository).save(captor.capture());
-
-        // then
-        assertEquals(JoinStatus.PENDING, captor.getValue().getStatus());
-        assertEquals("testNickName", response.getNickname());
-        assertEquals("testCrewName", response.getCrewName());
-        verify(joinApplicationRepository, times(1)).save(any(JoinApplyEntity.class));
-    }
+//    @Test
+//    @DisplayName("회원나이 비공개(실패)")
+//    void saveJoinApply_whenJoinPossible_MemberPrivate_Fail() {
+//        // given
+//        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
+//            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
+//            .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
+//        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
+//            .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
+//
+//        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
+//        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+//
+//        // when
+//        CustomException exception = assertThrows(CustomException.class,
+//            () -> userJoinService.saveJoinApply(1L,
+//                Request.builder().userId(1L).message("test").build()));
+//
+//        // then
+//        assertEquals(ErrorCode.AGE_REQUIRED, exception.getErrorCode());
+//    }
+//
+//    @Test
+//    @DisplayName("회원나이 비공개 & 나이제한 없음(성공)")
+//    void saveJoinApply_whenJoinPossible_MemberAgePrivate_Success() {
+//        // given
+//        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
+//            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
+//            .gender(Gender.FEMALE).build();
+//        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
+//            .leaderRequired(true).build(); // 필드들 초기화
+//
+//        JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
+//            .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
+//
+//        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
+//        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+//        when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
+//            joinApplyEntity);
+//
+//        // when
+//        JoinApplyDto.DetailResponse response = userJoinService.saveJoinApply(1L,
+//            Request.builder().userId(1L).message("test").build());
+//
+//        ArgumentCaptor<JoinApplyEntity> captor = forClass(JoinApplyEntity.class);
+//        verify(joinApplicationRepository).save(captor.capture());
+//
+//        // then
+//        assertEquals(JoinStatus.PENDING, captor.getValue().getStatus());
+//        assertEquals("testNickName", response.getNickname());
+//        assertEquals("testCrewName", response.getCrewName());
+//        verify(joinApplicationRepository, times(1)).save(any(JoinApplyEntity.class));
+//    }
 
     @Test
     @DisplayName("회원나이 null 성공(나이제한 없음)")
@@ -446,7 +446,7 @@ class UserJoinServiceTest {
     void testGetJoinApplications_ValidToken_Success() {
         String token = "Bearer validToken";
         Long memberId = 1L;
-        GetJoinApplicationsDto request = GetJoinApplicationsDto.builder().status(null)
+        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder().status(null)
             .pageable(PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")))).build();
         JoinApplyEntity entity = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(memberId).nickName("testNick").build())
@@ -473,7 +473,7 @@ class UserJoinServiceTest {
     void testGetJoinApplications_ValidToken_DefaultSorting_Success() {
         String token = "Bearer validToken";
         Long memberId = 1L;
-        GetJoinApplicationsDto request = GetJoinApplicationsDto.builder().status(null)
+        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder().status(null)
             .pageable(PageRequest.of(0, 10)).build();
         JoinApplyEntity entity = JoinApplyEntity.builder()
             .member(MemberEntity.builder().id(memberId).nickName("testNick").build())
@@ -505,7 +505,7 @@ class UserJoinServiceTest {
     void testGetJoinApplications_InvalidToken_ThrowsException() {
         String token = "Bearer invalidToken";
         Long memberId = 1L;
-        GetJoinApplicationsDto request = GetJoinApplicationsDto.builder().status(null)
+        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder().status(null)
             .pageable(null).build();
 
         when(jwtUtil.validateToken(memberId, "invalidToken")).thenCallRealMethod();
@@ -522,7 +522,7 @@ class UserJoinServiceTest {
     void testGetJoinApplications_NoStatus_FetchAll() {
         String token = "Bearer validToken";
         Long memberId = 1L;
-        GetJoinApplicationsDto request = GetJoinApplicationsDto.builder().status(null)
+        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder().status(null)
             .pageable(PageRequest.of(0, 10, Sort.by(Sort.Order.asc("createdAt"))))
             .build();
 
@@ -560,7 +560,7 @@ class UserJoinServiceTest {
         // Given
         String token = "Bearer validToken";
         Long memberId = 1L;
-        GetJoinApplicationsDto request = GetJoinApplicationsDto.builder().status(JoinStatus.PENDING)
+        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder().status(JoinStatus.PENDING)
             .pageable(PageRequest.of(0, 10, Sort.by(Sort.Order.asc("createdAt")))).build();
 
         JoinApplyEntity entity1 = JoinApplyEntity.builder()

@@ -31,7 +31,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.mashape.unirest:unirest-java:1.4.9'
@@ -72,7 +74,10 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.21.1')
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:sts'
+
 }
+
+
 
 tasks.named('test') {
     useJUnitPlatform()
