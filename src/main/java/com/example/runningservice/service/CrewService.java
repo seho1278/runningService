@@ -68,8 +68,8 @@ public class CrewService {
         chatRoomService.createChatRoom(crewEntity.getId(),
             crewEntity.getCrewName(), ChatRoom.CREW);
         // crew staff 채팅방 생성
-        chatRoomService.createChatRoom(crewEntity.getId(),
-            crewEntity.getCrewName() + "_Staff", ChatRoom.CREW_STAFF);
+        chatRoomService.createChatRoom(crewEntity.getCrewId(),
+            crewEntity.getCrewName(), ChatRoom.CREW_STAFF);
 
         return CrewBaseResponseDto.fromEntity(crewEntity);
     }

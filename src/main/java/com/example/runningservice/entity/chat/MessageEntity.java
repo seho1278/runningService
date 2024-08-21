@@ -2,10 +2,7 @@ package com.example.runningservice.entity.chat;
 
 import com.example.runningservice.entity.BaseEntity;
 import com.example.runningservice.enums.Message;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,5 +22,9 @@ public class MessageEntity extends BaseEntity {
     private Message messageType;
     private String content;
     private String imageUrl;
+
+    @ManyToOne
+    @JoinColumn(name = "chat_join_id")
+    private ChatJoinEntity chatJoin;
 
 }
