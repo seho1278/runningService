@@ -1,6 +1,5 @@
 package com.example.runningservice.repository;
 
-import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.entity.RunRecordEntity;
 import java.util.List;
 import java.util.Optional;
