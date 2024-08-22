@@ -23,11 +23,11 @@ import org.springframework.data.annotation.LastModifiedDate;
 public class RunGoalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String run_goal_id;
+    private Long run_goal_id;
 
-    @JoinColumn(name = "user_id")
-    @ManyToOne
-    private String user_id;
+//    @JoinColumn(name = "user_id")
+//    @ManyToOne
+//    private String user_id;
 
     private Integer total_distance;
     private String total_running_time;

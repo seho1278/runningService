@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity, Long> {
 
-    List<ChatRoomEntity> findByCrewId(Long crewId);
+//    List<ChatRoomEntity> findByCrewId(Long crewId);
 
     default ChatRoomEntity findChatRoomById(Long roomId) {
         return findById(roomId)

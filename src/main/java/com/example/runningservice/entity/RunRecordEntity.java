@@ -24,13 +24,13 @@ public class RunRecordEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long run_record_id;
 
-    @JoinColumn(name = "goal_id")
-    @ManyToOne
-    private Long goal_id;
-
-    @JoinColumn(name = "user_id")
-    @ManyToOne
-    private Long user_id;
+//    @JoinColumn(name = "goal_id")
+//    @ManyToOne
+//    private Long goal_id;
+//
+//    @JoinColumn(name = "user_id")
+//    @ManyToOne
+//    private Long user_id;
 
     private Integer distance;
     private LocalDateTime pace;
