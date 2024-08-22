@@ -1,11 +1,10 @@
 package com.example.runningservice.controller;
 
-import com.example.runningservice.entity.MemberEntity;
-import com.example.runningservice.entity.RunRecordEntity;
-import com.example.runningservice.repository.MemberRepository;
+import com.example.runningservice.dto.runRecord.RunRecordRequestDto;
+import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.service.RunRecordService;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.runningservice.util.LoginUser;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,57 +14,71 @@ import java.util.List;
 @RequestMapping("/run")
 public class RunRecordController {
 
-    @Autowired
-    private RunRecordService runRecordService;
+    private final RunRecordService runRecordService;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    public RunRecordController(RunRecordService runRecordService) {
+        this.runRecordService = runRecordService;
+    }
 
-    // 러닝 누적 기록 조회
-    @GetMapping("/{userId}/total")
-    public ResponseEntity<List<RunRecordEntity>> getRunRecordsByUserId(@PathVariable Long userId) {
-        Optional<MemberEntity> user = memberRepository.findById(userId);
-        if (user.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        List<RunRecordEntity> runRecords = runRecordService.findByUserId(user.get());
+    /**
+     * 러닝 누적 목록 조회
+     */
+    @GetMapping("/list")
+    public ResponseEntity<List<RunRecordResponseDto>> getRunRecordsByUserId(@LoginUser Long userId) {
+        List<RunRecordResponseDto> runRecords = runRecordService.findByUserId(userId);
         return ResponseEntity.ok(runRecords);
     }
 
-    // 러닝 누적 기록 조회 --> ?
+    /**
+     * 러닝 누적 기록 조회 : 페이스 average, 나머지는 합으로
+      */
+    @GetMapping("/total")
+    public ResponseEntity<RunRecordResponseDto> getAccumulatedRunrecordByUserId(@LoginUser Long userId) {
 
-    // 러닝 기록 조회
+        RunRecordResponseDto totalRecord = runRecordService.calculateTotalRunRecords(userId);
+
+        if (totalRecord == null) {
+            return ResponseEntity.noContent().build(); // 기록이 없을 경우 204 No Content 반환
+        }
+
+        return ResponseEntity.ok(totalRecord);
+    }
+
+    /**
+     * 러닝 기록 조회
+      */
     @GetMapping("/records/{runningId}")
-    public ResponseEntity<RunRecordEntity> getRunRecordById(@PathVariable Long runningId) {
+    public ResponseEntity<RunRecordResponseDto> getRunRecordById(@PathVariable Long runningId) {
         return runRecordService.findById(runningId)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-    // 러닝 기록 생성
+    /**
+     * 러닝 기록 생성
+      */
     @PostMapping("/records")
-    public RunRecordEntity createRunRecord(@RequestBody RunRecordEntity runRecord) {
-        return runRecordService.save(runRecord);
+    public ResponseEntity<RunRecordResponseDto> createRunRecord(@LoginUser Long userId, @RequestBody RunRecordRequestDto runRecord) {
+        RunRecordResponseDto createdRecord = runRecordService.createRunRecord(userId, runRecord);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRecord); // 201 Created 반환
     }
 
-    // 러닝 기록 수정
-    @PutMapping("/{userId}")
-    public ResponseEntity<RunRecordEntity> updateRunRecord(
-        @PathVariable Long userId, @RequestBody RunRecordEntity updatedRunRecord) {
-        return runRecordService.findById(userId)
-            .map(runRecord -> {
-                updatedRunRecord.setId(userId);
-                return ResponseEntity.ok(runRecordService.save(updatedRunRecord));
-            })
-            .orElse(ResponseEntity.notFound().build());
+    /**
+     * 러닝 기록 수정
+      */
+    @PutMapping("/records/{runRecordId}")
+    public ResponseEntity<RunRecordResponseDto> updateRunRecord(
+        @PathVariable Long runRecordId, @RequestBody RunRecordRequestDto updatedRunRecord) {
+        return ResponseEntity.ok(runRecordService.updateRunRecord(runRecordId, updatedRunRecord));
     }
 
-    // 러닝 기록 삭제
-    @DeleteMapping("/records/{runningId}")
-    public ResponseEntity<Void> deleteRunRecord(@PathVariable Long runningId) {
-        if (runRecordService.findById(runningId).isPresent()) {
-            runRecordService.deleteById(runningId);
+    /**
+     * 러닝 기록 삭제
+      */
+    @DeleteMapping("/records/{runRecordId}")
+    public ResponseEntity<Void> deleteRunRecord(@PathVariable Long runRecordId) {
+        if (runRecordService.findById(runRecordId).isPresent()) {
+            runRecordService.deleteById(runRecordId);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
