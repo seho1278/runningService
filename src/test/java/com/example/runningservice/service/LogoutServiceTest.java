@@ -26,7 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class LogoutServiceTest {
 
     @Mock
-    private BlackList blackList;
+    private TokenBlackList tokenBlackList;
 
     @Mock
     private JwtUtil jwtUtil;
@@ -115,7 +115,7 @@ class LogoutServiceTest {
         when(authentication.getPrincipal()).thenReturn(customUserDetails);
         when(customUserDetails.getUsername()).thenReturn("username");
         when(jwtUtil.validateToken("username", "validRefreshToken")).thenReturn(true);
-        when(blackList.isListed("validRefreshToken")).thenReturn(true);
+        when(tokenBlackList.isListed("validRefreshToken")).thenReturn(true);
 
         //when
         CustomException exception = assertThrows(CustomException.class,
@@ -132,12 +132,12 @@ class LogoutServiceTest {
         when(authentication.getPrincipal()).thenReturn(customUserDetails);
         when(customUserDetails.getUsername()).thenReturn("username");
         when(jwtUtil.validateToken("username", "validRefreshToken")).thenReturn(true);
-        when(blackList.isListed("validRefreshToken")).thenReturn(false);
+        when(tokenBlackList.isListed("validRefreshToken")).thenReturn(false);
 
         //when
         logoutService.logout(request, response, authentication);
 
-        verify(blackList, times(1)).add("validRefreshToken");
+        verify(tokenBlackList, times(1)).add("validRefreshToken");
         assert (SecurityContextHolder.getContext().getAuthentication() == null);
     }
 }

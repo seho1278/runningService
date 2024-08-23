@@ -45,8 +45,8 @@ public class CrewApplicantService {
 
         JoinStatus status = request.getStatus();
         Page<JoinApplyEntity> joinApplyEntityPage =
-            status == null ? joinApplicationRepository.findAllByCrew_CrewId(crewId, sortedPageable)
-                : joinApplicationRepository.findAllByCrew_CrewIdAndStatus(crewId, status,
+            status == null ? joinApplicationRepository.findAllByCrew_Id(crewId, sortedPageable)
+                : joinApplicationRepository.findAllByCrew_IdAndStatus(crewId, status,
                     sortedPageable);
 
         return joinApplyEntityPage.map(CrewApplicantResponseDto::of);
@@ -54,7 +54,7 @@ public class CrewApplicantService {
 
     @Transactional
     public CrewApplicantDetailResponseDto getJoinApplicationDetail(Long crewId, Long joinApplyId) {
-        JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndCrew_CrewId(
+        JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndCrew_Id(
             joinApplyId, crewId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
 
         //runGoalResponseDto 를 조회기능에서 받아옴
@@ -69,22 +69,23 @@ public class CrewApplicantService {
         JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(joinApplyId,
             JoinStatus.PENDING).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
         //상태 변경(Pending -> Approved)
-        joinApplyEntity.approveJoin();
+        joinApplyEntity.markAsJoinApproved();
         //CrewMemberEntity 생성 후 저장
         MemberEntity memberEntity = joinApplyEntity.getMember();
         CrewEntity crewEntity = joinApplyEntity.getCrew();
         CrewMemberEntity newMember = CrewMemberEntity.of(memberEntity, crewEntity);
         //DTO 변환
         CrewMemberEntity savedCrewMember = crewMemberRepository.save(newMember);
-        return CrewMemberResponseDto.of(savedCrewMember, memberEntity, aesUtil);
+        return CrewMemberResponseDto.of(savedCrewMember, aesUtil);
     }
+
 
     @Transactional
     public String rejectJoinApplication(Long joinApplyId) {
         JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(joinApplyId,
             JoinStatus.PENDING).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
 
-        joinApplyEntity.rejectJoin();
+        joinApplyEntity.markAsRejected();
 
         StringBuilder sb = new StringBuilder();
         sb.append(joinApplyEntity.getMember().getEmail()).append("님의 가입신청이 거부되었습니다.");

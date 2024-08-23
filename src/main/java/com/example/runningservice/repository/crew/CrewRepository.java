@@ -1,4 +1,4 @@
-package com.example.runningservice.repository;
+package com.example.runningservice.repository.crew;
 
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.enums.Gender;
@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CrewRepository extends JpaRepository<CrewEntity, Long> {
+public interface CrewRepository extends JpaRepository<CrewEntity, Long>, CrewRepositoryCustom {
 
     boolean existsByCrewName(String crewName);
 

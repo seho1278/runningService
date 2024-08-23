@@ -27,7 +27,7 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.util.JwtUtil;
@@ -81,7 +81,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -112,7 +113,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(anyLong())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -144,7 +146,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -176,7 +179,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(anyLong())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -208,7 +212,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(anyLong())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -240,7 +245,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -271,7 +277,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -300,7 +307,8 @@ class UserJoinServiceTest {
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
 
         // when
         CustomException exception = assertThrows(CustomException.class,
@@ -322,7 +330,8 @@ class UserJoinServiceTest {
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
 
         // when
         CustomException exception = assertThrows(CustomException.class,
@@ -344,82 +353,8 @@ class UserJoinServiceTest {
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
-
-        // when
-        CustomException exception = assertThrows(CustomException.class,
-            () -> userJoinService.saveJoinApply(1L,
-                Request.builder().userId(1L).message("test").build()));
-
-        // then
-        assertEquals(ErrorCode.AGE_REQUIRED, exception.getErrorCode());
-    }
-
-//    @Test
-//    @DisplayName("회원나이 비공개(실패)")
-//    void saveJoinApply_whenJoinPossible_MemberPrivate_Fail() {
-//        // given
-//        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
-//            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
-//            .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
-//        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName").maxAge(30)
-//            .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
-//
-//        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-//        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
-//
-//        // when
-//        CustomException exception = assertThrows(CustomException.class,
-//            () -> userJoinService.saveJoinApply(1L,
-//                Request.builder().userId(1L).message("test").build()));
-//
-//        // then
-//        assertEquals(ErrorCode.AGE_REQUIRED, exception.getErrorCode());
-//    }
-//
-//    @Test
-//    @DisplayName("회원나이 비공개 & 나이제한 없음(성공)")
-//    void saveJoinApply_whenJoinPossible_MemberAgePrivate_Success() {
-//        // given
-//        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
-//            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
-//            .gender(Gender.FEMALE).build();
-//        CrewEntity crewEntity = CrewEntity.builder().crewId(1L).crewName("testCrewName")
-//            .leaderRequired(true).build(); // 필드들 초기화
-//
-//        JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder().id(1L).member(memberEntity)
-//            .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
-//
-//        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-//        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
-//        when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
-//            joinApplyEntity);
-//
-//        // when
-//        JoinApplyDto.DetailResponse response = userJoinService.saveJoinApply(1L,
-//            Request.builder().userId(1L).message("test").build());
-//
-//        ArgumentCaptor<JoinApplyEntity> captor = forClass(JoinApplyEntity.class);
-//        verify(joinApplicationRepository).save(captor.capture());
-//
-//        // then
-//        assertEquals(JoinStatus.PENDING, captor.getValue().getStatus());
-//        assertEquals("testNickName", response.getNickname());
-//        assertEquals("testCrewName", response.getCrewName());
-//        verify(joinApplicationRepository, times(1)).save(any(JoinApplyEntity.class));
-//    }
-    @Test
-    @DisplayName("회원나이 비공개(실패)")
-    void saveJoinApply_whenJoinPossible_MemberPrivate_Fail() {
-        // given
-        MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
-            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PRIVATE)
-            .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
-        CrewEntity crewEntity = CrewEntity.builder().id(1L).crewName("testCrewName").maxAge(30)
-            .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
-
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
 
         // when
         CustomException exception = assertThrows(CustomException.class,
@@ -444,7 +379,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(crewEntity.getId())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -476,7 +412,8 @@ class UserJoinServiceTest {
             .crew(crewEntity).status(JoinStatus.PENDING).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(anyLong())).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(anyLong())).thenReturn(
+            Optional.of(crewEntity));
         when(joinApplicationRepository.save(any(JoinApplyEntity.class))).thenReturn(
             joinApplyEntity);
 
@@ -550,7 +487,7 @@ class UserJoinServiceTest {
         Pageable capturedPageable = pageableCaptor.getValue();
         assertEquals(0, capturedPageable.getPageNumber());
         assertEquals(10, capturedPageable.getPageSize());
-        assertEquals(Sort.by(Sort.Order.desc("createdAt")), capturedPageable.getSort());
+        assertEquals(Sort.by(Sort.Order.asc("createdAt")), capturedPageable.getSort());
     }
 
     @Test
@@ -613,7 +550,8 @@ class UserJoinServiceTest {
         // Given
         String token = "Bearer validToken";
         Long memberId = 1L;
-        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder().status(JoinStatus.PENDING)
+        GetApplicantsRequestDto request = GetApplicantsRequestDto.builder()
+            .status(JoinStatus.PENDING)
             .pageable(PageRequest.of(0, 10, Sort.by(Sort.Order.asc("createdAt")))).build();
 
         JoinApplyEntity entity1 = JoinApplyEntity.builder()
@@ -692,22 +630,29 @@ class UserJoinServiceTest {
             .gender(Gender.FEMALE).build();
         CrewEntity crewEntity = CrewEntity.builder().id(2L).crewName("testCrewName").maxAge(30)
             .leaderRequired(true).build(); // 필드들 초기화
+        JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder()
+            .member(memberEntity)
+            .crew(crewEntity)
+            .status(JoinStatus.PENDING)
+            .build();
 
         JoinApplyDto.Request joinApplyDto = JoinApplyDto.Request.builder().userId(userId)
             .message("testMessage").build();
 
         when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(2L)).thenReturn(Optional.of(crewEntity));
-        when(joinApplicationRepository.existsByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
-            true);
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(2L)).thenReturn(
+            Optional.of(crewEntity));
+        when(joinApplicationRepository.findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(userId,
+            crewId)).thenReturn(Optional.of(joinApplyEntity));
 
         // When
         CustomException exception = assertThrows(CustomException.class,
             () -> userJoinService.saveJoinApply(crewId, joinApplyDto));
 
         //then
-        assertEquals(ErrorCode.ALREADY_EXIST_JOIN_APPLY, exception.getErrorCode());
-        verify(joinApplicationRepository, times(1)).existsByMember_IdAndCrew_Id(userId, crewId);
+        assertEquals(ErrorCode.ALREADY_EXIST_PENDING_JOIN_APPLY, exception.getErrorCode());
+        verify(joinApplicationRepository,
+            times(1)).findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(userId, crewId);
     }
 
     @Test
@@ -727,7 +672,8 @@ class UserJoinServiceTest {
             .message("testMessage").build();
 
         when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
-        when(crewRepository.findById(2L)).thenReturn(Optional.of(crewEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(2L)).thenReturn(
+            Optional.of(crewEntity));
         when(crewMemberRepository.existsByMember_Id(userId)).thenReturn(true);
 
         // When
@@ -849,5 +795,42 @@ class UserJoinServiceTest {
         CustomException thrownException = assertThrows(CustomException.class,
             () -> userJoinService.removeJoinApply(token, 1L));
         assertEquals(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS, thrownException.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("강제퇴장된 회원일 경우 재가입 불가_실패")
+    void testSaveJoinApply_BlackListed_fail() {
+        // Given
+        Long userId = 1L;
+        Long crewId = 2L;
+
+        MemberEntity memberEntity = MemberEntity.builder().id(userId).email("testEmail")
+            .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
+            .gender(Gender.FEMALE).build();
+        CrewEntity crewEntity = CrewEntity.builder().id(crewId).crewName("testCrewName").maxAge(30)
+            .leaderRequired(true).build(); // 필드들 초기화
+        JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder()
+            .member(memberEntity)
+            .crew(crewEntity)
+            .status(JoinStatus.FORCE_WITHDRAWN)
+            .build();
+
+        JoinApplyDto.Request joinApplyDto = JoinApplyDto.Request.builder().userId(userId)
+            .message("testMessage").build();
+
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
+        when(crewRepository.findByIdAndMemberCountLessThanCapacity(2L)).thenReturn(
+            Optional.of(crewEntity));
+        when(joinApplicationRepository.findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(userId,
+            crewId)).thenReturn(Optional.of(joinApplyEntity));
+
+        // When
+        CustomException exception = assertThrows(CustomException.class,
+            () -> userJoinService.saveJoinApply(crewId, joinApplyDto));
+
+        //then
+        assertEquals(ErrorCode.JOIN_NOT_ALLOWED_FOR_FORCE_WITHDRAWN, exception.getErrorCode());
+        verify(joinApplicationRepository,
+            times(1)).findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(userId, crewId);
     }
 }
