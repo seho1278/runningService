@@ -28,4 +28,6 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
     Optional<CrewMemberEntity> findByCrewAndMember(CrewEntity crew, MemberEntity member);
 
     Optional<CrewMemberEntity> findByCrewAndMemberAndRoleIn(CrewEntity crew, MemberEntity member, List<CrewRole> roles);
+
+    List<CrewMemberEntity> findByCrew(CrewEntity crew);
 }

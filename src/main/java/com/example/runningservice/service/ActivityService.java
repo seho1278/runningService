@@ -1,5 +1,6 @@
 package com.example.runningservice.service;
 
+import com.example.runningservice.dto.NotificationRequestDto;
 import com.example.runningservice.dto.activity.ActivityFilterDto;
 import com.example.runningservice.dto.activity.ActivityRequestDto.Create;
 import com.example.runningservice.dto.activity.ActivityRequestDto.Update;
@@ -11,6 +12,8 @@ import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.entity.RegularRunMeetingEntity;
 import com.example.runningservice.enums.ActivityCategory;
 import com.example.runningservice.enums.CrewRole;
+import com.example.runningservice.enums.NotificationType;
+import com.example.runningservice.enums.TableType;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
@@ -18,6 +21,8 @@ import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
+import com.example.runningservice.service.notification.ActivityNotification;
+import com.example.runningservice.service.notification.NotificationService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +39,11 @@ public class ActivityService {
     private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
     private final RegularRunMeetingRepository regularRunMeetingRepository;
+    private final NotificationService notificationService;
+    private final ActivityNotification activityNotification;
 
     // 정기 러닝 일정 생성
+    @Transactional
     public ActivityResponseDto createRegularActivity(Long userId, Long crewId, Create activity) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
@@ -65,10 +73,20 @@ public class ActivityService {
 
         activityRepository.save(activityEntity);
 
+        // 크루원들에게 일정 추가 알림 전송
+        notificationService.sendNotification(activityNotification,
+            NotificationRequestDto.builder()
+                .topic("/topic/activity/" + crewId)
+                .notificationType(NotificationType.ACTIVITY)
+                .relatedType(TableType.ACTIVITY)
+                .relatedId(activityEntity.getId())
+                .build());
+
         return ActivityResponseDto.fromEntity(activityEntity);
     }
 
     // 번개 러닝 일정 생성
+    @Transactional
     public ActivityResponseDto createOnDemandActivity(Long userId, Long crewId, Create activity) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
@@ -88,6 +106,15 @@ public class ActivityService {
             .build();
 
         activityRepository.save(activityEntity);
+
+        // 크루원들에게 일정 추가 알림 전송
+        notificationService.sendNotification(activityNotification,
+            NotificationRequestDto.builder()
+                .topic("/topic/activity/" + crewId)
+                .notificationType(NotificationType.ACTIVITY)
+                .relatedType(TableType.ACTIVITY)
+                .relatedId(activityEntity.getId())
+                .build());
 
         return ActivityResponseDto.fromEntity(activityEntity);
     }

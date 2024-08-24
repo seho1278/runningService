@@ -31,6 +31,8 @@ public enum ErrorCode {
     UNAUTHORIZED_ACTIVITY(HttpStatus.FORBIDDEN, "활동 접근 권한이 없습니다."),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작 날짜가 종료 날짜보다 빨라야 합니다."),
     NOT_FOUND_CHATROOM(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
+    NOT_FOUND_USER_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자에게 전송된 알림을 찾을 수 없습니다."),
+    REJECT_SUBSCRIBE_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자가 알림 수신을 거부하여 구독할 수 없습니다."),
 
     //크루가입
     ALREADY_EXIST_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 가입신청 기록이 있습니다."),

@@ -79,10 +79,10 @@ public class MemberEntity extends BaseEntity {
     private Notification postNoti;
     @Column(name = "reply_noti")
     private Notification replyNoti;
-    @Column(name = "mention_noti")
-    private Notification mentionNoti;
     @Column(name = "chatting_noti")
     private Notification chattingNoti;
+    @Column(name = "activity_noti")
+    private Notification activityNoti;
 
     public void markEmailVerified() {
         this.emailVerified = true;
