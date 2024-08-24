@@ -14,7 +14,7 @@ import com.example.runningservice.dto.regular_run.RegularRunResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.RegularRunMeetingEntity;
 import com.example.runningservice.enums.Region;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import java.util.ArrayList;
 import java.util.List;

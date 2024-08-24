@@ -27,7 +27,7 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import java.time.LocalDate;

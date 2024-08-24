@@ -28,7 +28,6 @@ public class CrewApplicantService {
 
     private final CrewMemberRepository crewMemberRepository;
     private final JoinApplicationRepository joinApplicationRepository;
-    private final PageUtil pageUtil;
     private final AESUtil aesUtil;
 
     @Transactional
@@ -40,7 +39,7 @@ public class CrewApplicantService {
         String defaultSortBy = "createdAt";
         int defaultNumber = 0;
         int defaultPage = 10;
-        Pageable sortedPageable = pageUtil.getSortedPageable(request.getPageable(), defaultSortBy,
+        Pageable sortedPageable = PageUtil.getSortedPageable(request.getPageable(), defaultSortBy,
             Direction.ASC, defaultNumber, defaultPage);
 
         JoinStatus status = request.getStatus();
