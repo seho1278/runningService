@@ -44,6 +44,7 @@ public class SecurityConfig {
                         "/h2-console/**",
                         "/logout",
                         "/css/**",
+                        "/ws/**",
                         "/images/**",
                         "/js/**",
                         "/region",
