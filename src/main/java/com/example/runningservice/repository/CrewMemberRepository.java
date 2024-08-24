@@ -17,18 +17,13 @@ import java.util.Optional;
 @Repository
 public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Long> {
 
-    int countByCrew_CrewIdAndStatus(Long crewId, JoinStatus status);
+    void deleteAllByCrew_Id(Long crewId);
 
-    void deleteAllByCrew_CrewId(Long crewId);
-
-    Page<CrewMemberEntity> findByMember_IdAndRole(Long memberId, CrewRole role, Pageable pageable);
-
-    Page<CrewMemberEntity> findByMember_Id(Long memberId, Pageable pageable);
-
+    Page<CrewMemberEntity> findByMember_IdOrderByJoinedAt(Long memberId, Pageable pageable);
 
     Boolean existsByMember_Id(Long memberId);
 
-    Optional<CrewMemberEntity> findByCrew_CrewIdAndMember_Id(Long crewId, Long memberId);
+    Optional<CrewMemberEntity> findByCrew_IdAndMember_Id(Long crewId, Long memberId);
 
     Optional<CrewMemberEntity> findByCrewAndMember(CrewEntity crew, MemberEntity member);
 

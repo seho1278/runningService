@@ -1,4 +1,4 @@
-package com.example.runningservice.dto;
+package com.example.runningservice.dto.join;
 
 import com.example.runningservice.enums.JoinStatus;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 @Getter
 @Builder
-public class GetJoinApplicationsDto {
+public class GetApplicantsRequestDto {
     private JoinStatus status;
     private Pageable pageable;
 }

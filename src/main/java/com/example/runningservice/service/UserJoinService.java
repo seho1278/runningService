@@ -1,8 +1,8 @@
 package com.example.runningservice.service;
 
-import com.example.runningservice.dto.GetJoinApplicationsDto;
-import com.example.runningservice.dto.JoinApplyDto;
-import com.example.runningservice.dto.JoinApplyDto.SimpleResponse;
+import com.example.runningservice.dto.join.GetApplicantsRequestDto;
+import com.example.runningservice.dto.join.JoinApplyDto;
+import com.example.runningservice.dto.join.JoinApplyDto.SimpleResponse;
 import com.example.runningservice.dto.UpdateJoinApplyDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
@@ -56,14 +56,14 @@ public class UserJoinService {
 
         if (!crewEntity.getLeaderRequired()) { // 가입 승인이 필요 없는 경우
             // 가입 상태를 승인으로 설정
-            joinApplyEntity.markStatus(JoinStatus.APPROVED);
+            joinApplyEntity.approveJoin();
 
             // 크루원으로 자동 가입 처리
-            CrewMemberEntity crewMemberEntity = CrewMemberEntity.memberOf(memberEntity, crewEntity);
+            CrewMemberEntity crewMemberEntity = CrewMemberEntity.of(memberEntity, crewEntity);
             crewMemberRepository.save(crewMemberEntity);
         } else {
             // 가입 승인이 필요한 경우
-            joinApplyEntity.markStatus(JoinStatus.PENDING);
+            joinApplyEntity.initializeStatusAsPending();
         }
         // 엔티티 저장
         JoinApplyEntity savedJoinApplyEntity = joinApplicationRepository.save(joinApplyEntity);
@@ -74,7 +74,7 @@ public class UserJoinService {
     //가입신청내역 조회하기(페이지네이션, 신청일자 기준 정렬기준, 신청상태 필터링 적용 추가)
     @Transactional(readOnly = true)
     public Page<SimpleResponse> getJoinApplications(String token, Long memberId,
-        GetJoinApplicationsDto request) {
+        GetApplicantsRequestDto request) {
 
         //토큰 유효성 검사
         token = token.substring("Bearer ".length());
@@ -84,14 +84,14 @@ public class UserJoinService {
 
         // 기본 정렬 기준 및 방향 설정 (기본값은 createdAt 기준 내림차순)
         String defaultSortBy = "createdAt";
-        Sort defaultSort = Sort.by(Sort.Order.desc(defaultSortBy));
+        Sort defaultSort = Sort.by(Sort.Order.asc(defaultSortBy));
 
         // Pageable에서 sort 정보를 추출 (sort=정렬기준(ex.createdAt) 이 있으면 isSorted()==true)
         Pageable pageable = request.getPageable();
         int pageNumber = pageable != null ? pageable.getPageNumber() : 0; // 기본 페이지 번호 0
         int pageSize = (pageable != null && pageable.getPageSize() > 0) ? pageable.getPageSize() : 10; // 기본 페이지 크기 10
 
-        Sort sortOrder = pageable.getSort().isSorted() ? pageable.getSort() : defaultSort;
+        Sort sortOrder = pageable == null || pageable.getSort().isUnsorted() ? defaultSort : pageable.getSort();
 
         // 정렬 순서 설정
         Pageable sortedPageable = PageRequest.of(pageNumber, pageSize, sortOrder);
@@ -128,7 +128,7 @@ public class UserJoinService {
         Integer minAge = crewEntity.getMinAge();
         Integer maxAge = crewEntity.getMaxAge();
         Long memberId = memberEntity.getId();
-        Long crewId = crewEntity.getCrewId();
+        Long crewId = crewEntity.getId();
         // 나이 제한 있으면 검증
         if (minAge != null || maxAge != null) {
             //나이 검증
@@ -150,7 +150,7 @@ public class UserJoinService {
             throw new CustomException(ErrorCode.ALREADY_CREWMEMBER);
         }
         //이미 신청기록 있다면 신청 불가
-        if (joinApplicationRepository.existsByMember_IdAndCrew_CrewId(memberId, crewId)) {
+        if (joinApplicationRepository.existsByMember_IdAndCrew_Id(memberId, crewId)) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_JOIN_APPLY);
         }
     }
@@ -159,8 +159,7 @@ public class UserJoinService {
         Integer maxAge) {
 
         if (minAge != null || maxAge != null) {
-            if (memberEntity.getBirthYear() == null || memberEntity.getBirthYearVisibility()
-                .equals(Visibility.PRIVATE)) {
+            if (memberEntity.getBirthYear() == null) {
                 throw new CustomException(ErrorCode.AGE_REQUIRED);
             }
 
@@ -181,7 +180,7 @@ public class UserJoinService {
         Visibility memberGenderVisibility = memberEntity.getGenderVisibility();
 
         if (requiredGender != null) {
-            if (memberGender == null || memberGenderVisibility.equals(Visibility.PRIVATE)) {
+            if (memberGender == null) {
                 throw new CustomException(ErrorCode.GENDER_REQUIRED);
             }
             if (!memberGender.equals(requiredGender)) {

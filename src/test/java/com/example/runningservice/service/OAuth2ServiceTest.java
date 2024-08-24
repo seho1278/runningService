@@ -1,8 +1,8 @@
 package com.example.runningservice.service;
 
-import com.example.runningservice.dto.GoogleAccessTokenRequestDto;
-import com.example.runningservice.dto.GoogleAccessTokenResponseDto;
-import com.example.runningservice.dto.GoogleAccountProfileResponseDto;
+import com.example.runningservice.dto.googleToken.GoogleAccessTokenRequestDto;
+import com.example.runningservice.dto.googleToken.GoogleAccessTokenResponseDto;
+import com.example.runningservice.dto.googleToken.GoogleAccountProfileResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,9 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
-import javax.security.auth.login.LoginException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -34,30 +31,45 @@ public class OAuth2ServiceTest {
     }
 
     @Test
-    public void testGetGoogleAccountProfile() throws LoginException {
+    public void testGetGoogleAccountProfile() throws Exception {
         // GoogleAccessTokenResponseDto
-        GoogleAccessTokenResponseDto accessTokenResponseDto = new GoogleAccessTokenResponseDto();
-        accessTokenResponseDto.setAccessToken("mockAccessToken");
+        GoogleAccessTokenResponseDto accessTokenResponseDto = GoogleAccessTokenResponseDto.builder()
+                .access_token("mockAccessToken")
+                .build();
+
 
         // GoogleAccountProfileResponseDto
-        GoogleAccountProfileResponseDto profileResponseDto = new GoogleAccountProfileResponseDto();
-        profileResponseDto.setEmail("test@example.com");
-        profileResponseDto.setName("Test User");
+        GoogleAccountProfileResponseDto profileResponseDto = GoogleAccountProfileResponseDto.builder()
+            .email("test@example.com")
+            .name("Test User")
+            .build();
 
         // RestTemplate 세팅해서 Mock Test
         when(restTemplate.exchange(
             "http://mockAccessTokenUrl",
             HttpMethod.POST,
-            new HttpEntity<>(new GoogleAccessTokenRequestDto("clientId", "clientSecret", "code", "redirectUri"), new HttpHeaders()),
+            new HttpEntity<>(GoogleAccessTokenRequestDto.builder()
+                .client_id("clientId")
+                .client_secret("clientSecret")
+                .code("code")
+                .redirect_uri("redirectUri")
+                .build(), new HttpHeaders()),
             GoogleAccessTokenResponseDto.class))
             .thenReturn(ResponseEntity.ok(accessTokenResponseDto));
+
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer mockAccessToken");
+        // HttpEntity 설정
+        HttpEntity<GoogleAccountProfileResponseDto> entity = new HttpEntity<>(null, headers);
 
         when(restTemplate.exchange(
             "http://mockProfileUrl",
             HttpMethod.GET,
-            new HttpEntity<>(new HttpHeaders().set("Authorization", "Bearer mockAccessToken")),
+            entity,
             GoogleAccountProfileResponseDto.class))
             .thenReturn(ResponseEntity.ok(profileResponseDto));
+
 
         // OAuth2Service.getGoogleAccountProfile
         GoogleAccountProfileResponseDto result = oAuth2Service.getGoogleAccountProfile("mockCode");

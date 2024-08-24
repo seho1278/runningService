@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RegularRunMeetingRepository extends JpaRepository<RegularRunMeetingEntity, Long> {
 
-    @Query("SELECT r FROM RegularRunMeetingEntity r WHERE r.crew.crewId IN :crewIdList")
+    @Query("SELECT r FROM RegularRunMeetingEntity r WHERE r.crew.id IN :crewIdList")
     List<RegularRunMeetingEntity> findByCrewIdIn(@Param("crewIdList") List<Long> crewIdList);
 
-    Page<RegularRunMeetingEntity> findByCrew_CrewId(Long crewId, Pageable pageable);
+    Page<RegularRunMeetingEntity> findByCrew_Id(Long crewId, Pageable pageable);
 }
