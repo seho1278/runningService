@@ -18,7 +18,7 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
@@ -68,7 +68,7 @@ public class CrewService {
         chatRoomService.createChatRoom(crewEntity.getId(),
             crewEntity.getCrewName(), ChatRoom.CREW);
         // crew staff 채팅방 생성
-        chatRoomService.createChatRoom(crewEntity.getCrewId(),
+        chatRoomService.createChatRoom(crewEntity.getId(),
             crewEntity.getCrewName(), ChatRoom.CREW_STAFF);
 
         return CrewBaseResponseDto.fromEntity(crewEntity);

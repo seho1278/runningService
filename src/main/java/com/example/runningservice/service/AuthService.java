@@ -27,7 +27,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
-    private final BlackList blackList;
+    private final TokenBlackList tokenBlackList;
 
     public JwtResponse authenticate(LoginRequestDto loginRequestDto) throws Exception {
         //loginId와 비밀번호 일치여부 확인 (불일치 시 예외 발생)
@@ -58,7 +58,7 @@ public class AuthService {
 
     public JwtResponse refreshToken(String refreshToken, Principal principal) {
         //refresh token 이 블랙리스트에 있는지 확인
-        if (blackList.isListed(refreshToken)) {
+        if (tokenBlackList.isListed(refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         //토큰 유효성 검사(올바른 서명 & 유효기간)
@@ -74,7 +74,7 @@ public class AuthService {
         final String newRefreshToken = jwtUtil.generateRefreshToken(email, userDetails.getId(), authorities);
 
         //기존 refreshToken을 blackList에 추가
-        blackList.add(refreshToken);
+        tokenBlackList.add(refreshToken);
 
         return new JwtResponse(newAccessToken, newRefreshToken);
     }

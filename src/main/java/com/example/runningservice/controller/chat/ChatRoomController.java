@@ -24,7 +24,7 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoomService.getCrewChatRoomListForMember(crewId, memberId));
     }
 
-    @PostMapping("/crew/{crew_id}/chatroom/personal")
+    @PostMapping("/chatroom/personal")
     public ResponseEntity<Void> createPersonalChatRoom(@PathVariable("crew_id") Long crewId,
                                                        @RequestParam("memberA_id") Long memberAId,
                                                        @RequestParam("memberB_id") Long memberBId) {

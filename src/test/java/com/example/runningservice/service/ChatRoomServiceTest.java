@@ -1,5 +1,15 @@
 package com.example.runningservice.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.example.runningservice.dto.chat.ChatRoomDetailsDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
@@ -9,12 +19,17 @@ import com.example.runningservice.entity.chat.ChatRoomEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.chat.MessageRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,14 +37,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ChatRoomServiceTest {
@@ -64,7 +71,7 @@ public class ChatRoomServiceTest {
     @BeforeEach
     public void setUp() {
         crewEntity = CrewEntity.builder()
-            .crewId(1L)
+            .id(1L)
             .crewName("runningCrew")
             .build();
 
@@ -96,7 +103,7 @@ public class ChatRoomServiceTest {
     @Test
     public void createChatRoom_success() {
         // Given
-        when(crewRepository.findCrewById(crewEntity.getCrewId())).thenReturn(crewEntity);
+        when(crewRepository.findCrewById(crewEntity.getId())).thenReturn(crewEntity);
 
         ChatRoomEntity mockChatRoomEntity = ChatRoomEntity.builder()
             .roomName(crewEntity.getCrewName())
@@ -107,7 +114,7 @@ public class ChatRoomServiceTest {
         when(chatRoomRepository.save(any(ChatRoomEntity.class))).thenReturn(mockChatRoomEntity);
 
         // When
-        chatRoomService.createChatRoom(crewEntity.getCrewId(), crewEntity.getCrewName(), ChatRoom.CREW);
+        chatRoomService.createChatRoom(crewEntity.getId(), crewEntity.getCrewName(), ChatRoom.CREW);
 
         // Then
         ArgumentCaptor<ChatRoomEntity> chatRoomEntityCaptor = ArgumentCaptor.forClass(ChatRoomEntity.class);
@@ -213,4 +220,150 @@ public class ChatRoomServiceTest {
         assertEquals(2, chatRoom2Details.getMemberCount());
         assertTrue(chatRoom2Details.getMemberEntityList().contains(memberAEntity));
     }
+
+    @Test
+    public void createPersonalChatRoom_success() {
+//        // given
+//        when(crewRepository.findCrewById(crewEntity.getCrewId())).thenReturn(crewEntity);
+//        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
+//        when(memberRepository.findMemberById(memberBEntity.getId())).thenReturn(memberBEntity);
+//
+//        ChatRoomEntity mockChatRoomEntity = ChatRoomEntity.builder()
+//            .id(1L)
+//            .roomName("Personal Chat")
+//            .roomType(ChatRoom.PERSONAL)
+//            .crew(crewEntity)
+//            .build();
+//
+//        when(chatRoomRepository.save(any(ChatRoomEntity.class))).thenReturn(mockChatRoomEntity);
+//        when(chatRoomRepository.findChatRoomById(mockChatRoomEntity.getId())).thenReturn(mockChatRoomEntity);
+//
+//        when(crewMemberRepository.findByCrewAndMember(crewEntity, memberAEntity))
+//            .thenReturn(Optional.of(crewMemberAEntity));
+//        when(crewMemberRepository.findByCrewAndMember(crewEntity, memberBEntity))
+//            .thenReturn(Optional.of(crewMemberBEntity));
+//
+//        // when
+//        chatRoomService.createPersonalChatRoom(crewEntity.getCrewId(), memberAEntity.getId(), memberBEntity.getId());
+//
+//        // then
+//        verify(chatRoomRepository, times(1)).save(any(ChatRoomEntity.class));
+//        verify(chatJoinRepository, times(2)).save(any(ChatJoinEntity.class));
+    }
+
+    @Test
+    public void joinChatRoom_success() {
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .id(1L)
+            .roomName("Test Room")
+            .roomType(ChatRoom.PERSONAL)
+            .crew(crewEntity)
+            .build();
+
+        when(crewRepository.findCrewById(crewEntity.getId())).thenReturn(crewEntity);
+        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
+        when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
+        when(chatJoinRepository.existsByChatRoomAndMember(chatRoomEntity, memberAEntity)).thenReturn(false);
+
+        ChatJoinEntity chatJoinEntity = new ChatJoinEntity();
+        when(chatJoinRepository.save(any(ChatJoinEntity.class))).thenReturn(chatJoinEntity);
+
+        when(crewMemberRepository.findByCrewAndMember(crewEntity, memberAEntity))
+            .thenReturn(Optional.of(crewMemberAEntity));
+
+        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity)).thenReturn(chatJoinEntity);
+
+        // When
+        chatRoomService.joinChatRoom(crewEntity.getId(), chatRoomEntity.getId(), memberAEntity.getId());
+
+        // Then
+        verify(crewRepository, times(1)).findCrewById(crewEntity.getId());
+        verify(memberRepository, times(2)).findMemberById(memberAEntity.getId());
+        verify(chatRoomRepository, times(2)).findChatRoomById(chatRoomEntity.getId());
+        verify(chatJoinRepository, times(1)).existsByChatRoomAndMember(chatRoomEntity, memberAEntity);
+        verify(chatJoinRepository, times(1)).save(chatJoinEntity);
+    }
+
+    @Test
+    public void enterChatRoom_success() {
+        // given
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .id(1L)
+            .roomName("Personal Chat")
+            .roomType(ChatRoom.PERSONAL)
+            .crew(crewEntity)
+            .build();
+
+        ChatJoinEntity chatJoinEntity = new ChatJoinEntity();
+        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
+        when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
+        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity)).thenReturn(chatJoinEntity);
+
+        // when
+        chatRoomService.enterChatRoom(crewEntity.getId(), chatRoomEntity.getId(), memberAEntity.getId());
+
+        // then
+        verify(chatJoinRepository, times(1)).save(chatJoinEntity);
+    }
+
+    @Test
+    public void leaveChatRoom_success() {
+        // Given
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .id(1L)
+            .roomName("Personal Chat")
+            .roomType(ChatRoom.PERSONAL)
+            .crew(crewEntity)
+            .build();
+
+        ChatJoinEntity chatJoinEntity = new ChatJoinEntity();
+        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
+        when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
+        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity)).thenReturn(chatJoinEntity);
+
+        doNothing().when(chatJoinRepository).delete(any(ChatJoinEntity.class));
+
+        // When
+        chatRoomService.leaveChatRoom(crewEntity.getId(), chatRoomEntity.getId(), memberAEntity.getId());
+
+        // Then
+        verify(chatJoinRepository, times(1)).delete(chatJoinEntity);
+    }
+
+    @Test
+    public void ejectionChatRoom_success() {
+        // given
+        ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
+            .id(1L)
+            .roomName("Crew Chat")
+            .roomType(ChatRoom.CREW)
+            .crew(crewEntity)
+            .build();
+
+        when(crewRepository.findCrewById(crewEntity.getId())).thenReturn(crewEntity);
+        when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
+        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
+        when(memberRepository.findMemberById(memberBEntity.getId())).thenReturn(memberBEntity);
+
+        List<CrewRole> crewRoles = Arrays.asList(CrewRole.LEADER, CrewRole.STAFF);
+
+        when(crewMemberRepository.findByCrewAndMemberAndRoleIn(crewEntity, memberAEntity, crewRoles))
+            .thenReturn(Optional.of(crewMemberAEntity));
+
+        ChatJoinEntity adminChatJoinEntity = new ChatJoinEntity();
+        ChatJoinEntity memberChatJoinEntity = new ChatJoinEntity();
+
+        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity))
+            .thenReturn(adminChatJoinEntity);
+        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberBEntity))
+            .thenReturn(memberChatJoinEntity);
+        doNothing().when(chatJoinRepository).delete(memberChatJoinEntity);
+
+        // when
+        chatRoomService.ejectionChatRoom(crewEntity.getId(), chatRoomEntity.getId(), memberBEntity.getId(), memberAEntity.getId());
+
+        // then
+        verify(chatJoinRepository, times(1)).delete(memberChatJoinEntity);
+    }
+
 }

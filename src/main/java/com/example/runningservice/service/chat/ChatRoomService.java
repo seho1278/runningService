@@ -8,7 +8,7 @@ import com.example.runningservice.entity.chat.ChatRoomEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
@@ -16,7 +16,6 @@ import com.example.runningservice.repository.chat.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -91,11 +90,11 @@ public class ChatRoomService {
             .crew(crewEntity)
             .build();
 
-        chatRoomRepository.save(chatRoomEntity);
+        ChatRoomEntity savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
 
         // 채팅방 참여
-        joinChatRoom(crewId, chatRoomEntity.getId(), memberAEntity.getId());
-        joinChatRoom(crewId, chatRoomEntity.getId(), memberBEntity.getId());
+        joinChatRoom(crewId, savedChatRoomEntity.getId(), memberAEntity.getId());
+        joinChatRoom(crewId, savedChatRoomEntity.getId(), memberBEntity.getId());
     }
 
     // 채팅방 참여
@@ -128,6 +127,9 @@ public class ChatRoomService {
         }
 
         chatJoinRepository.save(chatJoinEntity);
+
+        // 채팅방 입장
+        enterChatRoom(crewId, roomId, memberId);
     }
 
     // 채팅방 입장
@@ -147,7 +149,6 @@ public class ChatRoomService {
 
         chatJoinRepository.save(chatJoinEntity);
     }
-
 
     // 채팅방 퇴장
     public void leaveChatRoom(Long crewId, Long roomId, Long memberId) {
@@ -191,13 +192,13 @@ public class ChatRoomService {
     }
 
     // 크루 멤버인지 확인
-    private void validateCrewMember(CrewEntity crew, MemberEntity member) {
+    public void validateCrewMember(CrewEntity crew, MemberEntity member) {
         if (!crewMemberRepository.findByCrewAndMember(crew, member).isPresent()) {
             throw new RuntimeException("해당 사용자가 크루에 가입되어 있지 않습니다.");
         }
     }
 
-    private void validateCrewLeaderOrStaff(CrewEntity crew, MemberEntity member) {
+    public void validateCrewLeaderOrStaff(CrewEntity crew, MemberEntity member) {
         List<CrewRole> crewRoles = Arrays.asList(CrewRole.LEADER, CrewRole.STAFF);
         if (!crewMemberRepository.findByCrewAndMemberAndRoleIn(crew, member, crewRoles).isPresent()) {
             throw new RuntimeException("해당 멤버는 운영진이 아닙니다.");

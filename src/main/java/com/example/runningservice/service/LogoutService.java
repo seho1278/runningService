@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class LogoutService implements LogoutHandler {
 
-    private final BlackList blackList;
+    private final TokenBlackList tokenBlackList;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -37,11 +37,11 @@ public class LogoutService implements LogoutHandler {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
-        if (blackList.isListed(refreshToken)) {
+        if (tokenBlackList.isListed(refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
-        blackList.add(refreshToken);
+        tokenBlackList.add(refreshToken);
         SecurityContextHolder.clearContext();
     }
 }

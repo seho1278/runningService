@@ -29,7 +29,7 @@ import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;

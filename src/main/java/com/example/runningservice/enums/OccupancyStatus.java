@@ -2,7 +2,7 @@ package com.example.runningservice.enums;
 
 import com.example.runningservice.dto.crew.CrewFilterDto;
 import com.example.runningservice.entity.CrewEntity;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

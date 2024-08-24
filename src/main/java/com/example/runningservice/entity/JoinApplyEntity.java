@@ -47,11 +47,22 @@ public class JoinApplyEntity extends BaseEntity{
     public void initializeStatusAsPending() {
         this.status = JoinStatus.PENDING;
     }
-    public void approveJoin() {
+
+    public void markAsJoinApproved() {
         this.status = JoinStatus.APPROVED;
     }
-    public void rejectJoin() {
+
+    public void markAsRejected() {
         this.status = JoinStatus.REJECTED;
     }
+
+    public void markAsWithdrawn() {
+        this.status = JoinStatus.WITHDRAWN;
+    }
+
+    public void markAsForceWithdrawn() {
+        this.status = JoinStatus.FORCE_WITHDRAWN;
+    }
+
     public void updateMessage(String message) { this.message = message; }
 }

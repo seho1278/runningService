@@ -27,4 +27,12 @@ public class MessageEntity extends BaseEntity {
     @JoinColumn(name = "chat_join_id")
     private ChatJoinEntity chatJoin;
 
+    public String getSender() {
+        return this.chatJoin.getMember().getNickName();
+    }
+
+    public Long getRoomId() {
+        return this.chatJoin.getChatRoom().getId();
+    }
+
 }

@@ -33,6 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,13 +85,10 @@ class CrewApplicantServiceTest {
             request.getPageable(),
             2);
 
-        when(
-            pageUtil.getSortedPageable(request.getPageable(), "createdAt", Direction.ASC, 0,
-                10))
-            .thenReturn(request.getPageable());
-
-        when(joinApplicationRepository.findAllByCrew_CrewIdAndStatus(eq(crewId),
-            eq(JoinStatus.PENDING), eq(request.getPageable())))
+        Pageable sortedPageable = PageUtil.getSortedPageable(request.getPageable(), "createdAt", Direction.ASC, 0,
+                10);
+        when(joinApplicationRepository.findAllByCrew_IdAndStatus(eq(crewId),
+            eq(JoinStatus.PENDING), eq(sortedPageable)))
             .thenReturn(page);
 
         // when
@@ -116,7 +114,7 @@ class CrewApplicantServiceTest {
             .createdAt(LocalDateTime.now())
             .build();
 
-        when(joinApplicationRepository.findByIdAndCrew_CrewId(joinApplyId, crewId))
+        when(joinApplicationRepository.findByIdAndCrew_Id(joinApplyId, crewId))
             .thenReturn(Optional.of(joinApplyEntity));
 
         // when
