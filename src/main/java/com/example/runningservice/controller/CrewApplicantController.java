@@ -30,6 +30,7 @@ public class CrewApplicantController {
     private final CrewApplicantService crewApplicantService;
 
     @GetMapping("/{crew_id}/join/list")
+    @CrewRoleCheck(role = {"LEADER", "STAFF"})
     public ResponseEntity<Page<CrewApplicantResponseDto>> getJoinApplications(
         @LoginUser Long userId,
         @PathVariable("crew_id") Long crewId,

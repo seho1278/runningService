@@ -89,7 +89,7 @@ class CrewApplicantServiceTest {
                 10))
             .thenReturn(request.getPageable());
 
-        when(joinApplicationRepository.findAllByCrew_CrewIdAndStatus(eq(crewId),
+        when(joinApplicationRepository.findAllByCrew_IdAndStatus(eq(crewId),
             eq(JoinStatus.PENDING), eq(request.getPageable())))
             .thenReturn(page);
 
@@ -116,7 +116,7 @@ class CrewApplicantServiceTest {
             .createdAt(LocalDateTime.now())
             .build();
 
-        when(joinApplicationRepository.findByIdAndCrew_CrewId(joinApplyId, crewId))
+        when(joinApplicationRepository.findByIdAndCrew_Id(joinApplyId, crewId))
             .thenReturn(Optional.of(joinApplyEntity));
 
         // when
