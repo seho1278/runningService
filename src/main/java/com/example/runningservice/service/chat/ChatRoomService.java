@@ -8,7 +8,7 @@ import com.example.runningservice.entity.chat.ChatRoomEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;

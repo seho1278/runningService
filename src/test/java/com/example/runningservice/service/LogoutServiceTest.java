@@ -78,8 +78,7 @@ class LogoutServiceTest {
         when(customUserDetails.getUsername()).thenReturn("username");
         when(jwtUtil.validateToken("username", "validRefreshToken")).thenCallRealMethod();
         Claims mockClaims = mock(Claims.class);
-        when(mockClaims.getSubject()).thenReturn("differentEmail");
-        when(jwtUtil.extractAllClaims("validRefreshToken")).thenReturn(mockClaims);
+        when(jwtUtil.extractEmail("validRefreshToken")).thenReturn("differentEmail");
 
         //when
         CustomException exception = assertThrows(CustomException.class,
@@ -96,9 +95,7 @@ class LogoutServiceTest {
         when(authentication.getPrincipal()).thenReturn(customUserDetails);
         when(customUserDetails.getUsername()).thenReturn("username");
         when(jwtUtil.validateToken("username", "validRefreshToken")).thenCallRealMethod();
-        Claims mockClaims = mock(Claims.class);
-        when(mockClaims.getSubject()).thenReturn("username");
-        when(jwtUtil.extractAllClaims("validRefreshToken")).thenReturn(mockClaims);
+        when(jwtUtil.extractEmail("validRefreshToken")).thenReturn("username");
         when(jwtUtil.isTokenExpired("validRefreshToken")).thenReturn(true);
 
         //when

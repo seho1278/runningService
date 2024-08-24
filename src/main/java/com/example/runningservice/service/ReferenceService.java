@@ -35,7 +35,7 @@ public class ReferenceService {
      * 사용자 크루 권한 조회
      */
     public CrewRoleResponseDto getCrewRole(Long userId, Long crewId) {
-        CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_CrewIdAndMember_Id(
+        CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_IdAndMember_Id(
             crewId, userId)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS));
 
