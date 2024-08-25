@@ -64,11 +64,12 @@ public class NotificationService {
         List<MemberEntity> subscriberList = notificationManager.findSubscriber(
             request.getRelatedId(), request.getRelatedType());
 
-        subscriberList.forEach(member ->
-            userNotificationRepository.save(UserNotificationEntity.builder()
+        userNotificationRepository.saveAll(subscriberList.stream().map(member ->
+            UserNotificationEntity.builder()
                 .notification(notificationEntity)
                 .member(member)
-                .build()));
+                .build()
+        ).toList());
     }
 
     /**
