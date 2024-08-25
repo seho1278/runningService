@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -43,15 +44,17 @@ public class RegularRunMeetingEntity extends BaseEntity {
     @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> dayOfWeek;
+    private LocalTime time;
 
     public List<String> getDayOfWeek() {
         return Collections.unmodifiableList(this.dayOfWeek);
     }
 
-    public void updateRegularRunInfo(int count, int week, Region activityRegion) {
+    public void updateRegularRunInfo(int count, int week, Region activityRegion, LocalTime time) {
         this.count = count;
         this.week = week;
         this.activityRegion = activityRegion;
+        this.time = time;
     }
 
     public void addDayOfWeek(String dayOfWeek) {
