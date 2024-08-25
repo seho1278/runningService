@@ -35,6 +35,7 @@ public enum ErrorCode {
     NOT_FOUND_CHATROOM(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
     NOT_FOUND_USER_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자에게 전송된 알림을 찾을 수 없습니다."),
     REJECT_SUBSCRIBE_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자가 알림 수신을 거부하여 구독할 수 없습니다."),
+    NOT_FOUND_CHAT_MESSAGE(HttpStatus.BAD_REQUEST, "채팅 메시지를 찾을 수 없습니다."),
 
     //크루가입
     ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),
