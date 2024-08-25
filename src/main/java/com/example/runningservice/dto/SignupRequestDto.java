@@ -4,18 +4,22 @@ import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
+import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.validator.PasswordMatches;
 import com.example.runningservice.util.validator.ValidYear;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,6 +67,15 @@ public class SignupRequestDto {
     private Region activityRegion;
     private MultipartFile profileImage; // 프로필 이미지 추가
 
+    @NotNull
+    private Visibility nameVisibility = Visibility.PRIVATE;
+    @NotNull
+    private Visibility phoneNumberVisibility = Visibility.PRIVATE;
+    @NotNull
+    private Visibility genderVisibility = Visibility.PRIVATE;
+    @NotNull
+    private Visibility birthYearVisibility = Visibility.PRIVATE;
+
     public MemberEntity toEntity(PasswordEncoder passwordEncoder, AESUtil aesUtil) throws Exception {
         return MemberEntity.builder()
             .email(email)
@@ -75,6 +88,10 @@ public class SignupRequestDto {
             .gender(gender)
             .activityRegion(activityRegion)
             .roles(new ArrayList<>(List.of(Role.ROLE_USER)))
+            .nameVisibility(nameVisibility)
+            .phoneNumberVisibility(phoneNumberVisibility)
+            .genderVisibility(genderVisibility)
+            .birthYearVisibility(birthYearVisibility)
             .build();
     }
 }

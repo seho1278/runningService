@@ -208,7 +208,7 @@ public class CrewMemberService {
         CrewMemberEntity newLeader = crewMemberRepository.findById(crewMemberId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
 
-        CrewMemberEntity oldLeader = crewMemberRepository.findByMember_IdAndCrew_CrewId(
+        CrewMemberEntity oldLeader = crewMemberRepository.findByMember_IdAndCrew_Id(
             userId, crewId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
 
         newLeader.acceptLeaderRole();

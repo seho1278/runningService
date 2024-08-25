@@ -1,10 +1,12 @@
 package com.example.runningservice.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -12,8 +14,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.runningservice.client.MailgunClient;
-import com.example.runningservice.dto.member.MemberResponseDto;
 import com.example.runningservice.dto.SignupRequestDto;
+import com.example.runningservice.dto.member.MemberResponseDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
@@ -29,7 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -246,11 +247,11 @@ class SignupServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(memberEntity));
 
         // When
-        boolean result = signupService.verifyUser("test@example.com", "valid-code");
+        signupService.verifyUser("test@example.com", "valid-code");
 
         // Then
-        assertTrue(result);
         verify(memberRepository, times(1)).findByEmail(anyString());
+        assertEquals(true, memberEntity.isEmailVerified());
     }
 
     @Test

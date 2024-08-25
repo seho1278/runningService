@@ -445,7 +445,7 @@ class CrewMemberServiceTest {
         Long crewMemberId = 2L;
 
         when(crewMemberRepository.findById(crewMemberId)).thenReturn(Optional.of(newLeader));
-        when(crewMemberRepository.findByMember_IdAndCrew_CrewId(userId, crewId)).thenReturn(
+        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             Optional.of(oldLeader));
 
         // when
@@ -459,7 +459,7 @@ class CrewMemberServiceTest {
         assertEquals("NewLeader", result.getNewLeaderNickName());
         assertEquals(CrewRole.LEADER, result.getNewLeaderRole());
         verify(crewMemberRepository, times(1)).findById(crewMemberId);
-        verify(crewMemberRepository, times(1)).findByMember_IdAndCrew_CrewId(userId, crewId);
+        verify(crewMemberRepository, times(1)).findByMember_IdAndCrew_Id(userId, crewId);
 
         // Verify that roles were changed
         assertEquals(CrewRole.MEMBER, oldLeader.getRole());
@@ -496,7 +496,7 @@ class CrewMemberServiceTest {
         // then
         assertEquals(ErrorCode.NOT_FOUND_CREW_MEMBER, exception.getErrorCode());
         verify(crewMemberRepository, times(1)).findById(crewMemberId);
-        verify(crewMemberRepository, never()).findByMember_IdAndCrew_CrewId(anyLong(), anyLong());
+        verify(crewMemberRepository, never()).findByMember_IdAndCrew_Id(anyLong(), anyLong());
     }
 
     @Test
@@ -520,7 +520,7 @@ class CrewMemberServiceTest {
         Long crewMemberId = 2L;
 
         when(crewMemberRepository.findById(crewMemberId)).thenReturn(Optional.of(newLeader));
-        when(crewMemberRepository.findByMember_IdAndCrew_CrewId(userId, crewId)).thenReturn(
+        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             Optional.empty());
 
         // when
@@ -532,7 +532,7 @@ class CrewMemberServiceTest {
         assertEquals(ErrorCode.NOT_FOUND_CREW_MEMBER, exception.getErrorCode());
 
         verify(crewMemberRepository, times(1)).findById(crewMemberId);
-        verify(crewMemberRepository, times(1)).findByMember_IdAndCrew_CrewId(userId, crewId);
+        verify(crewMemberRepository, times(1)).findByMember_IdAndCrew_Id(userId, crewId);
 
         // not changed
         assertEquals(CrewRole.LEADER, oldLeader.getRole());
