@@ -1,5 +1,6 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.dto.regular_run.RegularRunRequestDto;
 import com.example.runningservice.enums.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,6 +46,18 @@ public class RegularRunMeetingEntity extends BaseEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> dayOfWeek;
     private LocalTime time;
+
+    public static RegularRunMeetingEntity toEntity(RegularRunRequestDto regularDto,
+        CrewEntity crewEntity) {
+        return RegularRunMeetingEntity.builder()
+            .crew(crewEntity)
+            .week(regularDto.getWeek())
+            .count(regularDto.getCount())
+            .time(regularDto.getTime())
+            .dayOfWeek(regularDto.getDayOfWeek())
+            .activityRegion(regularDto.getActivityRegion())
+            .build();
+    }
 
     public List<String> getDayOfWeek() {
         return Collections.unmodifiableList(this.dayOfWeek);
