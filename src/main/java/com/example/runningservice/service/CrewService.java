@@ -17,7 +17,11 @@ import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
+import com.example.runningservice.repository.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
+import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.RegularRunMeetingRepository;
+import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
@@ -42,6 +46,10 @@ public class CrewService {
     private final S3FileUtil s3FileUtil;
     private final String DEFAULT_IMAGE_NAME = "crew-default";
     private final ChatRoomService chatRoomService;
+    private final RegularRunMeetingRepository regularRunMeetingRepository;
+    private final CrewMemberBlackListRepository crewMemberBlackListRepository;
+    private final JoinApplicationRepository joinApplicationRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     /**
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
@@ -121,8 +129,13 @@ public class CrewService {
             s3FileUtil.deleteObject(fileName);
         }
 
-        // 크루원 삭제
+        // 외래키로 사용중인 테이블에서 모두 삭제 (크루원, 정기러닝 정보, 활동, 크루블랙리스트, 가입 신청, 채팅방)
         crewMemberRepository.deleteAllByCrew_Id(crewId);
+        regularRunMeetingRepository.deleteByCrew_Id(crewId);
+        activityRepository.deleteByCrew_Id(crewId);
+        crewMemberBlackListRepository.deleteByCrew_Id(crewId);
+        joinApplicationRepository.deleteByCrew_Id(crewId);
+        chatRoomRepository.deleteByCrew_Id(crewId);
 
         crewRepository.delete(crewEntity);
 

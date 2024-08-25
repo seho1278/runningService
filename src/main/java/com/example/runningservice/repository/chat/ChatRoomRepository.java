@@ -17,4 +17,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity, Long> 
     }
 
     void deleteAllByCrewMember_Id(Long crewMemberId);
+
+    void deleteByCrew_Id(Long crewId);
 }
