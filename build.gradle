@@ -37,6 +37,10 @@ dependencies {
     implementation 'com.mashape.unirest:unirest-java:1.4.9'
     implementation 'org.apache.commons:commons-lang3:3.16.0'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    // websocket stomp
+    implementation 'io.projectreactor.netty:reactor-netty:1.1.7' // spring boot 3.3.2와 호환
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+//    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     //jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
