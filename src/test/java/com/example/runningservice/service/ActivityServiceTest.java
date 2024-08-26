@@ -61,7 +61,7 @@ class ActivityServiceTest {
 
     @Test
     @DisplayName("정기러닝 생성_권한 O")
-    void createRegularActivity_Authorized() {
+    public void createRegularActivity_Authorized() {
         // given
         Long userId = 1L;
         Long crewId = 10L;
@@ -318,7 +318,7 @@ class ActivityServiceTest {
 
         // when
         CustomException customException = assertThrows(CustomException.class,
-            () -> activityService.getCrewActivity(crewId, wrongDate, Pageable.ofSize(1)));
+            () -> activityService.getCrewActivityByDate(crewId, wrongDate, Pageable.ofSize(1)));
 
         // then
         assertEquals(customException.getErrorCode(), ErrorCode.INVALID_DATE_RANGE);
@@ -344,8 +344,8 @@ class ActivityServiceTest {
             activityList);
 
         // when
-        List<ActivityResponseDto> response = activityService.getCrewActivity(crewId, equalDate,
-            pageable);
+        List<ActivityResponseDto> response = activityService.getCrewActivityByDate(crewId,
+            equalDate, pageable);
 
         // then
         verify(activityRepository, times(1)).findByCrew_IdAndDateBetween(
