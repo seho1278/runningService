@@ -30,7 +30,7 @@ public class RunRecordService {
     }
 
     public List<RunRecordResponseDto> findByUserId(Long userId) {
-        List<RunRecordEntity> runRecords = runRecordRepository.findByUserId(userId);
+        List<RunRecordEntity> runRecords = runRecordRepository.findByUserId_Id(userId);
         return runRecords.stream()
             .map(this::entityToDto)
             .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class RunRecordService {
 
     public RunRecordResponseDto updateRunRecord(Long runningId, RunRecordRequestDto requestDto) {
         RunRecordEntity existingEntity = runRecordRepository
-            .findByRunRecordId(runningId)
+            .findById(runningId)
             .orElseThrow(() -> new NoSuchElementException("해당 기록을 찾을수 없습니다."));
 
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
@@ -82,7 +82,7 @@ public class RunRecordService {
     }
 
     public RunRecordResponseDto calculateTotalRunRecords(Long userId) {
-        List<RunRecordEntity> runRecords = runRecordRepository.findByUserId(userId);
+        List<RunRecordEntity> runRecords = runRecordRepository.findByUserId_Id(userId);
 
         if (runRecords.isEmpty()) {
             return null;
