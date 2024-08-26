@@ -20,4 +20,6 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
         LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     int countByCrew_Id(Long crewId);
+
+    void deleteByCrew_Id(Long crewId);
 }

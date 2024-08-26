@@ -16,6 +16,7 @@ import com.example.runningservice.entity.RegularRunMeetingEntity;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +53,7 @@ class RegularRunServiceTest {
         when(regularRunDto.getCount()).thenReturn(2);
         when(regularRunDto.getWeek()).thenReturn(3);
         when(regularRunDto.getDayOfWeek()).thenReturn(List.of("월요일", "화요일"));
+        when(regularRunDto.getTime()).thenReturn(LocalTime.of(1,1));
         when(regularRunDto.getActivityRegion()).thenReturn(Region.SEOUL);
         CrewEntity mockCrewEntity = new CrewEntity();
         given(crewRepository.findById(crewId)).willReturn(Optional.of(mockCrewEntity));
@@ -62,10 +64,10 @@ class RegularRunServiceTest {
         // Then
         verify(regularRunMeetingRepository).save(any(RegularRunMeetingEntity.class));
         assertNotNull(response);
-        assertEquals(2, response.getFrequency().getTimes());
-        assertEquals(3, response.getFrequency().getWeeks());
-        assertEquals(Region.SEOUL.getRegionName(), response.getLocation());
-        assertEquals(2, response.getWeekdays().size());
+        assertEquals(2, response.getCount());
+        assertEquals(3, response.getWeek());
+        assertEquals(Region.SEOUL.getRegionName(), response.getActivityRegion());
+        assertEquals(2, response.getDayOfWeek().size());
     }
 
     @Test
@@ -91,8 +93,8 @@ class RegularRunServiceTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(regularRunDto.getActivityRegion().getRegionName(), response.getLocation());
-        assertEquals(List.of("월요일", "화요일"), response.getWeekdays());
+        assertEquals(regularRunDto.getActivityRegion().getRegionName(), response.getActivityRegion());
+        assertEquals(List.of("월요일", "화요일"), response.getDayOfWeek());
     }
 
     @Test
@@ -115,7 +117,7 @@ class RegularRunServiceTest {
         assertNotNull(response);
         assertEquals(regularId, response.getId());
         assertEquals(mockRegularRunMeetingEntity.getActivityRegion().getRegionName(),
-            response.getLocation());
+            response.getActivityRegion());
     }
 
     @Test
@@ -150,7 +152,7 @@ class RegularRunServiceTest {
         assertEquals(2, response.size());
         assertEquals(crewIdList.get(0), response.get(0).getCrewId());
         assertEquals(1, response.get(0).getData().size());
-        assertEquals(Region.SEOUL.getRegionName(), response.get(0).getData().get(0).getLocation());
+        assertEquals(Region.SEOUL.getRegionName(), response.get(0).getData().get(0).getActivityRegion());
     }
 
     @Test
@@ -196,8 +198,8 @@ class RegularRunServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(expectedDto.getLocation(), result.getLocation());
-        assertEquals(expectedDto.getWeekdays(), result.getWeekdays());
+        assertEquals(expectedDto.getActivityRegion(), result.getActivityRegion());
+        assertEquals(expectedDto.getDayOfWeek(), result.getDayOfWeek());
         verify(regularRunMeetingRepository).findById(regularId);
     }
 }

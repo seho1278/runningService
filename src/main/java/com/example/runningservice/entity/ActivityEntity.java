@@ -1,6 +1,7 @@
 package com.example.runningservice.entity;
 
 import com.example.runningservice.dto.activity.ActivityRequestDto.Update;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -44,7 +45,7 @@ public class ActivityEntity extends BaseEntity {
     private LocalTime endTime;
     private String location;
     private String notes;
-    @OneToMany(mappedBy = "activity", orphanRemoval = true)
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.REMOVE,  orphanRemoval = true)
     private List<ParticipantEntity> participant;
 
     public void update(Update activityDto) {

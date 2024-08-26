@@ -2,6 +2,7 @@ package com.example.runningservice.dto.regular_run;
 
 import com.example.runningservice.enums.Region;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.Getter;
 
@@ -16,4 +17,5 @@ public class RegularRunRequestDto {
     private List<String> dayOfWeek;
     @NotNull
     private Region activityRegion;
+    private LocalTime time;
 }

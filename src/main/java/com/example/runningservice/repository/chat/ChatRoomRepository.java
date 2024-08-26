@@ -15,4 +15,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity, Long> 
         return findById(roomId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHATROOM));
     }
+  
 }

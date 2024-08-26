@@ -34,8 +34,11 @@ public class ActivityService {
     private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
     private final RegularRunMeetingRepository regularRunMeetingRepository;
+    // private final NotificationService notificationService;
+    // private final ActivityNotification activityNotification;
 
     // 정기 러닝 일정 생성
+    @Transactional
     public ActivityResponseDto createRegularActivity(Long userId, Long crewId, Create activity) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
@@ -65,10 +68,20 @@ public class ActivityService {
 
         activityRepository.save(activityEntity);
 
+        // 크루원들에게 일정 추가 알림 전송 - 현재 사용 안함
+        /*notificationService.sendNotification(activityNotification,
+            NotificationRequestDto.builder()
+                .topic("/topic/activity/" + crewId)
+                .notificationType(NotificationType.ACTIVITY)
+                .relatedType(TableType.ACTIVITY)
+                .relatedId(activityEntity.getId())
+                .build());*/
+
         return ActivityResponseDto.fromEntity(activityEntity);
     }
 
     // 번개 러닝 일정 생성
+    @Transactional
     public ActivityResponseDto createOnDemandActivity(Long userId, Long crewId, Create activity) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
@@ -88,6 +101,15 @@ public class ActivityService {
             .build();
 
         activityRepository.save(activityEntity);
+
+        // 크루원들에게 일정 추가 알림 전송 - 현재 사용 안함
+        /*notificationService.sendNotification(activityNotification,
+            NotificationRequestDto.builder()
+                .topic("/topic/activity/" + crewId)
+                .notificationType(NotificationType.ACTIVITY)
+                .relatedType(TableType.ACTIVITY)
+                .relatedId(activityEntity.getId())
+                .build());*/
 
         return ActivityResponseDto.fromEntity(activityEntity);
     }
