@@ -16,4 +16,6 @@ public interface RegularRunMeetingRepository extends JpaRepository<RegularRunMee
     List<RegularRunMeetingEntity> findByCrewIdIn(@Param("crewIdList") List<Long> crewIdList);
 
     Page<RegularRunMeetingEntity> findByCrew_Id(Long crewId, Pageable pageable);
+
+    void deleteByCrew_Id(Long crewId);
 }
