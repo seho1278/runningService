@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RunGoalRepository extends JpaRepository<RunGoalEntity, Long> {
-    List<RunGoalEntity> findByUserId(Long userId);
+    List<RunGoalEntity> findByUserId_Id(Long userId);
 }
