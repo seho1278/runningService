@@ -53,9 +53,11 @@ public class SecurityConfig {
                         "/js/**",
                         "/region",
                         "/posts/**",
+                        "/crew",
+                        "/crew/*/activity",
                         "/comments/**")
                     .permitAll().requestMatchers(
-                        HttpMethod.GET, "/crew")
+                        HttpMethod.GET, "/crew/*")
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "**/regular/**")
                     .permitAll().requestMatchers(
@@ -64,6 +66,7 @@ public class SecurityConfig {
                         "/comments/save",
                         "/crew/search/**",
                         "/logout",
+                        "/crew/participate",
                         "/user/**",
                         "crew/**")
                     .hasAnyAuthority("ROLE_USER")

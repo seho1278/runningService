@@ -19,6 +19,15 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
     Page<ActivityEntity> findByCrew_IdAndDateBetween(Long crewId,
         LocalDate startDate, LocalDate endDate, Pageable pageable);
 
+    Page<ActivityEntity> findByCrew_IdAndDateGreaterThanEqualAndRegularRunIsNullOrderByDate(
+        Long crewId, LocalDate startDate, Pageable pageable);
+
+    Page<ActivityEntity> findByCrew_IdAndDateGreaterThanEqualAndRegularRunIsNotNullOrderByDate(
+        Long crewId, LocalDate startDate, Pageable pageable);
+
+    Page<ActivityEntity> findByCrew_IdAndDateGreaterThanEqualOrderByDate(Long crewId,
+        LocalDate startDate, Pageable pageable);
+
     int countByCrew_Id(Long crewId);
 
     void deleteByCrew_Id(Long crewId);

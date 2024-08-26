@@ -80,21 +80,32 @@ public class ActivityController {
     }
 
     /**
-     * 크루 (정기/번개)러닝 일정 조회
+     * 크루 (정기/번개)러닝 날짜 구간별 일정 조회
      */
-    @GetMapping("/crew/{crewId}/activity")
+    @GetMapping("/crew/{crewId}/activity/date")
     @CrewRoleCheck(role = {"LEADER", "MEMBER", "STAFF"})
-    public ResponseEntity<List<ActivityResponseDto>> getCrewActivity(@LoginUser Long userId,
+    public ResponseEntity<List<ActivityResponseDto>> getCrewActivityByDate(@LoginUser Long userId,
         @PathVariable("crewId") Long crewId, Pageable pageable,
         @RequestParam(value = "startDate", required = false) LocalDate startDate,
         @RequestParam(value = "endDate", required = false) LocalDate endDate,
         @RequestParam(value = "category", required = false) ActivityCategory category) {
 
-        return ResponseEntity.ok(activityService.getCrewActivity(crewId,
+        return ResponseEntity.ok(activityService.getCrewActivityByDate(crewId,
             ActivityFilterDto.builder()
                 .startDate(startDate)
                 .endDate(endDate)
                 .category(category)
                 .build(), pageable));
+    }
+
+    /**
+     * 다가오는 크루 (정기/번개)러닝 일정 조회
+     */
+    @GetMapping("/crew/{crewId}/activity")
+    public ResponseEntity<List<ActivityResponseDto>> getCrewActivity(@LoginUser Long userId,
+        @PathVariable("crewId") Long crewId, Pageable pageable,
+        @RequestParam(value = "category", required = false) ActivityCategory category) {
+
+        return ResponseEntity.ok(activityService.getCrewActivity(crewId, category, pageable));
     }
 }

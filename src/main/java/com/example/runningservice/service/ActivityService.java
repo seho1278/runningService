@@ -181,9 +181,9 @@ public class ActivityService {
     }
 
     /**
-     * 크루 (정기/번개)러닝 일정 조회
+     * 날짜별 크루 (정기/번개)러닝 일정 조회
      */
-    public List<ActivityResponseDto> getCrewActivity(Long crewId, ActivityFilterDto activityFilter,
+    public List<ActivityResponseDto> getCrewActivityByDate(Long crewId, ActivityFilterDto activityFilter,
         Pageable pageable) {
         if (!validateDate(activityFilter.getStartDate(), activityFilter.getEndDate())) {
             throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
@@ -195,6 +195,21 @@ public class ActivityService {
             :
                 ActivityCategory.ALL.findByCrewIdAndDateBetween(activityRepository, crewId,
                     activityFilter.getStartDate(), activityFilter.getEndDate(), pageable);
+
+        return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
+    }
+
+    /**
+     * 다가오는 크루 (정기/번개)러닝 일정 조회
+     */
+    public List<ActivityResponseDto> getCrewActivity(Long crewId, ActivityCategory category,
+        Pageable pageable) {
+        List<ActivityEntity> activityPage = (category != null) ?
+            category.findByCrewIdOrderByUpcomingDate(activityRepository, crewId,
+                LocalDate.now(), pageable)
+            :
+                ActivityCategory.ALL.findByCrewIdOrderByUpcomingDate(activityRepository, crewId,
+                    LocalDate.now(), pageable);
 
         return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
     }
