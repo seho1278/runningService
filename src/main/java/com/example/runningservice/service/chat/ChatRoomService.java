@@ -1,6 +1,5 @@
 package com.example.runningservice.service.chat;
 
-import com.example.runningservice.controller.chat.MessageController;
 import com.example.runningservice.dto.chat.ChatRoomDetailsDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -10,18 +9,16 @@ import com.example.runningservice.entity.chat.MessageEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.chat.MessageRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

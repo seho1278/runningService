@@ -31,4 +31,6 @@ public interface ChatJoinRepository extends JpaRepository<ChatJoinEntity, Long>,
 //    @Query("SELECT m.nickName FROM ChatJoinEntity cj JOIN cj.member m WHERE cj.chatRoom = :chatRoom")
 //    List<MemberEntity> findMemberNicknamesByChatRoom(@Param("chatRoom") ChatRoomEntity chatRoom);
 
+    List<ChatJoinEntity> findByChatRoom_Id(Long chatRoomId);
+
 }
