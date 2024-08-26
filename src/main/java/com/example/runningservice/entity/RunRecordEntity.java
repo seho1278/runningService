@@ -1,6 +1,9 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.util.converter.BooleanToIntegerConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,34 +14,39 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "runRecord")
+@EntityListeners(AuditingEntityListener.class)
 public class RunRecordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long run_record_id;
+    @Setter
+    private Long id;
 
-//    @JoinColumn(name = "goal_id")
-//    @ManyToOne
-//    private Long goal_id;
-//
-//    @JoinColumn(name = "user_id")
-//    @ManyToOne
-//    private Long user_id;
+    @ManyToOne
+    @JoinColumn(name = "run_goal_id", nullable = false)
+    private RunGoalEntity goalId;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id", nullable = false)
+    private MemberEntity userId;
 
     private Integer distance;
     private LocalDateTime pace;
-    private LocalDateTime running_time;
+    private LocalDateTime runningTime;
 
     @CreatedDate
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
     @LastModifiedDate
-    private LocalDateTime updated_at;
-    private Integer is_public;
+    private LocalDateTime updatedAt;
+    @Convert(converter = BooleanToIntegerConverter.class)
+    private Integer isPublic;
 }

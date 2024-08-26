@@ -1,18 +1,19 @@
 package com.example.runningservice.controller;
 
+import com.example.runningservice.dto.crew.CrewBaseResponseDto;
+import com.example.runningservice.dto.crew.CrewDetailResponseDto;
 import com.example.runningservice.dto.crew.CrewFilterDto.CrewInfo;
-import com.example.runningservice.dto.crew.CrewFilterDto.Participate;
+import com.example.runningservice.dto.crew.CrewJoinStatusResponseDto;
 import com.example.runningservice.dto.crew.CrewRequestDto;
 import com.example.runningservice.dto.crew.CrewRequestDto.Update;
-import com.example.runningservice.dto.crew.CrewResponseDto.CrewData;
-import com.example.runningservice.dto.crew.CrewResponseDto.Detail;
-import com.example.runningservice.dto.crew.CrewResponseDto.Summary;
+import com.example.runningservice.dto.crew.CrewRoleResponseDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.service.CrewService;
 import com.example.runningservice.util.LoginUser;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class CrewController {
      * 크루 생성
      */
     @PostMapping
-    public ResponseEntity<CrewData> createCrew(@LoginUser Long userId,
+    public ResponseEntity<CrewBaseResponseDto> createCrew(@LoginUser Long userId,
         @Valid CrewRequestDto.Create request) {
         request.setLoginUserId(userId);
 
@@ -50,7 +51,7 @@ public class CrewController {
      * 크루 정보 수정
      */
     @PutMapping("/{crewId}")
-    public ResponseEntity<CrewData> updateCrew(@Valid Update request,
+    public ResponseEntity<CrewBaseResponseDto> updateCrew(@Valid Update request,
         @PathVariable("crewId") Long crewId) {
         request.setUpdateCrewId(crewId);
 
@@ -61,7 +62,7 @@ public class CrewController {
      * 크루 삭제
      */
     @DeleteMapping("/{crewId}")
-    public ResponseEntity<CrewData> deleteCrew(@PathVariable("crewId") Long crewId) {
+    public ResponseEntity<CrewBaseResponseDto> deleteCrew(@PathVariable("crewId") Long crewId) {
         return ResponseEntity.ok(crewService.deleteCrew(crewId));
     }
 
@@ -69,30 +70,25 @@ public class CrewController {
      * 크루 싱세 정보 조회
      */
     @GetMapping("/{crewId}")
-    public ResponseEntity<Detail> getCrew(@PathVariable("crewId") Long crewId) {
+    public ResponseEntity<CrewDetailResponseDto> getCrew(@PathVariable("crewId") Long crewId) {
         return ResponseEntity.ok(crewService.getCrew(crewId));
     }
 
     /**
-     * 참가 중인 크루 리스트 조회 (내가 만든 크루, 가입한 크루로 필터링하여 조회 가능)
+     * 참가 중인 크루 리스트 조회
      */
     @GetMapping("/participate")
-    public ResponseEntity<Summary> getParticipateCrewList(
-        @RequestParam(value = "filter", required = false) String filter,
+    public ResponseEntity<List<CrewRoleResponseDto>> getParticipateCrewList(@LoginUser Long userId,
         Pageable pageable) {
-        Participate participate = Participate.builder()
-            .userId(1L)
-            .build();
-        participate.setFilter(filter);
 
-        return ResponseEntity.ok(crewService.getParticipateCrewList(participate, pageable));
+        return ResponseEntity.ok(crewService.getParticipateCrewList(userId, pageable));
     }
 
     /**
      * 전체 크루 필터링 조회
      */
     @GetMapping
-    public ResponseEntity<Summary> getCrewList(
+    public ResponseEntity<List<CrewJoinStatusResponseDto>> getCrewList(@LoginUser Long userId,
         @RequestParam(value = "activityRegion", required = false) Region activityRegion,
         @RequestParam(value = "minAge", required = false) Integer minAge,
         @RequestParam(value = "maxAge", required = false) Integer maxAge,
@@ -102,7 +98,7 @@ public class CrewController {
         @RequestParam(value = "occupancyStatus", required = false) OccupancyStatus occupancyStatus,
         Pageable pageable
     ) {
-        return ResponseEntity.ok(crewService.getCrewList(CrewInfo.builder()
+        return ResponseEntity.ok(crewService.getCrewList(userId, CrewInfo.builder()
             .activityRegion(activityRegion)
             .leaderRequired(leaderRequired)
             .runRecordPublic(runRecordPublic)

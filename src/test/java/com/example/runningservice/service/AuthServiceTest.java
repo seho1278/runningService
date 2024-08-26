@@ -61,7 +61,7 @@ class AuthServiceTest {
     private Authentication authentication;
 
     @Mock
-    private BlackList blackList;
+    private TokenBlackList tokenBlackList;
 
     @Mock
     private CustomUserDetails userDetails;
@@ -176,7 +176,7 @@ class AuthServiceTest {
         String refreshToken = "refresh-token";
         String principalEmail = "test@example.com";
 
-        when(blackList.isListed(refreshToken)).thenReturn(false);
+        when(tokenBlackList.isListed(refreshToken)).thenReturn(false);
         when(jwtUtil.isTokenExpired(refreshToken)).thenReturn(false);
         when(jwtUtil.extractEmail(refreshToken)).thenReturn("test@example.com");
         when(customUserDetailsService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
@@ -192,14 +192,14 @@ class AuthServiceTest {
         assertNotNull(jwtResponse);
         assertEquals("refresh-token", jwtResponse.getRefreshJwt());
         assertEquals("access-token", jwtResponse.getAccessJwt());
-        verify(blackList).isListed(refreshToken);
+        verify(tokenBlackList).isListed(refreshToken);
     }
 
     @Test
     void testRefreshToken_BlacklistedToken() {
         // Given
         String refreshToken = "blacklisted-refresh-token";
-        when(blackList.isListed(refreshToken)).thenReturn(true);
+        when(tokenBlackList.isListed(refreshToken)).thenReturn(true);
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
@@ -207,7 +207,7 @@ class AuthServiceTest {
         });
 
         assertEquals(ErrorCode.INVALID_REFRESH_TOKEN, exception.getErrorCode());
-        verify(blackList).isListed(refreshToken);
+        verify(tokenBlackList).isListed(refreshToken);
         verify(jwtUtil, never()).isTokenExpired(anyString());
     }
 
@@ -216,7 +216,7 @@ class AuthServiceTest {
         // Given
         String refreshToken = "expired-refresh-token";
         String principalEmail = "test@example.com";
-        when(blackList.isListed(refreshToken)).thenReturn(false);
+        when(tokenBlackList.isListed(refreshToken)).thenReturn(false);
         when(principal.getName()).thenReturn(principalEmail);
         when(jwtUtil.validateToken(principalEmail, refreshToken)).thenCallRealMethod();
         when(jwtUtil.extractEmail(refreshToken)).thenReturn(principalEmail);
@@ -236,7 +236,7 @@ class AuthServiceTest {
         // Given
         String refreshToken = "expired-refresh-token";
         String principalEmail = "test@example.com";
-        when(blackList.isListed(refreshToken)).thenReturn(false);
+        when(tokenBlackList.isListed(refreshToken)).thenReturn(false);
         when(principal.getName()).thenReturn(principalEmail);
         when(jwtUtil.validateToken(principalEmail, refreshToken)).thenCallRealMethod();
         when(jwtUtil.extractEmail(refreshToken)).thenReturn("diffrent-email");

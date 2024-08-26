@@ -12,7 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ChatJoinRepository extends JpaRepository<ChatJoinEntity, Long> {
+public interface ChatJoinRepository extends JpaRepository<ChatJoinEntity, Long>,
+    ChatJoinRepositoryCustom {
     // 중복참여 확인
     boolean existsByChatRoomAndMember(ChatRoomEntity chatRoom, MemberEntity member);
 
@@ -29,4 +30,5 @@ public interface ChatJoinRepository extends JpaRepository<ChatJoinEntity, Long> 
 
 //    @Query("SELECT m.nickName FROM ChatJoinEntity cj JOIN cj.member m WHERE cj.chatRoom = :chatRoom")
 //    List<MemberEntity> findMemberNicknamesByChatRoom(@Param("chatRoom") ChatRoomEntity chatRoom);
+
 }

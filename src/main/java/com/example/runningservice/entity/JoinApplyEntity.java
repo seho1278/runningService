@@ -36,6 +36,7 @@ public class JoinApplyEntity extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private JoinStatus status;
     private String message;
+
     public static JoinApplyEntity of(MemberEntity member, CrewEntity crew, String message) {
         return JoinApplyEntity.builder()
             .member(member)
@@ -44,8 +45,25 @@ public class JoinApplyEntity extends BaseEntity{
             .build();
     }
 
-    public void markStatus(JoinStatus status) {
-        this.status = status;
+    public void initializeStatusAsPending() {
+        this.status = JoinStatus.PENDING;
     }
+
+    public void markAsJoinApproved() {
+        this.status = JoinStatus.APPROVED;
+    }
+
+    public void markAsRejected() {
+        this.status = JoinStatus.REJECTED;
+    }
+
+    public void markAsWithdrawn() {
+        this.status = JoinStatus.WITHDRAWN;
+    }
+
+    public void markAsForceWithdrawn() {
+        this.status = JoinStatus.FORCE_WITHDRAWN;
+    }
+
     public void updateMessage(String message) { this.message = message; }
 }

@@ -23,14 +23,14 @@ public class AuthController {
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequestDto loginRequestDto)
         throws Exception {
         JwtResponse jwtResponse = authService.authenticate(loginRequestDto);
-        log.info("{} 님이 로그인에 성공하셨습니다", loginRequestDto.getEmail());
+
         return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/token/refresh")
     public ResponseEntity<JwtResponse> refreshToken(
-        @RequestHeader(name = "Authorization") String refreshToken, Principal principal)
-        throws Exception {
+        @RequestHeader(name = "Authorization") String refreshToken, Principal principal) {
+
         refreshToken = refreshToken.replace("Bearer ", "");
         return ResponseEntity.ok(authService.refreshToken(refreshToken, principal));
     }

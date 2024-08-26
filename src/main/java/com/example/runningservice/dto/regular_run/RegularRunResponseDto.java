@@ -1,6 +1,8 @@
 package com.example.runningservice.dto.regular_run;
 
 import com.example.runningservice.entity.RegularRunMeetingEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,31 +16,23 @@ import lombok.NoArgsConstructor;
 public class RegularRunResponseDto {
 
     private Long id;
-    private Frequency frequency;
-    private List<String> weekdays;
-    private String location;
-
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Getter
-    public static class Frequency {
-
-        private int weeks;
-        private int times;
-    }
+    private int week;
+    private int count;
+    private List<String> dayOfWeek;
+    private String activityRegion;
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime time;
 
     public static RegularRunResponseDto fromEntity(
         RegularRunMeetingEntity regularRunMeetingEntity) {
 
         return RegularRunResponseDto.builder()
             .id(regularRunMeetingEntity.getId())
-            .frequency(Frequency.builder()
-                .weeks(regularRunMeetingEntity.getWeek())
-                .times(regularRunMeetingEntity.getCount())
-                .build())
-            .weekdays(regularRunMeetingEntity.getDayOfWeek())
-            .location(regularRunMeetingEntity.getActivityRegion().getRegionName())
+            .week(regularRunMeetingEntity.getWeek())
+            .count(regularRunMeetingEntity.getCount())
+            .dayOfWeek(regularRunMeetingEntity.getDayOfWeek())
+            .activityRegion(regularRunMeetingEntity.getActivityRegion().getRegionName())
+            .time(regularRunMeetingEntity.getTime())
             .build();
     }
 }

@@ -1,6 +1,6 @@
 package com.example.runningservice.util.validator;
 
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
