@@ -32,7 +32,8 @@ public class ChatRoomEntity extends BaseEntity {
 
 
     @Builder
-    public ChatRoomEntity(String roomName, ChatRoom roomType, CrewEntity crew) {
+    public ChatRoomEntity(Long id, String roomName, ChatRoom roomType, CrewEntity crew) {
+        this.id = id;
         this.roomName = roomName;
         this.roomType = roomType;
         this.crew = crew;

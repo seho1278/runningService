@@ -25,15 +25,27 @@ public enum ErrorCode {
     NOT_FOUND_APPLY(HttpStatus.BAD_REQUEST, "해당 신청내역을 찾을 수 없습니다."),
     NOT_FOUND_REGULAR_RUN(HttpStatus.BAD_REQUEST, "정기러닝이 존재하지 않습니다."),
     UNAUTHORIZED_CREW_ACCESS(HttpStatus.FORBIDDEN, "크루 접근 권한이 없습니다."),
+    DECRYPTION_ERROR(HttpStatus.BAD_REQUEST, "복호화 과정 중 에러가 발생하였습니다."),
+    NOT_FOUND_CREW_MEMBER(HttpStatus.BAD_REQUEST, "해당 크루원을 찾을 수 없습니다."),
+    ROLE_NOT_CHANGED(HttpStatus.BAD_REQUEST, "새로운 역할이 현재 역할과 동일합니다."),
+    UNAUTHORIZED_REGULAR_ACCESS(HttpStatus.FORBIDDEN, "정기러닝 접근 권한이 없습니다."),
+    NOT_FOUND_ACTIVITY(HttpStatus.BAD_REQUEST, "활동이 존재하지 않습니다."),
+    UNAUTHORIZED_ACTIVITY(HttpStatus.FORBIDDEN, "활동 접근 권한이 없습니다."),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작 날짜가 종료 날짜보다 빨라야 합니다."),
+    NOT_FOUND_CHATROOM(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
+    NOT_FOUND_USER_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자에게 전송된 알림을 찾을 수 없습니다."),
+    REJECT_SUBSCRIBE_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자가 알림 수신을 거부하여 구독할 수 없습니다."),
+    NOT_FOUND_CHAT_MESSAGE(HttpStatus.BAD_REQUEST, "채팅 메시지를 찾을 수 없습니다."),
 
     //크루가입
-    ALREADY_EXIST_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 가입신청 기록이 있습니다."),
+    ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),
     ALREADY_CREWMEMBER(HttpStatus.BAD_REQUEST, "이미 크루에 가입된 회원입니다."),
     RECORD_OPEN_REQUIRED(HttpStatus.FORBIDDEN, "러닝 기록을 공개해야 합니다."),
     GENDER_RESTRICTION_NOT_MET(HttpStatus.FORBIDDEN, "성별 제한을 충족하지 못했습니다."),
     GENDER_REQUIRED(HttpStatus.FORBIDDEN, "가입을 위해 성별 정보가 필요합니다."),
     AGE_RESTRICTION_NOT_MET(HttpStatus.FORBIDDEN, "나이 제한을 충족하지 못했습니다."),
     AGE_REQUIRED(HttpStatus.FORBIDDEN, "가입을 위해 연령 정보가 필요합니다."),
+    JOIN_NOT_ALLOWED_FOR_FORCE_WITHDRAWN(HttpStatus.FORBIDDEN, "강제퇴장된 멤버는 재가입할 수 없습니다."),
     //권한
     UNAUTHORIZED_MY_APPLY_ACCESS(HttpStatus.FORBIDDEN, "잘못된 접근입니다. 자신의 가입 신청 내역만 조회할 수 있습니다.");
 

@@ -26,6 +26,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class RunGoalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Setter
     private Long id;
 

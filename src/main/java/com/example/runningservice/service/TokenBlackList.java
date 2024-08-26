@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BlackList {
+public class TokenBlackList {
     private final JwtUtil jwtUtil;
 
     private final Map<String, Date> blacklist = new ConcurrentHashMap<>();

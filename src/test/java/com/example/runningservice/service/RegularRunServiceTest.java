@@ -14,7 +14,7 @@ import com.example.runningservice.dto.regular_run.RegularRunResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.RegularRunMeetingEntity;
 import com.example.runningservice.enums.Region;
-import com.example.runningservice.repository.CrewRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,8 +124,8 @@ class RegularRunServiceTest {
         Pageable pageable = PageRequest.of(0, 2);
 
         List<Long> crewIdList = List.of(1L, 2L);
-        List<CrewEntity> crewList = List.of(CrewEntity.builder().crewId(crewIdList.get(0)).build(),
-            CrewEntity.builder().crewId(crewIdList.get(1)).build());
+        List<CrewEntity> crewList = List.of(CrewEntity.builder().id(crewIdList.get(0)).build(),
+            CrewEntity.builder().id(crewIdList.get(1)).build());
         Page<CrewEntity> crewPage = new PageImpl<>(crewList);
 
         given(crewRepository.findAll(pageable)).willReturn(crewPage);
@@ -164,7 +164,7 @@ class RegularRunServiceTest {
             .build();
         Page<RegularRunMeetingEntity> page = new PageImpl<>(List.of(entity));
 
-        given(regularRunMeetingRepository.findByCrew_CrewId(crewId, Pageable.unpaged()))
+        given(regularRunMeetingRepository.findByCrew_Id(crewId, Pageable.unpaged()))
             .willReturn(page);
 
         // when
@@ -175,7 +175,7 @@ class RegularRunServiceTest {
         assertNotNull(result);
         assertEquals(crewId, result.getCrewId());
         assertEquals(1, result.getData().size());
-        verify(regularRunMeetingRepository).findByCrew_CrewId(crewId, Pageable.unpaged());
+        verify(regularRunMeetingRepository).findByCrew_Id(crewId, Pageable.unpaged());
     }
 
     @Test

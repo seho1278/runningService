@@ -1,9 +1,9 @@
 package com.example.runningservice.service;
 
-import com.example.runningservice.dto.GetJoinApplicationsDto;
-import com.example.runningservice.dto.JoinApplyDto;
-import com.example.runningservice.dto.JoinApplyDto.SimpleResponse;
 import com.example.runningservice.dto.UpdateJoinApplyDto;
+import com.example.runningservice.dto.join.GetApplicantsRequestDto;
+import com.example.runningservice.dto.join.JoinApplyDto;
+import com.example.runningservice.dto.join.JoinApplyDto.SimpleResponse;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
@@ -14,16 +14,16 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.CrewRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.MemberRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.util.JwtUtil;
+import com.example.runningservice.util.PageUtil;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +37,14 @@ public class UserJoinService {
     private final CrewMemberRepository crewMemberRepository;
     private final JwtUtil jwtUtil;
 
-    //Todo OccupancyStatus 반영하여 필터링 추가
     @Transactional
     public JoinApplyDto.DetailResponse saveJoinApply(Long crewId,
         JoinApplyDto.Request joinApplyForm) {
         MemberEntity memberEntity = memberRepository.findById(joinApplyForm.getUserId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        CrewEntity crewEntity = crewRepository.findById(crewId)
+        //크루원 수가 크루 정원보다 작은 크루일 때만 가져오기
+        CrewEntity crewEntity = crewRepository.findByIdAndMemberCountLessThanCapacity(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         //멤버제한 조건 검증 : 성별(선택), 최소연령(선택), 최대연령(선택), 러닝기록 오픈여부
@@ -56,14 +56,14 @@ public class UserJoinService {
 
         if (!crewEntity.getLeaderRequired()) { // 가입 승인이 필요 없는 경우
             // 가입 상태를 승인으로 설정
-            joinApplyEntity.markStatus(JoinStatus.APPROVED);
+            joinApplyEntity.markAsJoinApproved();
 
             // 크루원으로 자동 가입 처리
-            CrewMemberEntity crewMemberEntity = CrewMemberEntity.memberOf(memberEntity, crewEntity);
+            CrewMemberEntity crewMemberEntity = CrewMemberEntity.of(memberEntity, crewEntity);
             crewMemberRepository.save(crewMemberEntity);
         } else {
             // 가입 승인이 필요한 경우
-            joinApplyEntity.markStatus(JoinStatus.PENDING);
+            joinApplyEntity.initializeStatusAsPending();
         }
         // 엔티티 저장
         JoinApplyEntity savedJoinApplyEntity = joinApplicationRepository.save(joinApplyEntity);
@@ -74,7 +74,7 @@ public class UserJoinService {
     //가입신청내역 조회하기(페이지네이션, 신청일자 기준 정렬기준, 신청상태 필터링 적용 추가)
     @Transactional(readOnly = true)
     public Page<SimpleResponse> getJoinApplications(String token, Long memberId,
-        GetJoinApplicationsDto request) {
+        GetApplicantsRequestDto request) {
 
         //토큰 유효성 검사
         token = token.substring("Bearer ".length());
@@ -84,17 +84,14 @@ public class UserJoinService {
 
         // 기본 정렬 기준 및 방향 설정 (기본값은 createdAt 기준 내림차순)
         String defaultSortBy = "createdAt";
-        Sort defaultSort = Sort.by(Sort.Order.desc(defaultSortBy));
-
-        // Pageable에서 sort 정보를 추출 (sort=정렬기준(ex.createdAt) 이 있으면 isSorted()==true)
+        Direction defaultDirection = Direction.ASC;
         Pageable pageable = request.getPageable();
-        int pageNumber = pageable != null ? pageable.getPageNumber() : 0; // 기본 페이지 번호 0
-        int pageSize = (pageable != null && pageable.getPageSize() > 0) ? pageable.getPageSize() : 10; // 기본 페이지 크기 10
-
-        Sort sortOrder = pageable.getSort().isSorted() ? pageable.getSort() : defaultSort;
+        int defaultPageNumber =  0;
+        int defaultSize = 10;
 
         // 정렬 순서 설정
-        Pageable sortedPageable = PageRequest.of(pageNumber, pageSize, sortOrder);
+        Pageable sortedPageable = PageUtil.getSortedPageable(pageable, defaultSortBy, defaultDirection,
+            defaultPageNumber, defaultSize);
 
         // 신청결과 필터링
         JoinStatus status = request.getStatus();
@@ -128,7 +125,7 @@ public class UserJoinService {
         Integer minAge = crewEntity.getMinAge();
         Integer maxAge = crewEntity.getMaxAge();
         Long memberId = memberEntity.getId();
-        Long crewId = crewEntity.getCrewId();
+        Long crewId = crewEntity.getId();
         // 나이 제한 있으면 검증
         if (minAge != null || maxAge != null) {
             //나이 검증
@@ -140,31 +137,32 @@ public class UserJoinService {
             validateGender(memberEntity, crewEntity, requiredGender);
         }
         // Todo 기록 공개 여부 검증
-//        Boolean requireRecordOpen = crewEntity.getRunRecordOpen();
-//        if (requireRecordOpen && memberEntity.getRunRecordOpen().equals(Visibility.PUBLIC)) {
-//            throw new CustomException("가입 자격이 없습니다. 달리기 기록을 공개해야 합니다.");
-//        }
 
         //이미 회원이면 신청 불가
         if (crewMemberRepository.existsByMember_Id(memberId)) {
             throw new CustomException(ErrorCode.ALREADY_CREWMEMBER);
         }
-        //이미 신청기록 있다면 신청 불가
-        if (joinApplicationRepository.existsByMember_IdAndCrew_CrewId(memberId, crewId)) {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_JOIN_APPLY);
-        }
+        //최근 신청내역이 대기상태이거나 강제퇴장된 상태면 신청불가
+        joinApplicationRepository.findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(memberId, crewId)
+            .ifPresent(application -> {
+                if (application.getStatus() == JoinStatus.PENDING) {
+                    throw new CustomException(ErrorCode.ALREADY_EXIST_PENDING_JOIN_APPLY);
+                }
+                if (application.getStatus() == JoinStatus.FORCE_WITHDRAWN) {
+                    throw new CustomException(ErrorCode.JOIN_NOT_ALLOWED_FOR_FORCE_WITHDRAWN);
+                }
+            });
     }
 
     private void validateAge(MemberEntity memberEntity, CrewEntity crewEntity, Integer minAge,
         Integer maxAge) {
 
         if (minAge != null || maxAge != null) {
-            if (memberEntity.getBirthYear() == null || memberEntity.getBirthYearVisibility()
-                .equals(Visibility.PRIVATE)) {
+            if (memberEntity.getBirthYear() == null) {
                 throw new CustomException(ErrorCode.AGE_REQUIRED);
             }
 
-            int memberAge = LocalDate.now().getYear() - memberEntity.getBirthYear() + 1;
+            int memberAge = LocalDate.now().getYear() - memberEntity.getBirthYear() + 1; //한국나이
             if (minAge != null && memberAge < minAge) {
                 throw new CustomException(ErrorCode.AGE_RESTRICTION_NOT_MET);
             }
@@ -181,7 +179,7 @@ public class UserJoinService {
         Visibility memberGenderVisibility = memberEntity.getGenderVisibility();
 
         if (requiredGender != null) {
-            if (memberGender == null || memberGenderVisibility.equals(Visibility.PRIVATE)) {
+            if (memberGender == null) {
                 throw new CustomException(ErrorCode.GENDER_REQUIRED);
             }
             if (!memberGender.equals(requiredGender)) {

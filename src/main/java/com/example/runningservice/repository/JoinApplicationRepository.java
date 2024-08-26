@@ -12,9 +12,15 @@ import org.springframework.stereotype.Repository;
 public interface JoinApplicationRepository extends JpaRepository<JoinApplyEntity, Long> {
     Optional<JoinApplyEntity> findByIdAndMember_Id(Long id, Long memberId);
     Optional<JoinApplyEntity> findByIdAndStatus(Long id, JoinStatus status);
-    Boolean existsByMember_IdAndCrew_CrewId(Long memberId, Long crewId);
-    Optional<JoinApplyEntity> findByIdAndStatusAndCrew_CrewId(Long memberId, JoinStatus status, Long crewId);
+    Optional<JoinApplyEntity> findByIdAndStatusAndCrew_Id(Long memberId, JoinStatus status, Long crewId);
     Page<JoinApplyEntity> findAllByMember_Id(Long memberId, Pageable pageable);
 
     Page<JoinApplyEntity> findAllByMember_IdAndStatus(Long memberId, JoinStatus status, Pageable pageable);
+    Page<JoinApplyEntity> findAllByCrew_IdAndStatus(Long crewId, JoinStatus status, Pageable pageable);
+
+    Page<JoinApplyEntity> findAllByCrew_Id(Long crewId, Pageable pageable);
+
+    Optional<JoinApplyEntity> findByIdAndCrew_Id(Long joinApplyId, Long crewId);
+
+    Optional<JoinApplyEntity> findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(Long userId, Long crewId);
 }

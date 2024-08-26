@@ -27,7 +27,7 @@ public class CrewRoleCheckAspect {
         Long loginId = (Long) args[0];
         Long crewId = (Long) args[1];
 
-        CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_CrewIdAndMember_Id(
+        CrewMemberEntity crewMemberEntity = crewMemberRepository.findByCrew_IdAndMember_Id(
                 crewId, loginId)
             .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED_CREW_ACCESS));
 

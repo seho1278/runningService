@@ -2,6 +2,8 @@ package com.example.runningservice.entity;
 
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.JoinStatus;
+import com.example.runningservice.exception.CustomException;
+import com.example.runningservice.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
@@ -45,14 +47,26 @@ public class CrewMemberEntity {
     private CrewRole role;
     @CreatedDate
     private LocalDateTime joinedAt;
+    //Todo 삭제 논의
     @Enumerated(EnumType.STRING)
     private JoinStatus status;
 
-    public static CrewMemberEntity memberOf(MemberEntity member, CrewEntity crew) {
+    public static CrewMemberEntity of(MemberEntity member, CrewEntity crew) {
         return CrewMemberEntity.builder()
             .member(member)
             .crew(crew)
             .role(CrewRole.MEMBER)
             .build();
+    }
+
+    public void changeRoleTo(CrewRole newRole) {
+        if (newRole == this.role) {
+            throw new CustomException(ErrorCode.ROLE_NOT_CHANGED);
+        }
+            this.role = newRole;
+    }
+
+    public void acceptLeaderRole() {
+        this.role = CrewRole.LEADER;
     }
 }
