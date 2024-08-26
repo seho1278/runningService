@@ -1,6 +1,7 @@
 package com.example.runningservice.dto;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
@@ -11,7 +12,6 @@ import jakarta.validation.ValidatorFactory;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 class SignupRequestDtoTest {
 

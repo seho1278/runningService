@@ -47,4 +47,12 @@ public class CrewMemberEntity {
     private LocalDateTime joinedAt;
     @Enumerated(EnumType.STRING)
     private JoinStatus status;
+
+    public static CrewMemberEntity memberOf(MemberEntity member, CrewEntity crew) {
+        return CrewMemberEntity.builder()
+            .member(member)
+            .crew(crew)
+            .role(CrewRole.MEMBER)
+            .build();
+    }
 }
