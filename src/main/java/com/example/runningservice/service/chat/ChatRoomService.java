@@ -37,7 +37,6 @@ public class ChatRoomService {
     private final MemberRepository memberRepository;
     private final ChatJoinRepository chatJoinRepository;
     private final MessageRepository messageRepository;
-    private final MessageController messageController;
 
     public void createChatRoom(Long crewId, String roomName, ChatRoom roomType) {
         CrewEntity crewEntity = crewRepository.findCrewById(crewId);
