@@ -1,5 +1,7 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.util.converter.BooleanToIntegerConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -45,5 +47,6 @@ public class RunRecordEntity {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
+    @Convert(converter = BooleanToIntegerConverter.class)
     private Integer isPublic;
 }

@@ -1,5 +1,7 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.util.converter.BooleanToIntegerConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +28,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class RunGoalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     @Setter
     private Long id;
 
@@ -43,6 +44,7 @@ public class RunGoalEntity {
     private LocalDateTime updatedAt;
 
     private String averagePace;
+    @Convert(converter = BooleanToIntegerConverter.class)
     private Integer isPublic;
     private Integer runCount;
 }
