@@ -36,6 +36,7 @@ public class JoinApplyEntity extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private JoinStatus status;
     private String message;
+
     public static JoinApplyEntity of(MemberEntity member, CrewEntity crew, String message) {
         return JoinApplyEntity.builder()
             .member(member)

@@ -9,12 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity, Long> {
 
-    // List<ChatRoomEntity> findByCrewId(Long crewId);
+//     List<ChatRoomEntity> findByCrewId(Long crewId);
 
     default ChatRoomEntity findChatRoomById(Long roomId) {
         return findById(roomId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHATROOM));
     }
-
-    void deleteAllByCrewMember_Id(Long crewMemberId);
 }

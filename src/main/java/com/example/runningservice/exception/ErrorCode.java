@@ -33,6 +33,7 @@ public enum ErrorCode {
     UNAUTHORIZED_ACTIVITY(HttpStatus.FORBIDDEN, "활동 접근 권한이 없습니다."),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작 날짜가 종료 날짜보다 빨라야 합니다."),
     NOT_FOUND_CHATROOM(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
+    INVALID_SORT(HttpStatus.BAD_REQUEST, "유효한 정렬기준이 아닙니다."),
 
     //크루가입
     ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),
@@ -43,6 +44,7 @@ public enum ErrorCode {
     AGE_RESTRICTION_NOT_MET(HttpStatus.FORBIDDEN, "나이 제한을 충족하지 못했습니다."),
     AGE_REQUIRED(HttpStatus.FORBIDDEN, "가입을 위해 연령 정보가 필요합니다."),
     JOIN_NOT_ALLOWED_FOR_FORCE_WITHDRAWN(HttpStatus.FORBIDDEN, "강제퇴장된 멤버는 재가입할 수 없습니다."),
+
     //권한
     UNAUTHORIZED_MY_APPLY_ACCESS(HttpStatus.FORBIDDEN, "잘못된 접근입니다. 자신의 가입 신청 내역만 조회할 수 있습니다.");
 

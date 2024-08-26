@@ -17,13 +17,11 @@ import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
-import com.example.runningservice.util.JwtUtil;
-import com.example.runningservice.util.PageUtil;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,12 +33,11 @@ public class UserJoinService {
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
-    private final JwtUtil jwtUtil;
 
     @Transactional
-    public JoinApplyDto.DetailResponse saveJoinApply(Long crewId,
+    public JoinApplyDto.DetailResponse saveJoinApply(Long crewId, Long userId,
         JoinApplyDto.Request joinApplyForm) {
-        MemberEntity memberEntity = memberRepository.findById(joinApplyForm.getUserId())
+        MemberEntity memberEntity = memberRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         //크루원 수가 크루 정원보다 작은 크루일 때만 가져오기
@@ -73,50 +70,75 @@ public class UserJoinService {
 
     //가입신청내역 조회하기(페이지네이션, 신청일자 기준 정렬기준, 신청상태 필터링 적용 추가)
     @Transactional(readOnly = true)
-    public Page<SimpleResponse> getJoinApplications(String token, Long memberId,
+    public Page<SimpleResponse> getJoinApplications(Long memberId,
         GetApplicantsRequestDto request) {
 
-        //토큰 유효성 검사
-        token = token.substring("Bearer ".length());
-        if (!jwtUtil.validateToken(memberId, token)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS);
-        }
-
-        // 기본 정렬 기준 및 방향 설정 (기본값은 createdAt 기준 내림차순)
-        String defaultSortBy = "createdAt";
-        Direction defaultDirection = Direction.ASC;
         Pageable pageable = request.getPageable();
-        int defaultPageNumber =  0;
-        int defaultSize = 10;
 
-        // 정렬 순서 설정
-        Pageable sortedPageable = PageUtil.getSortedPageable(pageable, defaultSortBy, defaultDirection,
-            defaultPageNumber, defaultSize);
+        //정렬기준의 유효성 검증
+        pageable.getSort().stream()
+            .forEach(order -> {
+                if (!isValidSortField(order.getProperty())) {
+                    throw new CustomException(ErrorCode.INVALID_SORT);
+                }
+            });
 
         // 신청결과 필터링
         JoinStatus status = request.getStatus();
         Page<JoinApplyEntity> joinApplications =
-            status == null ? joinApplicationRepository.findAllByMember_Id(memberId, sortedPageable)
+            status == null ? joinApplicationRepository.findAllByMember_Id(memberId, pageable)
                 : joinApplicationRepository.findAllByMember_IdAndStatus(memberId, status,
-                    sortedPageable);
+                    pageable);
 
-        // 조회된 데이터를 SimpleResponse로 변환하여 반환
+        // 조회된 데이터를 SimpleResponse 로 변환하여 반환
         return joinApplications.map(SimpleResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public JoinApplyDto.DetailResponse getJoinApplicationDetail(String token, Long userId,
+    public JoinApplyDto.DetailResponse getJoinApplicationDetail(Long userId,
         Long joinApplyId) {
-        token = token.substring("Bearer ".length());
-        if (!jwtUtil.validateToken(userId, token)) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
-        }
-
         // JoinApplyEntity 조회 시, joinRequestId가 잘못된 경우 (존재하지 않는 경우)
         JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndMember_Id(
             joinApplyId, userId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
+        //토큰 주인과 신청자 일치여부 확인
+        if (!joinApplyEntity.getMember().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS);
+        }
 
         return JoinApplyDto.DetailResponse.from(joinApplyEntity);
+    }
+
+    @Transactional
+    public JoinApplyDto.DetailResponse updateJoinApply(Long userId, UpdateJoinApplyDto updateJoinApplyDto) {
+        //JoinEntity 가져오기 (대기상태인 것만 가져오기)
+        JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(
+                updateJoinApplyDto.getJoinApplyId(), JoinStatus.PENDING)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
+
+        //토큰 주인과 신청자 일치여부 확인
+        if (!joinApplyEntity.getMember().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS);
+        }
+
+        //메세지내용 수정
+        joinApplyEntity.updateMessage(updateJoinApplyDto.getMessage());
+        return JoinApplyDto.DetailResponse.from(joinApplyEntity);
+    }
+
+    //가입신청을 취소하면 JoinApplyRespository에서 삭제
+    @Transactional
+    public void removeJoinApply(Long userId, Long joinApplyId) {
+        //대기 상태인 것만 취소할 수 있음
+        JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(
+                joinApplyId, JoinStatus.PENDING)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
+
+        //토큰 주인과 엔티티 작성자 일치여부 확인
+        if (!joinApplyEntity.getMember().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS);
+        }
+
+        joinApplicationRepository.delete(joinApplyEntity);
     }
 
     private void isJoinPossible(MemberEntity memberEntity, CrewEntity crewEntity) {
@@ -126,6 +148,7 @@ public class UserJoinService {
         Integer maxAge = crewEntity.getMaxAge();
         Long memberId = memberEntity.getId();
         Long crewId = crewEntity.getId();
+        Boolean recordOpen = crewEntity.getRunRecordOpen();
         // 나이 제한 있으면 검증
         if (minAge != null || maxAge != null) {
             //나이 검증
@@ -136,10 +159,15 @@ public class UserJoinService {
             // 성별 검증
             validateGender(memberEntity, crewEntity, requiredGender);
         }
-        // Todo 기록 공개 여부 검증
+        // 기록공개여부 검증
+        if (recordOpen != null && recordOpen) {
+            if (memberEntity.getRunRecordVisibility() != Visibility.PUBLIC) {
+                throw new CustomException(ErrorCode.RECORD_OPEN_REQUIRED);
+            }
+        }
 
         //이미 회원이면 신청 불가
-        if (crewMemberRepository.existsByMember_Id(memberId)) {
+        if (crewMemberRepository.existsByCrew_IdAndMember_Id(crewId, memberId)) {
             throw new CustomException(ErrorCode.ALREADY_CREWMEMBER);
         }
         //최근 신청내역이 대기상태이거나 강제퇴장된 상태면 신청불가
@@ -188,40 +216,11 @@ public class UserJoinService {
         }
     }
 
-    @Transactional
-    public JoinApplyDto.DetailResponse updateJoinApply(String token,
-        UpdateJoinApplyDto updateJoinApplyDto) {
-        token = token.substring("Bearer ".length());
-        //JoinEntity 가져오기 (대기상태인 것만 가져오기)
-        JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(
-                updateJoinApplyDto.getJoinApplyId(), JoinStatus.PENDING)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
+    private final List<String> ALLOWED_SORT_FIELDS = List.of(
+        "createdAt", "status", "member.nickName", "crew.crewName" // 허용된 필드들
+    );
 
-        //토큰 주인과 엔티티 작성자 일치여부 확인
-        if (!joinApplyEntity.getMember().getId().equals(jwtUtil.extractUserId(token))) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS);
-        }
-
-        //메세지내용 수정
-        joinApplyEntity.updateMessage(updateJoinApplyDto.getMessage());
-        return JoinApplyDto.DetailResponse.from(joinApplyEntity);
-    }
-
-    //가입신청을 취소하면 JoinApplyRespository에서 삭제
-    @Transactional
-    public void removeJoinApply(String token, Long joinApplyId) {
-
-        //대기 상태인 것만 취소할 수 있음
-        JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(
-                joinApplyId, JoinStatus.PENDING)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_APPLY));
-
-        //토큰 주인과 엔티티 작성자 일치여부 확인
-        if (!joinApplyEntity.getMember().getId()
-            .equals(jwtUtil.extractUserId(token.substring("Bearer ".length())))) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_MY_APPLY_ACCESS);
-        }
-
-        joinApplicationRepository.delete(joinApplyEntity);
+    private boolean isValidSortField(String field) {
+        return ALLOWED_SORT_FIELDS.contains(field);
     }
 }
