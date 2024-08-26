@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +19,7 @@ public class MessageResponseDto {
     private String sender;
     private String content;
     private String imageUrl;
+    private LocalDateTime createdAt;
 
     public static MessageResponseDto of (MessageEntity messageEntity) throws Exception {
         return MessageResponseDto.builder()
@@ -25,6 +28,7 @@ public class MessageResponseDto {
             .content(messageEntity.getContent())
             .imageUrl(messageEntity.getImageUrl())
             .sender(messageEntity.getSender())
+            .createdAt(messageEntity.getCreatedAt())
             .build();
     }
 

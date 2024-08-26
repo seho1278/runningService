@@ -1,5 +1,7 @@
 package com.example.runningservice.service;
 
+import com.example.runningservice.dto.chat.MessageDeleteResponseDto;
+import com.example.runningservice.dto.chat.MessageEditRequestDto;
 import com.example.runningservice.dto.chat.MessageRequestDto;
 import com.example.runningservice.dto.chat.MessageResponseDto;
 import com.example.runningservice.enums.Message;
@@ -70,21 +72,27 @@ public class WebSocketTest {
         return transports;
     }
 
-    @Test
-    public void sendMessageAndReceive() throws Exception {
-        CompletableFuture<MessageResponseDto> messageResponseFuture = new CompletableFuture<>();
+    private <T> CompletableFuture<T> subscribeToMessageResponse(Long roomId, Class<T> responseType) {
+        CompletableFuture<T> responseFuture = new CompletableFuture<>();
 
-        StompSession.Subscription subscription = this.stompSession.subscribe("/topic/chatroom/1", new StompSessionHandlerAdapter() {
+        this.stompSession.subscribe("/topic/chatroom/" + roomId, new StompSessionHandlerAdapter() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
-                return MessageResponseDto.class;
+                return responseType;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                messageResponseFuture.complete((MessageResponseDto) payload);
+                responseFuture.complete(responseType.cast(payload));
             }
         });
+
+        return responseFuture;
+    }
+
+    @Test
+    public void sendMessageAndReceive() throws Exception {
+        CompletableFuture<MessageResponseDto> messageResponseFuture = subscribeToMessageResponse(1L, MessageResponseDto.class);
 
         MessageRequestDto messageRequestDto = MessageRequestDto.builder()
             .type(Message.TALK)
@@ -101,5 +109,31 @@ public class WebSocketTest {
         assertEquals(Message.TALK, response.getType());
         assertEquals("test", response.getSender());
         assertEquals("Hello", response.getContent());
+    }
+
+    @Test
+    public void editMessageAndReceive() throws Exception {
+        CompletableFuture<MessageResponseDto> messageResponseFuture = subscribeToMessageResponse(1L, MessageResponseDto.class);
+
+        this.stompSession.send("/app/edit/1/1", new MessageEditRequestDto("World"));
+
+        MessageResponseDto response = messageResponseFuture.get(5, TimeUnit.SECONDS);
+
+        assertNotNull(response);
+        assertEquals(Message.TALK, response.getType());
+        assertEquals("test", response.getSender());
+        assertEquals("World", response.getContent());
+    }
+
+    @Test
+    public void deleteMessageAndReceive() throws Exception {
+        CompletableFuture<MessageDeleteResponseDto> deleteConfirmationFuture = subscribeToMessageResponse(1L, MessageDeleteResponseDto.class);
+
+        this.stompSession.send("/app/delete/1/1", null);
+
+        MessageDeleteResponseDto response = deleteConfirmationFuture.get(5, TimeUnit.SECONDS);
+
+        assertNotNull(response);
+        assertEquals("메시지가 삭제되었습니다.", response.getMessage());
     }
 }

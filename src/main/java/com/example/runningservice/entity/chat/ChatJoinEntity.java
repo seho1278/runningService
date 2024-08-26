@@ -33,8 +33,8 @@ public class ChatJoinEntity {
 
     private LocalDateTime readAt;
 
-    @OneToMany(mappedBy = "chatJoin")
-    private List<MessageEntity> messageEntity;
+//    @OneToMany(mappedBy = "chatJoin")
+//    private List<MessageEntity> messageEntity;
 
 
     public void addMemberChatRoom(ChatRoomEntity chatRoom, MemberEntity member) {

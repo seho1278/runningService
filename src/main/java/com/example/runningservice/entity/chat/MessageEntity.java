@@ -35,4 +35,12 @@ public class MessageEntity extends BaseEntity {
         return this.chatJoin.getChatRoom().getId();
     }
 
+    public void editContent(String content) {
+        this.content = content;
+    }
+
+    public void setChatJoinNull(ChatJoinEntity chatJoin) {
+        this.chatJoin = chatJoin;
+    }
+
 }

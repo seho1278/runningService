@@ -11,5 +11,5 @@ import java.util.List;
 public class ChatRoomDetailsDto {
     private long memberCount;
     private int messageCount;
-    private List<MemberEntity> memberEntityList;
+//    private List<MemberEntity> memberEntityList;
 }
