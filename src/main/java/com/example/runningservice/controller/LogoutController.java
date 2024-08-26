@@ -18,7 +18,7 @@ public class LogoutController {
     private final LogoutService logoutService;
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String refreshToken,
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String refreshToken,
         Authentication authentication,
         HttpServletRequest request) {
 

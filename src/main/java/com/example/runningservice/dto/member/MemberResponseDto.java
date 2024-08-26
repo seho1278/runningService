@@ -4,10 +4,14 @@ import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
+import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.util.AESUtil;
-import lombok.*;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -28,7 +32,12 @@ public class MemberResponseDto {
     private Region activityRegion;
     private String imageUrl;
 
-    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) throws Exception {
+    private Visibility nameVisibility;
+    private Visibility phoneNumberVisibility;
+    private Visibility genderVisibility;
+    private Visibility birthYearVisibility;
+
+    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) {
 
         return MemberResponseDto.builder()
                     .id(memberEntity.getId())
@@ -41,6 +50,10 @@ public class MemberResponseDto {
                     .roles(memberEntity.getRoles())
                     .activityRegion(memberEntity.getActivityRegion())
                     .imageUrl(memberEntity.getProfileImageUrl())
+                    .nameVisibility(memberEntity.getNameVisibility())
+                    .phoneNumberVisibility(memberEntity.getPhoneNumberVisibility())
+                    .genderVisibility(memberEntity.getGenderVisibility())
+                    .birthYearVisibility(memberEntity.getBirthYearVisibility())
                     .build();
     }
 }
