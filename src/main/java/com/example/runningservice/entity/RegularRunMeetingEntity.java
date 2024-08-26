@@ -1,5 +1,6 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.dto.regular_run.RegularRunRequestDto;
 import com.example.runningservice.enums.Region;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -43,15 +45,29 @@ public class RegularRunMeetingEntity extends BaseEntity {
     @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> dayOfWeek;
+    private LocalTime time;
+
+    public static RegularRunMeetingEntity toEntity(RegularRunRequestDto regularDto,
+        CrewEntity crewEntity) {
+        return RegularRunMeetingEntity.builder()
+            .crew(crewEntity)
+            .week(regularDto.getWeek())
+            .count(regularDto.getCount())
+            .time(regularDto.getTime())
+            .dayOfWeek(regularDto.getDayOfWeek())
+            .activityRegion(regularDto.getActivityRegion())
+            .build();
+    }
 
     public List<String> getDayOfWeek() {
         return Collections.unmodifiableList(this.dayOfWeek);
     }
 
-    public void updateRegularRunInfo(int count, int week, Region activityRegion) {
+    public void updateRegularRunInfo(int count, int week, Region activityRegion, LocalTime time) {
         this.count = count;
         this.week = week;
         this.activityRegion = activityRegion;
+        this.time = time;
     }
 
     public void addDayOfWeek(String dayOfWeek) {

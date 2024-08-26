@@ -34,6 +34,13 @@ public enum ErrorCode {
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작 날짜가 종료 날짜보다 빨라야 합니다."),
     NOT_FOUND_CHATROOM(HttpStatus.BAD_REQUEST, "채팅방을 찾을 수 없습니다."),
     INVALID_SORT(HttpStatus.BAD_REQUEST, "유효한 정렬기준이 아닙니다."),
+    GOOGLE_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "Google 로그인에 실패했습니다."),
+    ALREADY_EXIST_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
+    MISSING_REQUIRED_INFORMATION(HttpStatus.BAD_REQUEST, "필수 정보가 누락되었습니다."),
+    NOT_FOUND_USER_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자에게 전송된 알림을 찾을 수 없습니다."),
+    REJECT_SUBSCRIBE_NOTIFICATION(HttpStatus.BAD_REQUEST, "사용자가 알림 수신을 거부하여 구독할 수 없습니다."),
+    NOT_FOUND_CHAT_MESSAGE(HttpStatus.BAD_REQUEST, "채팅 메시지를 찾을 수 없습니다."),
 
     //크루가입
     ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),

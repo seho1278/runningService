@@ -1,5 +1,6 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.dto.SignupRequestDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Notification;
 import com.example.runningservice.enums.Region;
@@ -84,10 +85,10 @@ public class MemberEntity extends BaseEntity {
     private Notification postNoti;
     @Column(name = "reply_noti")
     private Notification replyNoti;
-    @Column(name = "mention_noti")
-    private Notification mentionNoti;
     @Column(name = "chatting_noti")
     private Notification chattingNoti;
+    @Column(name = "activity_noti")
+    private Notification activityNoti;
 
     //러닝 프로필
     @OneToMany
@@ -129,5 +130,17 @@ public class MemberEntity extends BaseEntity {
         this.phoneNumberVisibility = phoneNumberVisibility;
         this.genderVisibility = genderVisibility;
         this.birthYearVisibility = birthYearVisibility;
+    }
+
+    public void updateAdditionalInfo(SignupRequestDto form) {
+        this.name = form.getName();
+        this.phoneNumber = form.getPhoneNumber();
+        this.gender = form.getGender();
+        this.birthYear = form.getBirthYear();
+        this.activityRegion = form.getActivityRegion();
+        this.nameVisibility = form.getNameVisibility();
+        this.genderVisibility = form.getGenderVisibility();
+        this.birthYearVisibility = form.getBirthYearVisibility();
+        this.phoneNumberVisibility = form.getPhoneNumberVisibility();
     }
 }

@@ -28,7 +28,11 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.ActivityRepository;
+import com.example.runningservice.repository.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
+import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.RegularRunMeetingRepository;
+import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
@@ -62,6 +66,14 @@ class CrewServiceTest {
     private S3FileUtil s3FileUtil;
     @Mock
     private ChatRoomService chatRoomService;
+    @Mock
+    private RegularRunMeetingRepository regularRunMeetingRepository;
+    @Mock
+    private CrewMemberBlackListRepository crewMemberBlackListRepository;
+    @Mock
+    private JoinApplicationRepository joinApplicationRepository;
+    @Mock
+    private ChatRoomRepository chatRoomRepository;
     @Mock
     private ActivityRepository activityRepository;
     @InjectMocks

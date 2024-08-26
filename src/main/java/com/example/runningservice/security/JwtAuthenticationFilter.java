@@ -27,9 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 토큰이 없거나 유효하지 않은 경우 필터 체인으로 넘김
     @Override
     protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain
+        HttpServletRequest request,
+        HttpServletResponse response,
+        FilterChain chain
     ) throws ServletException, IOException {
         String accessJwt = resolveToken(request, ACCESS_TOKEN_HEADER);
         log.debug("request path: {}", request.getRequestURI());

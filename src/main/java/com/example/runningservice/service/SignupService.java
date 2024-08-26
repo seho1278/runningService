@@ -52,7 +52,7 @@ public class SignupService {
         memberEntity.saveVerificationCode(code);
 
         //이메일 전송
-        String from = "wadadak@example.com";
+        String from = "simzoo93@naver.com";
         String to = email;
         String subject = "Email 인증메일입니다.";
         String text = getBody(email, memberEntity.getName(), code);
@@ -60,7 +60,7 @@ public class SignupService {
     }
 
     @Transactional
-    public boolean verifyUser(String email, String code) {
+    public void verifyUser(String email, String code) {
         // 이메일로 사용자 찾기
         MemberEntity memberEntity = memberRepository.findByEmail(email)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -72,9 +72,6 @@ public class SignupService {
 
         // 이메일을 인증된 상태로 표시
         memberEntity.markEmailVerified();
-
-        // 이메일이 인증되었는지를 반환
-        return memberEntity.isEmailVerified();
     }
 
     private void validateRegisterForm(SignupRequestDto registerForm) throws Exception {
@@ -115,5 +112,23 @@ public class SignupService {
         } else { // 크루 이미지가 없으면 기본 이미지로 사용
             return s3FileUtil.getImgUrl("user-default");
         }
+    }
+
+    @Transactional
+    public void verifyNickName(String nickname) {
+        if (memberRepository.existsByNickName(nickname)) {
+            throw new CustomException(ErrorCode.ALREADY_EXIST_NICKNAME);
+        }
+    }
+
+    @Transactional
+    public MemberResponseDto saveAdditionalInfo(SignupRequestDto form) {
+        // 기존 회원 정보 업데이트
+        MemberEntity memberEntity = memberRepository.findByEmail(form.getEmail())
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        memberEntity.updateAdditionalInfo(form);
+
+        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil);
     }
 }

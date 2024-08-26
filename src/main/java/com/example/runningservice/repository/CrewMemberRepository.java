@@ -18,7 +18,7 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
 
     Page<CrewMemberEntity> findByMember_IdOrderByJoinedAt(Long memberId, Pageable pageable);
 
-    Optional<CrewMemberEntity> findByMember_IdAndCrew_CrewId(Long memberId, Long crewId);
+    Optional<CrewMemberEntity> findByMember_IdAndCrew_Id(Long memberId, Long crewId);
 
     Boolean existsByMember_Id(Long memberId);
 
@@ -27,4 +27,6 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
     Optional<CrewMemberEntity> findByCrewAndMember(CrewEntity crew, MemberEntity member);
 
     Optional<CrewMemberEntity> findByCrewAndMemberAndRoleIn(CrewEntity crew, MemberEntity member, List<CrewRole> roles);
+
+    List<CrewMemberEntity> findByCrew(CrewEntity crew);
 }
