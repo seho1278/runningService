@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OAuthController {
     private final OAuth2Service oAuth2Service;
-    OAuthController(OAuth2Service oAuth2Service) {
+    public OAuthController(OAuth2Service oAuth2Service) {
         this.oAuth2Service = oAuth2Service;
     }
 
-    @GetMapping("/login/oauth")
-    public ResponseEntity<GoogleAccountProfileResponseDto> googleAccessToken(@RequestParam String code) {
+    @GetMapping("login/oauth")
+    public ResponseEntity<GoogleAccountProfileResponseDto> googleAccountProfileRes(@RequestParam String code) {
         return ResponseEntity.ok(oAuth2Service.getGoogleAccountProfile(code));
     }
 
