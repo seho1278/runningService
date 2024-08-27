@@ -1,6 +1,7 @@
 package com.example.runningservice.entity;
 
 import com.example.runningservice.dto.SignupRequestDto;
+import com.example.runningservice.dto.member.UpdateMemberRequestDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Notification;
 import com.example.runningservice.enums.Region;
@@ -112,24 +113,19 @@ public class MemberEntity extends BaseEntity {
         this.password = password;
     }
 
-    public void updateMemberProfile(
-        String nickName, Integer birthYear, Gender gender, Region activityRegion) {
-        this.nickName = nickName;
-        this.birthYear = birthYear;
-        this.gender = gender;
-        this.activityRegion = activityRegion;
-    }
-
     public void updateProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public void updateProfileVisibility(
-        Visibility nameVisibility, Visibility phoneNumberVisibility, Visibility genderVisibility, Visibility birthYearVisibility) {
-        this.nameVisibility = nameVisibility;
-        this.phoneNumberVisibility = phoneNumberVisibility;
-        this.genderVisibility = genderVisibility;
-        this.birthYearVisibility = birthYearVisibility;
+    public void updateMemberProfile(UpdateMemberRequestDto form){
+        this.nickName = form.getNickName();
+        this.birthYear = form.getBirthYear();
+        this.gender = form.getGender();
+        this.activityRegion = form.getActivityRegion();
+        this.nameVisibility = form.getNameVisibility();
+        this.phoneNumberVisibility = form.getPhoneNumberVisibility();
+        this.genderVisibility = form.getGenderVisibility();
+        this.birthYearVisibility = form.getBirthYearVisibility();
     }
 
     public void updateAdditionalInfo(SignupRequestDto form) {
