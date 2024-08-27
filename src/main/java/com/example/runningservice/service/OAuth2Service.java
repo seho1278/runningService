@@ -6,7 +6,6 @@ import com.example.runningservice.dto.googleToken.GoogleAccessTokenResponseDto;
 import com.example.runningservice.dto.googleToken.GoogleAccountProfileResponseDto;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
-import com.example.runningservice.util.AESUtil;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -37,7 +36,6 @@ public class OAuth2Service {
     private String profileUrl;
 
     private final RestTemplate restTemplate;
-    private final AESUtil aesUtil;
 
     public GoogleAccountProfileResponseDto getGoogleAccountProfile(final String code) {
         final String accessToken = requestGoogleAccessToken(code);
@@ -51,8 +49,8 @@ public class OAuth2Service {
             headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
             final HttpEntity<GoogleAccessTokenRequestDto> httpEntity = new HttpEntity<>(
                 GoogleAccessTokenRequestDto.builder()
-                    .client_id(aesUtil.decrypt(clientId))
-                    .client_secret(aesUtil.decrypt(clientSecret))
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
                     .code(decodedCode)
                     .redirect_uri(redirectUri)
                     .grant_type(authorizationCode)
