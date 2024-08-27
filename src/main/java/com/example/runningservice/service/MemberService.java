@@ -29,7 +29,7 @@ public class MemberService {
 
     // 사용자 정보 조회
     @Transactional
-    public MemberResponseDto getMemberProfile(Long userId) throws Exception {
+    public MemberResponseDto getMemberProfile(Long userId) {
         MemberEntity memberEntity = memberRepository.findMemberById(userId);
         return MemberResponseDto.of(memberEntity, aesUtil);
     }
@@ -37,18 +37,13 @@ public class MemberService {
     // 사용자 정보 수정
     @Transactional
     public MemberResponseDto updateMemberProfile(Long userId,
-                                                 UpdateMemberRequestDto updateMemberRequestDto) throws Exception {
+                                                 UpdateMemberRequestDto updateMemberRequestDto) {
         MemberEntity memberEntity = memberRepository.findMemberById(userId);
 
         // 프로필 이미지 업로드
         profileImageUploadHandler(updateMemberRequestDto.getProfileImage(), userId, memberEntity);
 
-        memberEntity.updateMemberProfile(
-            updateMemberRequestDto.getNickName(),
-            updateMemberRequestDto.getBirthYear(),
-            Gender.fromCode(updateMemberRequestDto.getGender()),
-            Region.valueOf(updateMemberRequestDto.getActivityRegion())
-        );
+        memberEntity.updateMemberProfile(updateMemberRequestDto);
 
         memberRepository.save(memberEntity);
 
@@ -73,24 +68,6 @@ public class MemberService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.ENCRYPTION_ERROR);
         }
-    }
-
-    // 사용자 프로필 공개여부 설정
-    @Transactional
-    public ProfileVisibilityResponseDto updateProfileVisibility(Long userId,
-                                                                ProfileVisibilityRequestDto profileVisibilityRequestDto) {
-        MemberEntity memberEntity = memberRepository.findMemberById(userId);
-
-        // 프로필 공개여부 설정
-        memberEntity.updateProfileVisibility(
-            Visibility.fromCode(profileVisibilityRequestDto.getUserName()),
-            Visibility.fromCode(profileVisibilityRequestDto.getPhoneNumber()),
-            Visibility.fromCode(profileVisibilityRequestDto.getGender()),
-            Visibility.fromCode(profileVisibilityRequestDto.getBirthYear()));
-
-        memberRepository.save(memberEntity);
-
-        return ProfileVisibilityResponseDto.of(memberEntity);
     }
 
     // 회원 탈퇴
