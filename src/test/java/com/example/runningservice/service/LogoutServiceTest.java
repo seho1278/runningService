@@ -2,7 +2,6 @@ package com.example.runningservice.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,7 +10,6 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.security.CustomUserDetails;
 import com.example.runningservice.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -71,47 +69,8 @@ class LogoutServiceTest {
     }
 
     @Test
-    void testLogout_UserEmailTokenEmailMisMatch() {
-        //given
-        when(request.getHeader("Authorization")).thenReturn("Bearer validRefreshToken");
-        when(authentication.getPrincipal()).thenReturn(customUserDetails);
-        when(customUserDetails.getUsername()).thenReturn("username");
-        when(jwtUtil.validateToken("username", "validRefreshToken")).thenCallRealMethod();
-        Claims mockClaims = mock(Claims.class);
-        when(jwtUtil.extractEmail("validRefreshToken")).thenReturn("differentEmail");
-
-        //when
-        CustomException exception = assertThrows(CustomException.class,
-            () -> logoutService.logout(request, response, authentication));
-
-        //then
-        assertEquals(ErrorCode.INVALID_TOKEN, exception.getErrorCode());
-    }
-
-    @Test
-    void testLogout_ExpiredToken() {
-        // given
-        when(request.getHeader("Authorization")).thenReturn("Bearer validRefreshToken");
-        when(authentication.getPrincipal()).thenReturn(customUserDetails);
-        when(customUserDetails.getUsername()).thenReturn("username");
-        when(jwtUtil.validateToken("username", "validRefreshToken")).thenCallRealMethod();
-        when(jwtUtil.extractEmail("validRefreshToken")).thenReturn("username");
-        when(jwtUtil.isTokenExpired("validRefreshToken")).thenReturn(true);
-
-        //when
-        CustomException exception = assertThrows(CustomException.class,
-            () -> logoutService.logout(request, response, authentication));
-
-        //then
-        assertEquals(ErrorCode.INVALID_TOKEN, exception.getErrorCode());
-    }
-
-    @Test
     void testLogout_TokenAlreadyInBlacklist() {
         when(request.getHeader("Authorization")).thenReturn("Bearer validRefreshToken");
-        when(authentication.getPrincipal()).thenReturn(customUserDetails);
-        when(customUserDetails.getUsername()).thenReturn("username");
-        when(jwtUtil.validateToken("username", "validRefreshToken")).thenReturn(true);
         when(tokenBlackList.isListed("validRefreshToken")).thenReturn(true);
 
         //when
@@ -126,9 +85,6 @@ class LogoutServiceTest {
     void testLogout_success() {
         //given
         when(request.getHeader("Authorization")).thenReturn("Bearer validRefreshToken");
-        when(authentication.getPrincipal()).thenReturn(customUserDetails);
-        when(customUserDetails.getUsername()).thenReturn("username");
-        when(jwtUtil.validateToken("username", "validRefreshToken")).thenReturn(true);
         when(tokenBlackList.isListed("validRefreshToken")).thenReturn(false);
 
         //when

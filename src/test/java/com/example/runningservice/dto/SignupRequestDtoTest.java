@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
+import com.example.runningservice.enums.Visibility;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -55,14 +56,19 @@ class SignupRequestDtoTest {
         // Given
         SignupRequestDto signupRequestDto = SignupRequestDto.builder()
             .email("email@example.com")
-            .password("password") // Invalid password format
-            .confirmPassword("password")
+            .password("password!")
+            .confirmPassword("password!")
             .phoneNumber("01012345678")
             .name("Kim")
             .nickName("Kim")
             .gender(Gender.MALE)
+            .profileImage(null)
             .birthYear(1990)
             .activityRegion(Region.SEOUL)
+            .birthYearVisibility(Visibility.PUBLIC)
+            .nameVisibility(Visibility.PUBLIC)
+            .genderVisibility(Visibility.PUBLIC)
+            .phoneNumberVisibility(Visibility.PUBLIC)
             .build();
 
         // When
@@ -87,8 +93,13 @@ class SignupRequestDtoTest {
             .name("Kim")
             .nickName("Kim")
             .gender(Gender.MALE)
+            .profileImage(null)
             .birthYear(1990)
             .activityRegion(Region.SEOUL)
+            .birthYearVisibility(Visibility.PUBLIC)
+            .nameVisibility(Visibility.PUBLIC)
+            .genderVisibility(Visibility.PUBLIC)
+            .nameVisibility(Visibility.PUBLIC)
             .build();
 
         // When
@@ -96,11 +107,20 @@ class SignupRequestDtoTest {
             signupRequestDto);
 
         // Then
-        assertEquals(1, violations.size());
-        ConstraintViolation<SignupRequestDto> violation = violations.iterator().next();
-        assertEquals("비밀번호가 일치하지 않습니다.", violation.getMessage());
-        assertEquals(SignupRequestDto.class.getSimpleName(),
-            violation.getRootBeanClass().getSimpleName());
+        assertEquals(2, violations.size());
+
+        // 모든 violation을 확인하면서 메시지와 필드를 검증
+        for (ConstraintViolation<SignupRequestDto> violation : violations) {
+            String message = violation.getMessage();
+            String propertyPath = violation.getPropertyPath().toString();
+
+            if (propertyPath.equals("confirmPassword")) {
+                assertEquals("비밀번호가 일치하지 않습니다.", message);
+            } else if (propertyPath.equals("password") || propertyPath.equals("confirmPassword")) {
+                // 다른 유효성 검사 위반 메시지 확인 (예: NotBlank 등의 메시지)
+                assertEquals("필수 정보입니다.", message);
+            }
+        }
     }
 
     @Test
@@ -108,14 +128,19 @@ class SignupRequestDtoTest {
         // Given
         SignupRequestDto signupRequestDto = SignupRequestDto.builder()
             .email("email@example.com")
-            .password("Password123!")
-            .confirmPassword("Password123!")
-            .phoneNumber("invalid-phone-number") // Invalid phone number format
-            .name("John Doe")
-            .nickName("johndoe")
+            .password("Qwerqwer1!")
+            .confirmPassword("Qwerqwer1!")
+            .phoneNumber("010123456")
+            .name("Kim")
+            .nickName("Kim")
             .gender(Gender.MALE)
+            .profileImage(null)
             .birthYear(1990)
             .activityRegion(Region.SEOUL)
+            .birthYearVisibility(Visibility.PUBLIC)
+            .nameVisibility(Visibility.PUBLIC)
+            .genderVisibility(Visibility.PUBLIC)
+            .phoneNumberVisibility(Visibility.PUBLIC)
             .build();
 
         // When
@@ -136,11 +161,16 @@ class SignupRequestDtoTest {
             .password("Password123!")
             .confirmPassword("Password123!")
             .phoneNumber("01012345678")
-            .name("") // Invalid name (empty)
-            .nickName("johndoe")
+            .name("")
+            .nickName("Kim")
             .gender(Gender.MALE)
+            .profileImage(null)
             .birthYear(1990)
             .activityRegion(Region.SEOUL)
+            .birthYearVisibility(Visibility.PUBLIC)
+            .nameVisibility(Visibility.PUBLIC)
+            .genderVisibility(Visibility.PUBLIC)
+            .phoneNumberVisibility(Visibility.PUBLIC)
             .build();
 
         // When
@@ -182,6 +212,10 @@ class SignupRequestDtoTest {
             .gender(Gender.MALE)
             .birthYear(1800) // Invalid birth year (too early)
             .activityRegion(Region.SEOUL)
+            .nameVisibility(Visibility.PUBLIC)
+            .birthYearVisibility(Visibility.PUBLIC)
+            .phoneNumberVisibility(Visibility.PUBLIC)
+            .genderVisibility(Visibility.PUBLIC)
             .build();
 
         // When

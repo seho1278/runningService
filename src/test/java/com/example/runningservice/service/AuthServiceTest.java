@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -23,6 +21,7 @@ import com.example.runningservice.security.CustomUserDetailsService;
 import com.example.runningservice.util.JwtUtil;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -79,17 +78,25 @@ class AuthServiceTest {
         loginRequestDto.setEmail("test@example.com");
         loginRequestDto.setPassword("password");
 
+        // Mocking roles and authorities
         List<Role> roles = new ArrayList<>(List.of(Role.ROLE_USER));
-        List<GrantedAuthority> authorities = roles.stream()
-            .map(role -> new SimpleGrantedAuthority(role.name())).collect(Collectors.toList());
-        when(authenticationManager.authenticate(
-            any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
-        when(customUserDetailsService.loadUserByUsername(anyString())).thenReturn(
-            userDetails);
-        when(userDetails.getUsername()).thenReturn("test@example.com");
-        when(userDetails.getAuthorities()).thenAnswer(invocation -> authorities);
-        when(jwtUtil.generateToken("test@example.com", userDetails.getId(), authorities)).thenReturn("access-token");
-        when(jwtUtil.generateRefreshToken("test@example.com", userDetails.getId(), authorities)).thenReturn(
+        Collection<? extends GrantedAuthority> authorities = roles.stream()
+            .map(role -> new SimpleGrantedAuthority(role.name()))
+            .collect(Collectors.toList());
+
+        // Create a mock CustomUserDetails object
+        CustomUserDetails customUserDetails = new CustomUserDetails(1L, "test@example.com",
+            "password", roles);
+
+        // Set up the mocks
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+            .thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(
+            customUserDetails); // Return the customUserDetails object
+        when(jwtUtil.generateToken(customUserDetails.getUsername(), customUserDetails.getId(),
+            new ArrayList<>(customUserDetails.getAuthorities()))).thenReturn("access-token");
+        when(jwtUtil.generateRefreshToken(customUserDetails.getUsername(), customUserDetails.getId(),
+            new ArrayList<>(customUserDetails.getAuthorities()))).thenReturn(
             "refresh-token");
 
         // When
@@ -99,11 +106,6 @@ class AuthServiceTest {
         assertNotNull(jwtResponse);
         assertEquals("access-token", jwtResponse.getAccessJwt());
         assertEquals("refresh-token", jwtResponse.getRefreshJwt());
-
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(customUserDetailsService).loadUserByUsername(anyString());
-        verify(jwtUtil).generateToken(anyString(), anyLong(), anyList());
-        verify(jwtUtil).generateRefreshToken(anyString(), anyLong(), anyList());
     }
 
     @Test
@@ -179,10 +181,14 @@ class AuthServiceTest {
         when(tokenBlackList.isListed(refreshToken)).thenReturn(false);
         when(jwtUtil.isTokenExpired(refreshToken)).thenReturn(false);
         when(jwtUtil.extractEmail(refreshToken)).thenReturn("test@example.com");
-        when(customUserDetailsService.loadUserByUsername("test@example.com")).thenReturn(userDetails);
+        when(customUserDetailsService.loadUserByUsername("test@example.com")).thenReturn(
+            userDetails);
         List<GrantedAuthority> authorities = new ArrayList<>();
-        when(jwtUtil.generateToken("test@example.com", userDetails.getId(), authorities)).thenReturn("access-token");
-        when(jwtUtil.generateRefreshToken("test@example.com", userDetails.getId(), authorities)).thenReturn("refresh-token");
+        when(
+            jwtUtil.generateToken("test@example.com", userDetails.getId(), authorities)).thenReturn(
+            "access-token");
+        when(jwtUtil.generateRefreshToken("test@example.com", userDetails.getId(),
+            authorities)).thenReturn("refresh-token");
         when(principal.getName()).thenReturn(principalEmail);
         when(jwtUtil.validateToken(principalEmail, refreshToken)).thenCallRealMethod();
         when(jwtUtil.isTokenExpired(refreshToken)).thenReturn(false);

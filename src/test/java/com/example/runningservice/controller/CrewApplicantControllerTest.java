@@ -1,5 +1,6 @@
 package com.example.runningservice.controller;
 
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,8 +12,6 @@ import com.example.runningservice.dto.join.CrewApplicantDetailResponseDto;
 import com.example.runningservice.dto.join.CrewApplicantResponseDto;
 import com.example.runningservice.dto.join.GetApplicantsRequestDto;
 import com.example.runningservice.enums.JoinStatus;
-import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.security.JwtAuthenticationFilter;
 import com.example.runningservice.service.CrewApplicantService;
 import com.example.runningservice.util.JwtUtil;
 import java.time.LocalDateTime;
@@ -45,13 +44,7 @@ class CrewApplicantControllerTest {
     private CrewApplicantService crewApplicantService;
 
     @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    @MockBean
     private JwtUtil jwtUtil;
-
-    @MockBean
-    private CrewMemberRepository crewMemberRepository;
 
     @Test
     @DisplayName("모든 가입신청자 리스트 조회")
@@ -60,12 +53,6 @@ class CrewApplicantControllerTest {
         //given
         Long userId = 1L;
         Long crewId = 2L;
-
-//        // CrewMemberEntity를 모킹하여 LEADER 권한을 반환하도록 설정
-//        when(crewMemberRepository.findByCrew_CrewIdAndMember_Id(eq(crewId), eq(userId)))
-//            .thenReturn(Optional.of(CrewMemberEntity.builder()
-//                .role(CrewRole.LEADER)
-//                .build()));
 
         GetApplicantsRequestDto requestDto = GetApplicantsRequestDto.builder()
             .status(JoinStatus.PENDING)
@@ -96,7 +83,10 @@ class CrewApplicantControllerTest {
             new UsernamePasswordAuthenticationToken("user", null,
                 List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
-        when(crewApplicantService.getAllJoinApplications(eq(crewId), eq(requestDto))).thenReturn(
+        when(crewApplicantService.getAllJoinApplications(eq(crewId),
+            argThat(it -> it.getStatus().equals(JoinStatus.PENDING) &&
+                it.getPageable().getPageNumber() == 0 &&
+                it.getPageable().getPageSize() == 5))).thenReturn(
             responsePage);
         //when
         //then
@@ -110,11 +100,11 @@ class CrewApplicantControllerTest {
                     request.setAttribute("loginId", 1L);
                     return request;
                 }))
-                .andExpect(status().isOk())
-                .andDo(print())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].nickName").value("testNick1"))
-                .andExpect(jsonPath("$.content[1].nickName").value("testNick2"));
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.content[0].nickName").value("testNick1"))
+            .andExpect(jsonPath("$.content[1].nickName").value("testNick2"));
     }
 
     private RequestPostProcessor mockJwtToken() {

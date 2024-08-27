@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -40,7 +39,7 @@ public class SignupController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/signup/email-verify")
+    @GetMapping("/signup/email-verify")
     ResponseEntity<Void> verifyUser(@RequestParam String email, @RequestParam String code) {
         signupService.verifyUser(email, code);
         return ResponseEntity.ok().build();

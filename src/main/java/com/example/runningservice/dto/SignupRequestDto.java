@@ -67,7 +67,7 @@ public class SignupRequestDto {
     @ValidYear
     private Integer birthYear;
     private Region activityRegion;
-    private MultipartFile profileImage; // 프로필 이미지 추가
+    private MultipartFile profileImage;
 
     @NotNull
     private Visibility nameVisibility = Visibility.PRIVATE;
@@ -84,6 +84,7 @@ public class SignupRequestDto {
             .emailVerified(false)
             .password(passwordEncoder.encode(password))
             .phoneNumber(aesUtil.encrypt(phoneNumber))
+            .phoneNumberHash(aesUtil.generateHash(phoneNumber))
             .name(name)
             .nickName(nickName)
             .birthYear(birthYear)
