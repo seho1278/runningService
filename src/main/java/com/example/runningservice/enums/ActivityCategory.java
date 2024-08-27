@@ -15,6 +15,14 @@ public enum ActivityCategory {
             return activityRepository.findByCrew_IdAndDateBetweenAndRegularRunIsNotNull(crewId,
                 startDate, endDate, pageable).getContent();
         }
+
+        @Override
+        public List<ActivityEntity> findByCrewIdOrderByUpcomingDate(
+            ActivityRepository activityRepository, Long crewId, LocalDate startDate,
+            Pageable pageable) {
+            return activityRepository.findByCrew_IdAndDateGreaterThanEqualAndRegularRunIsNotNullOrderByDate(
+                crewId, startDate, pageable).getContent();
+        }
     },
     ON_DEMAND {
         @Override
@@ -23,6 +31,14 @@ public enum ActivityCategory {
             LocalDate endDate, Pageable pageable) {
             return activityRepository.findByCrew_IdAndDateBetweenAndRegularRunIsNull(crewId,
                 startDate, endDate, pageable).getContent();
+        }
+
+        @Override
+        public List<ActivityEntity> findByCrewIdOrderByUpcomingDate(
+            ActivityRepository activityRepository, Long crewId, LocalDate startDate,
+            Pageable pageable) {
+            return activityRepository.findByCrew_IdAndDateGreaterThanEqualAndRegularRunIsNullOrderByDate(
+                crewId, startDate, pageable).getContent();
         }
     },
     ALL {
@@ -33,9 +49,20 @@ public enum ActivityCategory {
             return activityRepository.findByCrew_IdAndDateBetween(crewId, startDate, endDate,
                 pageable).getContent();
         }
+
+        @Override
+        public List<ActivityEntity> findByCrewIdOrderByUpcomingDate(
+            ActivityRepository activityRepository, Long crewId, LocalDate startDate,
+            Pageable pageable) {
+            return activityRepository.findByCrew_IdAndDateGreaterThanEqualOrderByDate(
+                crewId, startDate, pageable).getContent();
+        }
     };
 
     public abstract List<ActivityEntity> findByCrewIdAndDateBetween(
         ActivityRepository activityRepository, Long crewId, LocalDate startDate, LocalDate endDate,
         Pageable pageable);
+
+    public abstract List<ActivityEntity> findByCrewIdOrderByUpcomingDate(
+        ActivityRepository activityRepository, Long crewId, LocalDate startDate, Pageable pageable);
 }

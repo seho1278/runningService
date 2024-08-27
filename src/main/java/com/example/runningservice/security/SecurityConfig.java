@@ -53,17 +53,21 @@ public class SecurityConfig {
                         "/js/**",
                         "/region",
                         "/posts/**",
+                        "/crew",
                         "/comments/**")
                     .permitAll().requestMatchers(
-                        HttpMethod.GET, "/crew")
+                        HttpMethod.GET, "/crew/*")
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "**/regular/**")
+                    .permitAll().requestMatchers(
+                        HttpMethod.GET, "/crew/*/activity")
                     .permitAll().requestMatchers(
                         "/token/refresh/**",
                         "/posts/new",
                         "/comments/save",
                         "/crew/search/**",
                         "/logout",
+                        "/crew/participate",
                         "/user/**",
                         "crew/**")
                     .hasAnyAuthority("ROLE_USER")
