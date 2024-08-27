@@ -13,7 +13,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
     boolean existsByEmail(String email);
 
-    boolean existsByPhoneNumber(String encryptedPhoneNumber);
+    boolean existsByPhoneNumberHash(String phoneNumberHash);
 
     default MemberEntity findMemberById(Long userId) {
         return findById(userId)

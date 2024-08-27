@@ -79,8 +79,13 @@ public class SignupService {
         if (memberRepository.existsByEmail(registerForm.getEmail())) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
         }
-        // 회원 전화번호 중복 체크
-        if (memberRepository.existsByPhoneNumber(aesUtil.encrypt(registerForm.getPhoneNumber()))) {
+        // 닉네임 중복 체크
+        if (memberRepository.existsByNickName(registerForm.getNickName())) {
+            throw new CustomException(ErrorCode.ALREADY_EXIST_NICKNAME);
+        }
+        // 휴대전화번호 중복 체크
+        if (memberRepository.existsByPhoneNumberHash(
+            aesUtil.generateHash(registerForm.getPhoneNumber()))) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_PHONE);
         }
     }
@@ -95,7 +100,7 @@ public class SignupService {
 
         StringBuilder sb = new StringBuilder();
         sb.append(name).append("님, 안녕하세요!").append("회원가입 완료를 위해 아래 인증 코드를 클릭해주세요.\n\n")
-            .append("http://localhost:8080/user/signup/email-verify?email=").append(email)
+            .append("http://13.209.127.192:8080/user/signup/email-verify?email=").append(email)
             .append("&code=").append(code);
         return new String(sb);
     }
@@ -127,7 +132,7 @@ public class SignupService {
         MemberEntity memberEntity = memberRepository.findByEmail(form.getEmail())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        memberEntity.updateAdditionalInfo(form);
+        memberEntity.updateAdditionalInfo(form, aesUtil);
 
         return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil);
     }

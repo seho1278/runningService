@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,27 +32,37 @@ public class AuthService {
 
     public JwtResponse authenticate(LoginRequestDto loginRequestDto) throws Exception {
         //loginId와 비밀번호 일치여부 확인 (불일치 시 예외 발생)
+        Authentication authentication = null;
         try {
-            Authentication authenticate = authenticationManager.authenticate(
+            authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(),
                     loginRequestDto.getPassword()));
+
             log.debug("Authentication successful");
+
+        } catch (CustomException e) {
+            if (e.getErrorCode() == ErrorCode.INVALID_EMAIL) {
+                throw new CustomException(ErrorCode.INVALID_EMAIL);
+            }
+            if (e.getErrorCode() == ErrorCode.NOT_FOUND_USER) {
+                throw new CustomException(ErrorCode.NOT_FOUND_USER);
+            }
         } catch (AuthenticationException e) {
             throw new CustomException(ErrorCode.INVALID_LOGIN);
         }
 
-        // 해당 이메일로 회원정보 가져오기
-        final CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(
-            loginRequestDto.getEmail());
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
 
         // 회원 권한 가져오기
         List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
         log.debug("Authorities : {}", authorities);
-        // 회원권한 & email로 accessToken, refreshToken 발행
+        // 회원권한 & email & id 로 accessToken, refreshToken 발행
         final String accessJwt = jwtUtil.generateToken(userDetails.getUsername(),
-            userDetails.getId(), authorities);
+            customUserDetails.getId(), authorities);
         final String refreshJwt = jwtUtil.generateRefreshToken(userDetails.getUsername(),
-            userDetails.getId(), authorities);
+            customUserDetails.getId(), authorities);
 
         return new JwtResponse(accessJwt, refreshJwt);
     }

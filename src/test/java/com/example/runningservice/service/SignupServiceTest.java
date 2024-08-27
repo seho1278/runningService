@@ -144,7 +144,7 @@ class SignupServiceTest {
             .build();
 
         given(aesUtil.encrypt(signupRequestDto.getPhoneNumber())).willReturn("encryptedPhoneNumber");
-        given(memberRepository.existsByPhoneNumber("encryptedPhoneNumber")).willReturn(true);
+        given(memberRepository.existsByPhoneNumberHash("encryptedPhoneNumber")).willReturn(true);
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
