@@ -63,7 +63,7 @@ public class SignupRequestDto {
     @NotBlank
     private Gender gender;
 
-    @NotBlank
+    @NotNull
     @ValidYear
     private Integer birthYear;
     private Region activityRegion;
