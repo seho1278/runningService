@@ -31,10 +31,10 @@ import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
-import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
@@ -328,6 +328,7 @@ class CrewServiceTest {
 
         given(crewRepository.findFullCrewList(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(result);
+        given(memberRepository.findMemberById(loginId)).willReturn(member);
 
         List<CrewJoinStatusResponseDto> response = crewService.getCrewList(loginId, crewInfo,
             pageable);
