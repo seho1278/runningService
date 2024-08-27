@@ -21,5 +21,9 @@ public class CrewFilterDto {
         private Boolean runRecordPublic;
         private Boolean leaderRequired;
         private OccupancyStatus occupancyStatus;
+
+        public void updateRegionForLoginUser(Region region) {
+            this.activityRegion = region;
+        }
     }
 }

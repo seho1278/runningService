@@ -19,14 +19,14 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long>, CrewRep
 
     @Query("SELECT c "
         + "FROM CrewEntity c "
-        + "WHERE (:region IS NULL OR c.activityRegion = :region) "
+        + "WHERE (:region IS NULL OR c.activityRegion = :region OR c.activityRegion = 'NATIONWIDE') "
         + "AND (:minAge IS NULL OR c.minAge <= :minAge) "
         + "AND (:maxAge IS NULL OR c.maxAge >= :maxAge) "
         + "AND (:gender IS NULL OR c.gender = :gender) "
         + "AND (:runRecordPublic IS NULL OR c.runRecordOpen = :runRecordPublic) "
         + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) "
         + "AND c.crewCapacity <= SIZE(c.crewMember) "
-        + "ORDER BY c.createdAt DESC")
+        + "ORDER BY SIZE(c.crewMember) DESC")
     Page<CrewEntity> findFullCrewList(@Param("region") Region activityRegion,
         @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
         @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,
@@ -34,14 +34,14 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long>, CrewRep
 
     @Query("SELECT c "
         + "FROM CrewEntity c "
-        + "WHERE (:region IS NULL OR c.activityRegion = :region) "
+        + "WHERE (:region IS NULL OR c.activityRegion = :region OR c.activityRegion = 'NATIONWIDE') "
         + "AND (:minAge IS NULL OR c.minAge <= :minAge) "
         + "AND (:maxAge IS NULL OR c.maxAge >= :maxAge) "
         + "AND (:gender IS NULL OR c.gender = :gender) "
         + "AND (:runRecordPublic IS NULL OR c.runRecordOpen = :runRecordPublic) "
         + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) "
         + "AND c.crewCapacity > SIZE(c.crewMember) "
-        + "ORDER BY c.createdAt DESC")
+        + "ORDER BY SIZE(c.crewMember) DESC")
     Page<CrewEntity> findAvailableCrewList(@Param("region") Region activityRegion,
         @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
         @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,
@@ -49,13 +49,13 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long>, CrewRep
 
     @Query("SELECT c "
         + "FROM CrewEntity c "
-        + "WHERE (:region IS NULL OR c.activityRegion = :region) "
+        + "WHERE (:region IS NULL OR c.activityRegion = :region OR c.activityRegion = 'NATIONWIDE') "
         + "AND (:minAge IS NULL OR c.minAge <= :minAge) "
         + "AND (:maxAge IS NULL OR c.maxAge >= :maxAge) "
         + "AND (:gender IS NULL OR c.gender = :gender) "
         + "AND (:runRecordPublic IS NULL OR c.runRecordOpen = :runRecordPublic) "
         + "AND (:leaderRequired IS NULL OR c.leaderRequired = :leaderRequired) "
-        + "ORDER BY c.createdAt DESC")
+        + "ORDER BY SIZE(c.crewMember) DESC")
     Page<CrewEntity> findAllCrewList(@Param("region") Region activityRegion,
         @Param("minAge") Integer minAge, @Param("maxAge") Integer maxAge,
         @Param("gender") Gender gender, @Param("runRecordPublic") Boolean runRecordPublic,

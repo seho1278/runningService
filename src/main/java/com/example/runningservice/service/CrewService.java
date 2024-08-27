@@ -14,16 +14,17 @@ import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.OccupancyStatus;
+import com.example.runningservice.enums.Region;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
-import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.ArrayList;
@@ -186,6 +187,17 @@ public class CrewService {
      */
     public List<CrewJoinStatusResponseDto> getCrewList(Long loginId,
         CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
+
+        // 로그인을 했고 따로 입력한 지역 정보가 없으면 회원이 설정한 지역 기반으로 조회한다.
+        if (crewFilter.getActivityRegion() == null && loginId != null) {
+            crewFilter.updateRegionForLoginUser(getRegionForLoginUser(loginId));
+        }
+
+        // 전국 조회 시 모든 지역 조회가 가능하므로 필터값을 없애줌
+        if (Region.NATIONWIDE.equals(crewFilter.getActivityRegion())) {
+            crewFilter.updateRegionForLoginUser(null);
+        }
+
         Page<CrewEntity> crewEntityList = (crewFilter.getOccupancyStatus() != null) ?
             crewFilter.getOccupancyStatus().getCrewList(crewRepository, crewFilter, pageable) :
             OccupancyStatus.ALL.getCrewList(crewRepository, crewFilter, pageable);
@@ -197,6 +209,13 @@ public class CrewService {
         }
 
         return crewList;
+    }
+
+    // 사용자의 활동 지역 조회
+    private Region getRegionForLoginUser(Long loginId) {
+        MemberEntity memberEntity = memberRepository.findMemberById(loginId);
+
+        return memberEntity.getActivityRegion();
     }
 
     // 조회한 크루가 가입한 크루인지 확인한다.
