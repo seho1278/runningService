@@ -95,7 +95,7 @@ public class SignupService {
 
         StringBuilder sb = new StringBuilder();
         sb.append(name).append("님, 안녕하세요!").append("회원가입 완료를 위해 아래 인증 코드를 클릭해주세요.\n\n")
-            .append("http://localhost:8080/user/signup/email-verify?email=").append(email)
+            .append("http://13.209.127.192:8080/user/signup/email-verify?email=").append(email)
             .append("&code=").append(code);
         return new String(sb);
     }

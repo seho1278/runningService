@@ -60,8 +60,10 @@ public class SignupRequestDto {
     @Size(min = 2, max = 12)
     private String nickName;
 
+    @NotBlank
     private Gender gender;
 
+    @NotBlank
     @ValidYear
     private Integer birthYear;
     private Region activityRegion;

@@ -46,7 +46,7 @@ public class SignupController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/user/signup/nickname-verify")
+    @GetMapping("/signup/nickname-verify")
     ResponseEntity<?> verifyNickname(@RequestParam String nickname) {
 
         signupService.verifyNickName(nickname);
