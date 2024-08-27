@@ -54,12 +54,13 @@ public class SecurityConfig {
                         "/region",
                         "/posts/**",
                         "/crew",
-                        "/crew/*/activity",
                         "/comments/**")
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "/crew/*")
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "**/regular/**")
+                    .permitAll().requestMatchers(
+                        HttpMethod.GET, "/crew/*/activity")
                     .permitAll().requestMatchers(
                         "/token/refresh/**",
                         "/posts/new",
