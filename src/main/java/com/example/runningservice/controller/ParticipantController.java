@@ -1,8 +1,10 @@
 package com.example.runningservice.controller;
 
 import com.example.runningservice.aop.CrewRoleCheck;
+import com.example.runningservice.dto.activity.ParticipantResponseDto;
 import com.example.runningservice.service.ParticipantService;
 import com.example.runningservice.util.LoginUser;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class ParticipantController {
      */
     @PostMapping("/crew/{crewId}/activity/{activityId}/attendance")
     @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
-    public ResponseEntity<?> participateActivity(@LoginUser Long userId,
+    public ResponseEntity<ParticipantResponseDto> participateActivity(@LoginUser Long userId,
         @PathVariable("crewId") Long crewId, @PathVariable("activityId") Long activityId) {
 
         return ResponseEntity.ok(participantService.participateActivity(userId, activityId));
@@ -34,7 +36,7 @@ public class ParticipantController {
      */
     @DeleteMapping("/crew/{crewId}/activity/{activityId}/attendance")
     @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
-    public ResponseEntity<?> cancelParticipateActivity(@LoginUser Long userId,
+    public ResponseEntity<ParticipantResponseDto> cancelParticipateActivity(@LoginUser Long userId,
         @PathVariable("crewId") Long crewId, @PathVariable("activityId") Long activityId) {
 
         return ResponseEntity.ok(participantService.cancelParticipateActivity(userId, activityId));
@@ -45,7 +47,8 @@ public class ParticipantController {
      */
     @GetMapping("/crew/{crewId}/activity/{activityId}/attendance")
     @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
-    public ResponseEntity<?> getActivityParticipant(@LoginUser Long userId,
+    public ResponseEntity<List<ParticipantResponseDto>> getActivityParticipant(
+        @LoginUser Long userId,
         @PathVariable("crewId") Long crewId, @PathVariable("activityId") Long activityId,
         Pageable pageable) {
 
