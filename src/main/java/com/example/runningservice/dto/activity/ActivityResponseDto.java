@@ -27,7 +27,7 @@ public class ActivityResponseDto {
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
-    private String notes;
+    private String memo;
     private String location;
     private int participant;
 
@@ -43,7 +43,7 @@ public class ActivityResponseDto {
             .date(activityEntity.getDate())
             .startTime(activityEntity.getStartTime())
             .endTime(activityEntity.getEndTime())
-            .notes(activityEntity.getNotes())
+            .memo(activityEntity.getNotes())
             .location(activityEntity.getLocation())
             .participant(
                 (activityEntity.getParticipant() != null) ?
