@@ -7,7 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RunRecordRepository extends JpaRepository<RunRecordEntity, Long> {
-
     List<RunRecordEntity> findByUserId_Id(Long userId);
-    //Optional<RunRecordEntity> findByRunRecordId_Id(Long runRecordId);
 }

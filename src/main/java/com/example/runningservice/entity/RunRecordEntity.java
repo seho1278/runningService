@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,8 +41,8 @@ public class RunRecordEntity {
     private MemberEntity userId;
 
     private Integer distance;
-    private LocalDateTime pace;
-    private LocalDateTime runningTime;
+    private Duration pace;
+    private Duration runningTime;
 
     @CreatedDate
     private LocalDateTime createdAt;

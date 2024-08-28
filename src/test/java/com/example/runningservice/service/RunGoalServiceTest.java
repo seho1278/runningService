@@ -6,24 +6,21 @@ import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.MemberRepository;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-public class RunGoalServiceTest {
-
-    @InjectMocks
-    private RunGoalService runGoalService;
+class RunGoalServiceTest {
 
     @Mock
     private RunGoalRepository runGoalRepository;
@@ -31,53 +28,55 @@ public class RunGoalServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @InjectMocks
+    private RunGoalService runGoalService;
 
-    @Test
-    public void testCreateRunGoal() {
-        Long userId = 1L;
-        RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
-            .userId(userId)
-            .totalDistance(100)
-            .totalRunningTime("10:00:00")
-            .averagePace("5:00")
-            .isPublic(1)
-            .runCount(10)
+    private RunGoalEntity runGoalEntity;
+    private MemberEntity memberEntity;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        memberEntity = MemberEntity.builder()
+            .id(1L)
+            .name("Test User")
             .build();
 
-        MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setId(userId);
-
-        RunGoalEntity runGoalEntity = RunGoalEntity.builder()
+        runGoalEntity = RunGoalEntity.builder()
+            .id(1L)
             .userId(memberEntity)
-            .totalDistance(requestDto.getTotalDistance())
-            .totalRunningTime(requestDto.getTotalRunningTime())
-            .averagePace(requestDto.getAveragePace())
-            .isPublic(requestDto.getIsPublic())
-            .runCount(requestDto.getRunCount())
+            .totalDistance(100)
+            .totalRunningTime("01:00:00")
+            .averagePace("06:00")
+            .isPublic(1)
+            .runCount(10)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
+    }
 
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(memberEntity));
-        when(runGoalRepository.save(any(RunGoalEntity.class))).thenReturn(runGoalEntity);
+    @Test
+    void testFindAll() {
+        when(runGoalRepository.findAll()).thenReturn(Collections.singletonList(runGoalEntity));
 
-        RunGoalResponseDto responseDto = runGoalService.createRunGoal(requestDto);
+        List<RunGoalResponseDto> result = runGoalService.findAll();
 
-        assertNotNull(responseDto);
-        assertEquals(userId, responseDto.getUserId());
-        assertEquals(requestDto.getTotalDistance(), responseDto.getTotalDistance());
-        verify(runGoalRepository, times(1)).save(any(RunGoalEntity.class));
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(runGoalEntity.getId(), result.getFirst().getId());
     }
 
     @Test
     public void testFindById() {
         Long id = 1L;
+        MemberEntity memberEntity = MemberEntity.builder()
+            .id(id)
+            .build();
+
         RunGoalEntity entity = RunGoalEntity.builder()
             .id(id)
+            .userId(memberEntity) // 널값 체크
             .totalDistance(100)
             .totalRunningTime("10:00:00")
             .averagePace("5:00")
@@ -87,11 +86,112 @@ public class RunGoalServiceTest {
             .updatedAt(LocalDateTime.now())
             .build();
 
+        // Mock 설정
         when(runGoalRepository.findById(id)).thenReturn(Optional.of(entity));
 
+        // 서비스 호출
         RunGoalResponseDto responseDto = runGoalService.findById(id);
 
+        // Assertions
         assertNotNull(responseDto);
         assertEquals(id, responseDto.getId());
+        assertEquals(id, responseDto.getUserId()); // id 체크
+    }
+
+    @Test
+    void testFindByUserId() {
+        when(runGoalRepository.findByUserId_Id(1L)).thenReturn(Collections.singletonList(runGoalEntity));
+
+        List<RunGoalResponseDto> result = runGoalService.findByUserId(1L);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(runGoalEntity.getId(), result.getFirst().getId());
+    }
+
+    @Test
+    void testCreateRunGoal() {
+        RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
+            .userId(1L)
+            .totalDistance(100)
+            .totalRunningTime("01:00:00")
+            .averagePace("06:00")
+            .isPublic(1)
+            .runCount(10)
+            .build();
+
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
+        when(runGoalRepository.save(any(RunGoalEntity.class))).thenReturn(runGoalEntity);
+
+        RunGoalResponseDto result = runGoalService.createRunGoal(requestDto);
+
+        assertNotNull(result);
+        assertEquals(runGoalEntity.getId(), result.getId());
+    }
+
+    @Test
+    public void testUpdateRunGoal() {
+        Long id = 1L;
+        Long userId = 2L;
+
+        MemberEntity memberEntity = MemberEntity.builder()
+            .id(userId)
+            .build();
+
+        RunGoalEntity existingEntity = RunGoalEntity.builder()
+            .id(id)
+            .userId(memberEntity)
+            .totalDistance(100)
+            .totalRunningTime("05:00:00")
+            .averagePace("5:00")
+            .isPublic(1)
+            .runCount(10)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
+            .build();
+
+        RunGoalEntity updatedEntity = RunGoalEntity.builder()
+            .id(id)
+            .userId(memberEntity)
+            .totalDistance(150)
+            .totalRunningTime("06:00:00")
+            .averagePace("4:30")
+            .isPublic(1)
+            .runCount(12)
+            .createdAt(existingEntity.getCreatedAt())
+            .updatedAt(LocalDateTime.now())
+            .build();
+
+        when(runGoalRepository.findById(id)).thenReturn(Optional.of(existingEntity));
+        when(runGoalRepository.save(any(RunGoalEntity.class))).thenReturn(updatedEntity);
+
+        RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
+            .totalDistance(150)
+            .totalRunningTime("06:00:00")
+            .averagePace("4:30")
+            .isPublic(1)
+            .runCount(12)
+            .build();
+
+        RunGoalResponseDto responseDto = runGoalService.updateRunGoal(id, requestDto);
+
+        assertNotNull(responseDto);
+        assertEquals(150, responseDto.getTotalDistance());
+        assertEquals("06:00:00", responseDto.getTotalRunningTime());
+        assertEquals("4:30", responseDto.getAveragePace());
+        assertEquals(1, responseDto.getIsPublic());
+        assertEquals(12, responseDto.getRunCount());
+        verify(runGoalRepository, times(1)).save(any(RunGoalEntity.class));
+    }
+
+
+
+    @Test
+    void testDeleteById() {
+        doNothing().when(runGoalRepository).deleteById(1L);
+
+        runGoalService.deleteById(1L);
+
+        verify(runGoalRepository, times(1)).deleteById(1L);
     }
 }
