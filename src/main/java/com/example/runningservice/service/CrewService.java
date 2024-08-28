@@ -1,12 +1,12 @@
 package com.example.runningservice.service;
 
 import com.example.runningservice.dto.crew.CrewBaseResponseDto;
+import com.example.runningservice.dto.crew.CrewCreateRequestDto;
 import com.example.runningservice.dto.crew.CrewDetailResponseDto;
 import com.example.runningservice.dto.crew.CrewFilterDto;
 import com.example.runningservice.dto.crew.CrewJoinStatusResponseDto;
-import com.example.runningservice.dto.crew.CrewRequestDto.Create;
-import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewRoleResponseDto;
+import com.example.runningservice.dto.crew.CrewUpdateRequestDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -55,8 +55,8 @@ public class CrewService {
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
      */
     @Transactional
-    public CrewBaseResponseDto createCrew(Create newCrew) {
-        MemberEntity memberEntity = memberRepository.findById(newCrew.getLeaderId())
+    public CrewBaseResponseDto createCrew(CrewCreateRequestDto newCrew, Long loginId) {
+        MemberEntity memberEntity = memberRepository.findById(loginId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         CrewEntity crewEntity = CrewEntity.toEntity(newCrew, memberEntity);
@@ -99,8 +99,8 @@ public class CrewService {
      * 크루 정보 수정 :: 크루 db 수정 - 이미지 s3 저장 - 수정된 크루 정보 리턴
      */
     @Transactional
-    public CrewBaseResponseDto updateCrew(Update updateCrew) {
-        CrewEntity crewEntity = crewRepository.findById(updateCrew.getCrewId())
+    public CrewBaseResponseDto updateCrew(CrewUpdateRequestDto updateCrew, Long crewId) {
+        CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         crewEntity.updateFromDto(updateCrew);

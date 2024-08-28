@@ -1,12 +1,12 @@
 package com.example.runningservice.controller;
 
 import com.example.runningservice.dto.crew.CrewBaseResponseDto;
+import com.example.runningservice.dto.crew.CrewCreateRequestDto;
 import com.example.runningservice.dto.crew.CrewDetailResponseDto;
 import com.example.runningservice.dto.crew.CrewFilterDto.CrewInfo;
 import com.example.runningservice.dto.crew.CrewJoinStatusResponseDto;
-import com.example.runningservice.dto.crew.CrewRequestDto;
-import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewRoleResponseDto;
+import com.example.runningservice.dto.crew.CrewUpdateRequestDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.enums.Region;
@@ -39,23 +39,19 @@ public class CrewController {
      */
     @PostMapping
     public ResponseEntity<CrewBaseResponseDto> createCrew(@LoginUser Long userId,
-        @Valid CrewRequestDto.Create request) {
-        request.setLoginUserId(userId);
-
+        @Valid CrewCreateRequestDto request) {
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(crewService.createCrew(request));
+            .body(crewService.createCrew(request, userId));
     }
 
     /**
      * 크루 정보 수정
      */
     @PutMapping("/{crewId}")
-    public ResponseEntity<CrewBaseResponseDto> updateCrew(@Valid Update request,
-        @PathVariable("crewId") Long crewId) {
-        request.setUpdateCrewId(crewId);
-
-        return ResponseEntity.ok(crewService.updateCrew(request));
+    public ResponseEntity<CrewBaseResponseDto> updateCrew(@PathVariable("crewId") Long crewId,
+        @Valid CrewUpdateRequestDto request) {
+        return ResponseEntity.ok(crewService.updateCrew(request, crewId));
     }
 
     /**
@@ -90,8 +86,8 @@ public class CrewController {
     @GetMapping
     public ResponseEntity<List<CrewJoinStatusResponseDto>> getCrewList(@LoginUser Long userId,
         @RequestParam(value = "activityRegion", required = false) Region activityRegion,
-        @RequestParam(value = "minAge", required = false) Integer minAge,
-        @RequestParam(value = "maxAge", required = false) Integer maxAge,
+        @RequestParam(value = "minYear", required = false) Integer minYear,
+        @RequestParam(value = "maxYear", required = false) Integer maxYear,
         @RequestParam(value = "gender", required = false) Gender gender,
         @RequestParam(value = "runRecordPublic", required = false) Boolean runRecordPublic,
         @RequestParam(value = "leaderRequired", required = false) Boolean leaderRequired,
@@ -102,8 +98,8 @@ public class CrewController {
             .activityRegion(activityRegion)
             .leaderRequired(leaderRequired)
             .runRecordPublic(runRecordPublic)
-            .maxAge(maxAge)
-            .minAge(minAge)
+            .maxYear(maxYear)
+            .minYear(minYear)
             .gender(gender)
             .occupancyStatus(occupancyStatus)
             .build(), pageable));
