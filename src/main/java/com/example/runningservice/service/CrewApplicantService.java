@@ -11,9 +11,8 @@ import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
-import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
-import com.example.runningservice.util.AESUtil;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.PageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,6 @@ public class CrewApplicantService {
 
     private final CrewMemberRepository crewMemberRepository;
     private final JoinApplicationRepository joinApplicationRepository;
-    private final AESUtil aesUtil;
 
     @Transactional
     public Page<CrewApplicantResponseDto> getAllJoinApplications(Long crewId,
@@ -75,7 +73,7 @@ public class CrewApplicantService {
         CrewMemberEntity newMember = CrewMemberEntity.of(memberEntity, crewEntity);
         //DTO 변환
         CrewMemberEntity savedCrewMember = crewMemberRepository.save(newMember);
-        return CrewMemberResponseDto.of(savedCrewMember, aesUtil);
+        return CrewMemberResponseDto.of(savedCrewMember);
     }
 
 

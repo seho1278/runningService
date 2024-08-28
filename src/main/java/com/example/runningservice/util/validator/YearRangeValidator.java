@@ -31,7 +31,7 @@ public class YearRangeValidator implements ConstraintValidator<YearRange, Object
     }
 
     private Integer getFieldValue(Object object, String fieldName) {
-        Class<?> clazz = object.getClass().getSuperclass();
+        Class<?> clazz = object.getClass();
         Field yearField;
         try {
             yearField = clazz.getDeclaredField(fieldName);

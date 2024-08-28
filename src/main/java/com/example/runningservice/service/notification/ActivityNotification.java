@@ -7,7 +7,7 @@ import com.example.runningservice.enums.TableType;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.CrewMemberRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;

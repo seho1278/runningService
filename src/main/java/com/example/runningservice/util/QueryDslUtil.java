@@ -24,7 +24,7 @@ public class QueryDslUtil {
         // 새로운 엔티티가 추가될 때마다 여기에 추가
     }
 
-    public static List<OrderSpecifier<?>> getAllOrderSpecifiers(Pageable pageable, String entityType) {
+    public static OrderSpecifier<?>[] getAllOrderSpecifiers(Pageable pageable, String entityType) {
 
         List<OrderSpecifier<?>> orders = new ArrayList<>();
 
@@ -43,7 +43,7 @@ public class QueryDslUtil {
             }
         }
 
-        return orders;
+        return orders.toArray(new OrderSpecifier[0]);
     }
 
     private static boolean isEmpty(Sort sort) {
