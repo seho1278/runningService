@@ -73,7 +73,7 @@ public class JoinApplyDto {
                 .capacity(joinApplyEntity.getCrew().getCrewCapacity())
                 .currentMemberCount(joinApplyEntity.getCrew().getCrewMember().size())
                 .applyMessage(joinApplyEntity.getMessage())
-                .description(joinApplyEntity.getMessage())
+                .description(joinApplyEntity.getCrew().getDescription())
                 .activityRegion(joinApplyEntity.getCrew().getActivityRegion())
                 .appliedAt(joinApplyEntity.getCreatedAt())
                 .updatedAt(joinApplyEntity.getUpdatedAt())
