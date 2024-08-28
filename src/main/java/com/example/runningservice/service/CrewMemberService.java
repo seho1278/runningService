@@ -49,7 +49,9 @@ public class CrewMemberService {
                 }
             });
 
-        if (filterDto == null) {
+        if (filterDto.getCrewRole() == null
+            && filterDto.getGender() == null && filterDto.getMaxYear() == null
+            && filterDto.getMinYear() == null) {
             return crewMemberRepository.findAllByOrderByRoleOrderAscJoinedAtAsc(pageable);
         }
 
