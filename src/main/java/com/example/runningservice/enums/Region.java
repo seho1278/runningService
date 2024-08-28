@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum Region {
+    NATIONWIDE("전국"),
     SEOUL("서울특별시"),
     BUSAN("부산광역시"),
     DAEGU("대구광역시"),
@@ -22,8 +23,7 @@ public enum Region {
     JEOLLANAM("전라남도"),
     GYEONGBUK("경상북도"),
     GYEONGNAM("경상남도"),
-    JEJU("제주특별자치도"),
-    NATIONWIDE("전국");
+    JEJU("제주특별자치도");
 
     private final String regionName;
 }
