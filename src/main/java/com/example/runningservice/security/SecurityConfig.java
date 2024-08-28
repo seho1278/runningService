@@ -1,7 +1,6 @@
 package com.example.runningservice.security;
 
 import com.example.runningservice.service.LogoutService;
-import com.example.runningservice.service.Oauth2CustomSuccessHandler;
 import com.example.runningservice.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +34,15 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-    private final Oauth2CustomSuccessHandler oauth2CustomSuccessHandler;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService,
-        Oauth2CustomSuccessHandler oauth2CustomSuccessHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService)
+        throws Exception {
         http.authorizeHttpRequests(
                 request -> request.requestMatchers(
                         "/",
                         "/login/**",
+                        "/oauth/**",
                         "/user/signup/**",
                         "/api.mailgun.net/v3/**",
                         "/h2-console/**",
@@ -91,10 +90,7 @@ public class SecurityConfig {
                     })
             )
             // OAuth2 로그인 기능에 대한 여러 설정
-            .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(oAuth2UserService())) // OAuth2UserService 설정
-                .successHandler(oauth2CustomSuccessHandler));
+            .oauth2Login(oauth2 -> oauth2.loginPage("/oauth/login"));
         return http.build();
     }
 
