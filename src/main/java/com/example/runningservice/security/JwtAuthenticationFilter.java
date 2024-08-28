@@ -1,5 +1,7 @@
 package com.example.runningservice.security;
 
+import com.example.runningservice.exception.CustomException;
+import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.debug("request path: {}", request.getRequestURI());
         log.debug("accessJwt: {}", accessJwt);
         if (accessJwt != null &&
-            jwtUtil.validateToken(jwtUtil.extractEmail(accessJwt), accessJwt)) {
+            jwtUtil.isTokenExpired(accessJwt)) {
             Authentication authentication = jwtUtil.getAuthentication(accessJwt);
             log.info("Filtering request token Authentication: {}", authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -44,6 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             // LoginUserResolver에서 request를 통해 가져오기 위해 토큰에서 id를 가져와 저장한다.
             request.setAttribute("loginId", jwtUtil.extractUserId(accessJwt));
+        } else if (jwtUtil.isTokenExpired(accessJwt)) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         }
         log.info("Filtering request token: {}", accessJwt);
         log.info("authentication: {}", SecurityContextHolder.getContext().getAuthentication());
