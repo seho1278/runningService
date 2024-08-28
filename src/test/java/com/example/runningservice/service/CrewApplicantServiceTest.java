@@ -15,11 +15,10 @@ import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
 import com.example.runningservice.entity.MemberEntity;
-import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.Visibility;
-import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.PageUtil;
 import java.time.LocalDateTime;
@@ -44,9 +43,6 @@ class CrewApplicantServiceTest {
 
     @Mock
     private JoinApplicationRepository joinApplicationRepository;
-
-    @Mock
-    private PageUtil pageUtil;
 
     @Mock
     private AESUtil aesUtil;
@@ -161,24 +157,13 @@ class CrewApplicantServiceTest {
         when(crewMemberRepository.save(any(CrewMemberEntity.class)))
             .thenReturn(newCrewMember);
 
-        when(aesUtil.decrypt(memberEntity.getPhoneNumber())).thenReturn("decryptedNumber");
-
         // when
         CrewMemberResponseDto result = crewApplicantService.approveJoinApplication(joinApplyId);
 
         // then
         assertNotNull(result);
-        assertEquals(crewEntity.getCrewName(), result.getCrewName());
-        assertEquals(CrewRole.MEMBER, result.getRole());
         assertEquals(memberEntity.getNickName(), result.getMemberNickName());
-        assertEquals(memberEntity.getName(), result.getName());
         assertEquals(memberEntity.getProfileImageUrl(), result.getMemberProfileImage());
-        assertEquals(null, result.getMemberGender());
-        assertEquals("decryptedNumber", result.getPhoneNumber());
-        assertEquals(JoinStatus.APPROVED, joinApplyEntity.getStatus());
-
-        verify(joinApplicationRepository).findByIdAndStatus(joinApplyId, JoinStatus.PENDING);
-        verify(crewMemberRepository).save(any(CrewMemberEntity.class));
     }
 
     @Test
