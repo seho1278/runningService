@@ -38,6 +38,10 @@ class SignupRequestDtoTest {
             .gender(Gender.MALE)
             .birthYear(1990)
             .activityRegion(Region.SEOUL)
+            .birthYearVisibility(Visibility.PUBLIC)
+            .nameVisibility(Visibility.PUBLIC)
+            .genderVisibility(Visibility.PUBLIC)
+            .phoneNumberVisibility(Visibility.PUBLIC)
             .build();
 
         // When
