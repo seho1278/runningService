@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.debug("request path: {}", request.getRequestURI());
         log.debug("accessJwt: {}", accessJwt);
         if (accessJwt != null &&
-            jwtUtil.isTokenExpired(accessJwt)) {
+            !jwtUtil.isTokenExpired(accessJwt)) {
             Authentication authentication = jwtUtil.getAuthentication(accessJwt);
             log.info("Filtering request token Authentication: {}", authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
