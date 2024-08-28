@@ -144,8 +144,8 @@ public class UserJoinService {
     private void isJoinPossible(MemberEntity memberEntity, CrewEntity crewEntity) {
 
         Gender requiredGender = crewEntity.getGender();
-        Integer minAge = crewEntity.getMinAge();
-        Integer maxAge = crewEntity.getMaxAge();
+        Integer minAge = crewEntity.getMinYear();
+        Integer maxAge = crewEntity.getMaxYear();
         Long memberId = memberEntity.getId();
         Long crewId = crewEntity.getId();
         Boolean recordOpen = crewEntity.getRunRecordOpen();
