@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,23 +20,19 @@ import com.example.runningservice.entity.CrewMemberBlackListEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
 import com.example.runningservice.entity.MemberEntity;
-import com.example.runningservice.entity.QCrewMemberEntity;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
-import com.example.runningservice.repository.CrewMemberBlackListRepository;
-import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.PageUtil;
-import com.example.runningservice.util.QueryDslUtil;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -155,61 +150,9 @@ class CrewMemberServiceTest {
         Pageable sortedPageable = PageUtil.getSortedPageable(pageable, defaultSortBy,
             defaultSortDirection,
             defaultPageNumber, defaultPageSize);
-        QCrewMemberEntity crewMemberEntity = QCrewMemberEntity.crewMemberEntity;
 
-        // Mock the JPAQuery object
-        JPAQuery<CrewMemberEntity> jpaQuery = (JPAQuery<CrewMemberEntity>) mock(JPAQuery.class);
-
-        when(queryFactory.selectFrom(crewMemberEntity)).thenReturn(jpaQuery);
-
-        when(jpaQuery.where(
-            crewIdEq(crewId),
-            genderEq(filter.getGender()),
-            roleEq(filter.getCrewRole()),
-            birthYearGoe(filter.getMinAge()),
-            birthYearLoe(filter.getMaxAge()))
-        ).thenReturn(jpaQuery);
-
-        when(jpaQuery.orderBy(QueryDslUtil.getAllOrderSpecifiers(sortedPageable, "crewMemberEntity")
-            .toArray(new OrderSpecifier[0]))).thenReturn(jpaQuery);
-
-        when(jpaQuery.offset(sortedPageable.getOffset())).thenReturn(jpaQuery);
-        when(jpaQuery.limit(sortedPageable.getPageSize())).thenReturn(jpaQuery);
-
-        when(queryFactory.selectFrom(crewMemberEntity)
-            .where(
-                crewIdEq(crewId),
-                genderEq(filter.getGender()),
-                roleEq(filter.getCrewRole()),
-                birthYearGoe(filter.getMinAge()),
-                birthYearLoe(filter.getMaxAge())
-            )
-            .orderBy(QueryDslUtil.getAllOrderSpecifiers(sortedPageable, "crewMemberEntity")
-                .toArray(new OrderSpecifier[0]))
-            .offset(sortedPageable.getOffset())
-            .limit(sortedPageable.getPageSize())
-            .fetch()).thenReturn(crewMembers);
-
-        JPAQuery<Long> countQuery = mock(JPAQuery.class);
-
-        when(queryFactory.select(crewMemberEntity.count())).thenReturn(countQuery);
-        when(countQuery.from(crewMemberEntity)).thenReturn(countQuery);
-        when(countQuery.where(
-            crewIdEq(crewId),
-            genderEq(filter.getGender()),
-            roleEq(filter.getCrewRole()),
-            birthYearGoe(filter.getMinAge()),
-            birthYearLoe(filter.getMaxAge())
-        )).thenReturn(countQuery);
-
-        when(queryFactory.select(crewMemberEntity.count())
-            .from(crewMemberEntity)
-            .where(crewIdEq(crewId),
-                genderEq(filter.getGender()),
-                roleEq(filter.getCrewRole()),
-                birthYearGoe(filter.getMinAge()),
-                birthYearLoe(filter.getMaxAge()))
-            .fetchOne()).thenReturn(3L);
+        when(crewMemberRepository.findAllByCrewIdAndFilter(crewId, filter, pageable)).thenReturn(
+            expectedPage);
 
         //when
         Page<CrewMemberEntity> result = crewMemberService.getCrewMembers(crewId, filter, pageable);
@@ -420,7 +363,6 @@ class CrewMemberServiceTest {
 
         // then
         assertEquals(ErrorCode.NOT_FOUND_CREW_MEMBER, exception.getErrorCode());
-        assertEquals(null, crewMember.getStatus());
     }
 
 

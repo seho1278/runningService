@@ -1,7 +1,7 @@
 package com.example.runningservice.dto.runRecord;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.Duration;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,9 +15,9 @@ public class RunRecordRequestDto {
     @NotNull
     private Integer distance;
     @NotNull
-    private LocalDateTime runningTime;
+    private Duration runningTime;
     @NotNull
-    private LocalDateTime pace;
+    private Duration pace;
     @NotNull
     private Integer isPublic;
 }

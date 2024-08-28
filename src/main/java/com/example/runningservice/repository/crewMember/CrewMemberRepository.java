@@ -1,4 +1,4 @@
-package com.example.runningservice.repository;
+package com.example.runningservice.repository.crewMember;
 
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Long> {
+public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Long>, CrewMemberRepositoryCustom {
 
     void deleteAllByCrew_Id(Long crewId);
 
@@ -29,4 +29,6 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
     Optional<CrewMemberEntity> findByCrewAndMemberAndRoleIn(CrewEntity crew, MemberEntity member, List<CrewRole> roles);
 
     List<CrewMemberEntity> findByCrew(CrewEntity crew);
+
+    Page<CrewMemberEntity> findAllByOrderByRoleOrderAscJoinedAtAsc(Pageable pageable);
 }

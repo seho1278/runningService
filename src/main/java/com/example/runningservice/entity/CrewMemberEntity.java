@@ -1,7 +1,6 @@
 package com.example.runningservice.entity;
 
 import com.example.runningservice.enums.CrewRole;
-import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import jakarta.persistence.Entity;
@@ -47,9 +46,6 @@ public class CrewMemberEntity {
     private CrewRole role;
     @CreatedDate
     private LocalDateTime joinedAt;
-    //Todo 삭제 논의
-    @Enumerated(EnumType.STRING)
-    private JoinStatus status;
 
     public static CrewMemberEntity of(MemberEntity member, CrewEntity crew) {
         return CrewMemberEntity.builder()

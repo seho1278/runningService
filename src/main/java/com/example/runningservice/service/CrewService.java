@@ -12,19 +12,18 @@ import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
-import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.CrewMemberBlackListRepository;
-import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.ArrayList;
@@ -70,7 +69,6 @@ public class CrewService {
             .crew(crewEntity)
             .member(memberEntity)
             .role(CrewRole.LEADER)
-            .status(JoinStatus.APPROVED)
             .build());
 
         // crew 채팅방 생성

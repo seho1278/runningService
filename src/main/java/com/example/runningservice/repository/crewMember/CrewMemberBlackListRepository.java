@@ -1,4 +1,4 @@
-package com.example.runningservice.repository;
+package com.example.runningservice.repository.crewMember;
 
 import com.example.runningservice.entity.CrewMemberBlackListEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

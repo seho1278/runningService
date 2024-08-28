@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/run-goals")
+@RequestMapping("/run/goals")
 public class RunGoalController {
 
     private final RunGoalService runGoalService;
@@ -24,10 +24,16 @@ public class RunGoalController {
         return ResponseEntity.ok(runGoals);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RunGoalResponseDto> getRunGoalById(@PathVariable Long id) {
-        RunGoalResponseDto runGoal = runGoalService.findById(id);
+    @GetMapping("/{runningId}")
+    public ResponseEntity<RunGoalResponseDto> getRunGoalById(@PathVariable Long runningId) {
+        RunGoalResponseDto runGoal = runGoalService.findById(runningId);
         return ResponseEntity.ok(runGoal);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<RunGoalResponseDto>> getRunGoalByUserId(@PathVariable Long userId) {
+        List<RunGoalResponseDto> runGoals = runGoalService.findByUserId(userId);
+        return ResponseEntity.ok(runGoals);
     }
 
     @PostMapping
@@ -36,16 +42,16 @@ public class RunGoalController {
         return ResponseEntity.status(201).body(runGoal);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{runningId}")
     public ResponseEntity<RunGoalResponseDto> updateRunGoal(
-        @PathVariable Long id, @RequestBody RunGoalRequestDto runGoalRequestDto) {
-        RunGoalResponseDto runGoal = runGoalService.updateRunGoal(id, runGoalRequestDto);
+        @PathVariable Long runningId, @RequestBody RunGoalRequestDto runGoalRequestDto) {
+        RunGoalResponseDto runGoal = runGoalService.updateRunGoal(runningId, runGoalRequestDto);
         return ResponseEntity.ok(runGoal);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRunGoal(@PathVariable Long id) {
-        runGoalService.deleteById(id);
+    @DeleteMapping("/{runningId}")
+    public ResponseEntity<Void> deleteRunGoal(@PathVariable Long runningId) {
+        runGoalService.deleteById(runningId);
         return ResponseEntity.noContent().build();
     }
 }
