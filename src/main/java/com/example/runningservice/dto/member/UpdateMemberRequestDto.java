@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UpdateMemberRequestDto {
     private String nickName;
     private Gender gender;

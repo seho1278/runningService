@@ -1,15 +1,8 @@
 package com.example.runningservice.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import com.example.runningservice.dto.member.DeleteRequestDto;
-import com.example.runningservice.dto.member.ProfileVisibilityResponseDto;
 import com.example.runningservice.dto.member.MemberResponseDto;
 import com.example.runningservice.dto.member.PasswordRequestDto;
-import com.example.runningservice.dto.member.ProfileVisibilityRequestDto;
 import com.example.runningservice.dto.member.UpdateMemberRequestDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;
@@ -18,9 +11,6 @@ import com.example.runningservice.enums.Role;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.util.AESUtil;
-import java.util.List;
-import java.util.Optional;
-
 import com.example.runningservice.util.S3FileUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -101,6 +98,10 @@ public class MemberServiceTest {
             .gender(Gender.MALE)
             .activityRegion(Region.BUSAN)
             .profileImageUrl(oldImageUrl)
+            .nameVisibility(Visibility.PRIVATE)
+            .phoneNumberVisibility(Visibility.PRIVATE)
+            .genderVisibility(Visibility.PRIVATE)
+            .birthYearVisibility(Visibility.PRIVATE)
             .build();
 
         when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
@@ -111,9 +112,13 @@ public class MemberServiceTest {
         UpdateMemberRequestDto updateMemberRequestDto = UpdateMemberRequestDto.builder()
             .nickName("test22")
             .birthYear(1996)
-            .gender(1)
-            .activityRegion("SEOUL")
+            .gender(Gender.FEMALE)
+            .activityRegion(Region.INCHEON)
             .profileImage(profileImage)
+            .nameVisibility(Visibility.PRIVATE)
+            .phoneNumberVisibility(Visibility.PRIVATE)
+            .genderVisibility(Visibility.PRIVATE)
+            .birthYearVisibility(Visibility.PRIVATE)
             .build();
 
         when(s3FileUtil.getImgUrl(fileName)).thenReturn(imageUrl);
@@ -128,7 +133,7 @@ public class MemberServiceTest {
         assertEquals("test22", memberResponseDto.getNickName());
         assertEquals(1996, memberResponseDto.getBirthYear());
         assertEquals(Gender.FEMALE, memberResponseDto.getGender());
-        assertEquals(Region.SEOUL, memberResponseDto.getActivityRegion());
+        assertEquals(Region.INCHEON, memberResponseDto.getActivityRegion());
         assertEquals(imageUrl, memberResponseDto.getImageUrl());
     }
 
@@ -148,7 +153,7 @@ public class MemberServiceTest {
         when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
         when(passwordEncoder.matches(passwordRequestDto.getOldPassword(), mockMemberEntity.getPassword()))
             .thenReturn(true);
-        when(aesUtil.encrypt(passwordRequestDto.getNewPassword())).thenReturn("encryptedNewPassword");
+        when(passwordEncoder.encode(passwordRequestDto.getNewPassword())).thenReturn("encryptedNewPassword");
 
         // when
         memberService.updateMemberPassword(userId, passwordRequestDto);
@@ -156,7 +161,7 @@ public class MemberServiceTest {
         // then
         verify(memberRepository, times(1)).findMemberById(userId);
         verify(passwordEncoder, times(1)).matches(passwordRequestDto.getOldPassword(), "encryptedOldPassword");
-        verify(aesUtil, times(1)).encrypt(passwordRequestDto.getNewPassword());
+        verify(passwordEncoder, times(1)).encode(passwordRequestDto.getNewPassword());
         verify(memberRepository, times(1)).save(mockMemberEntity);
         assertEquals("encryptedNewPassword", mockMemberEntity.getPassword());
     }
@@ -184,36 +189,5 @@ public class MemberServiceTest {
         verify(memberRepository, times(1)).findMemberById(userId);
         verify(passwordEncoder, times(1)).matches(deleteRequestDto.getPassword(), mockMemberEntity.getPassword());
         verify(memberRepository, times(1)).delete(mockMemberEntity);
-    }
-
-    @Test
-    public void testUpdateVisibility_success() {
-        // given
-        Long userId = 1L;
-
-        MemberEntity mockMemberEntity = MemberEntity.builder()
-            .id(userId)
-            .nameVisibility(Visibility.PUBLIC)
-            .phoneNumberVisibility(Visibility.PUBLIC)
-            .genderVisibility(Visibility.PUBLIC)
-            .birthYearVisibility(Visibility.PUBLIC)
-            .build();
-
-        ProfileVisibilityRequestDto profileVisibilityRequestDto = new ProfileVisibilityRequestDto(0, 0, 1, 1);
-
-        when(memberRepository.findMemberById(userId)).thenReturn(mockMemberEntity);
-        when(memberRepository.save(any(MemberEntity.class))).thenReturn(mockMemberEntity);
-
-        // when
-        ProfileVisibilityResponseDto profileVisibilityResponseDto = memberService.updateProfileVisibility(userId, profileVisibilityRequestDto);
-
-        // then
-        verify(memberRepository, times(1)).findMemberById(userId);
-        verify(memberRepository, times(1)).save(mockMemberEntity);
-
-        assertEquals(Visibility.PUBLIC, profileVisibilityResponseDto.getUserName());
-        assertEquals(Visibility.PUBLIC, profileVisibilityResponseDto.getPhoneNumber());
-        assertEquals(Visibility.PRIVATE, profileVisibilityResponseDto.getGender());
-        assertEquals(Visibility.PRIVATE, profileVisibilityResponseDto.getBirthYear());
     }
 }
