@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidYear {
 
-    String message() default "Invalid year";
+    String message() default "1900 ~ 현재 연도 이내 값을 입력하세요.";
 
     Class<?>[] groups() default {};
 
