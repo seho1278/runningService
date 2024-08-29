@@ -1,4 +1,4 @@
-//package com.example.runningservice.service;
+package com.example.runningservice.service;
 //
 //import com.example.runningservice.dto.googleToken.GoogleAccessTokenResponseDto;
 //import com.example.runningservice.dto.googleToken.GoogleAccountProfileResponseDto;
@@ -13,11 +13,10 @@
 //import org.springframework.http.HttpMethod;
 //import org.springframework.http.ResponseEntity;
 //import org.springframework.web.client.RestTemplate;
-//
 //import static org.junit.jupiter.api.Assertions.*;
 //import static org.mockito.Mockito.*;
 //
-//public class OAuth2ServiceTest {
+public class OAuth2ServiceTest {
 //
 //    @InjectMocks
 //    private OAuth2Service oAuth2Service; // 테스트할 서비스 클래스
@@ -124,4 +123,4 @@
 //            any(HttpEntity.class),
 //            eq(GoogleAccountProfileResponseDto.class));
 //    }
-//}
+}

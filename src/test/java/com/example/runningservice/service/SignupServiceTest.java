@@ -143,8 +143,10 @@ class SignupServiceTest {
             .activityRegion(Region.BUSAN)
             .build();
 
-        given(aesUtil.encrypt(signupRequestDto.getPhoneNumber())).willReturn("encryptedPhoneNumber");
-        given(memberRepository.existsByPhoneNumberHash("encryptedPhoneNumber")).willReturn(true);
+        given(memberRepository.existsByEmail(signupRequestDto.getEmail())).willReturn(false);
+        given(memberRepository.existsByNickName(signupRequestDto.getNickName())).willReturn(false);
+        given(aesUtil.generateHash(signupRequestDto.getPhoneNumber())).willReturn("HashedPhoneNumber");
+        given(memberRepository.existsByPhoneNumberHash("HashedPhoneNumber")).willReturn(true);
 
         // When & Then
         CustomException exception = assertThrows(CustomException.class, () -> {
@@ -219,10 +221,10 @@ class SignupServiceTest {
         String subjectCaptured = captor.getAllValues().get(2);
         String textCaptured = captor.getAllValues().get(3);
 
-        assertEquals("wadadak@example.com", fromCaptured);
+        assertEquals("simzoo93@naver.com", fromCaptured);
         assertEquals(email, toCaptured);
         assertEquals("Email 인증메일입니다.", subjectCaptured);
-        assertTrue(textCaptured.contains("http://localhost:8080/user/signup/email-verify?email=" + email));
+        assertTrue(textCaptured.contains("http://13.209.127.192:8080/user/signup/email-verify?email=" + email));
         assertTrue(textCaptured.contains(memberEntity.getName()));
         assertTrue(textCaptured.contains(memberEntity.getVerificationCode()));
     }

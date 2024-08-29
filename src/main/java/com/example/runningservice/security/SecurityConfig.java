@@ -1,7 +1,6 @@
 package com.example.runningservice.security;
 
 import com.example.runningservice.service.LogoutService;
-import com.example.runningservice.service.Oauth2CustomSuccessHandler;
 import com.example.runningservice.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,15 +35,15 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
-    private final Oauth2CustomSuccessHandler oauth2CustomSuccessHandler;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService,
-        Oauth2CustomSuccessHandler oauth2CustomSuccessHandler) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService)
+        throws Exception {
         http.authorizeHttpRequests(
                 request -> request.requestMatchers(
                         "/",
                         "/login/**",
+                        "/oauth/login",
                         "/user/signup/**",
                         "/api.mailgun.net/v3/**",
                         "/h2-console/**",
@@ -90,11 +90,7 @@ public class SecurityConfig {
                         response.getWriter().flush();
                     })
             )
-            // OAuth2 로그인 기능에 대한 여러 설정
-            .oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(oAuth2UserService())) // OAuth2UserService 설정
-                .successHandler(oauth2CustomSuccessHandler));
+            .oauth2Login(Customizer.withDefaults());
         return http.build();
     }
 

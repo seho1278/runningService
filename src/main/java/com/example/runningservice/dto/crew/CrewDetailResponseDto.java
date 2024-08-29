@@ -32,8 +32,8 @@ public class CrewDetailResponseDto extends CrewBaseResponseDto {
             .limit(Limit.builder()
                 .gender(crewEntity.getGender())
                 .leaderRequired(crewEntity.getLeaderRequired())
-                .maxAge(crewEntity.getMaxAge())
-                .minAge(crewEntity.getMinAge())
+                .maxYear(crewEntity.getMaxYear())
+                .minYear(crewEntity.getMinYear())
                 .runRecordOpen(crewEntity.getRunRecordOpen())
                 .build())
             .leader(crewEntity.getLeader().getNickName())
@@ -52,8 +52,8 @@ public class CrewDetailResponseDto extends CrewBaseResponseDto {
     public static class Limit {
 
         private Gender gender;
-        private Integer minAge;
-        private Integer maxAge;
+        private Integer minYear;
+        private Integer maxYear;
         private boolean leaderRequired;
         private boolean runRecordOpen;
     }

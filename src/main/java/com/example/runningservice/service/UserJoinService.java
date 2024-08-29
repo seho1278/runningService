@@ -13,11 +13,10 @@ import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
-import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
-import java.time.LocalDate;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -109,7 +108,8 @@ public class UserJoinService {
     }
 
     @Transactional
-    public JoinApplyDto.DetailResponse updateJoinApply(Long userId, UpdateJoinApplyDto updateJoinApplyDto) {
+    public JoinApplyDto.DetailResponse updateJoinApply(Long userId,
+        UpdateJoinApplyDto updateJoinApplyDto) {
         //JoinEntity 가져오기 (대기상태인 것만 가져오기)
         JoinApplyEntity joinApplyEntity = joinApplicationRepository.findByIdAndStatus(
                 updateJoinApplyDto.getJoinApplyId(), JoinStatus.PENDING)
@@ -144,20 +144,21 @@ public class UserJoinService {
     private void isJoinPossible(MemberEntity memberEntity, CrewEntity crewEntity) {
 
         Gender requiredGender = crewEntity.getGender();
-        Integer minAge = crewEntity.getMinAge();
-        Integer maxAge = crewEntity.getMaxAge();
+        Integer maxYear = crewEntity.getMaxYear();
+        Integer minYear = crewEntity.getMinYear();
+      
         Long memberId = memberEntity.getId();
         Long crewId = crewEntity.getId();
         Boolean recordOpen = crewEntity.getRunRecordOpen();
         // 나이 제한 있으면 검증
-        if (minAge != null || maxAge != null) {
+        if (maxYear != null || minYear != null) {
             //나이 검증
-            validateAge(memberEntity, crewEntity, minAge, maxAge);
+            validateAge(memberEntity, maxYear, minYear);
         }
         // 성별 제한 있으면 검증
         if (requiredGender != null) {
             // 성별 검증
-            validateGender(memberEntity, crewEntity, requiredGender);
+            validateGender(memberEntity, requiredGender);
         }
         // 기록공개여부 검증
         if (recordOpen != null && recordOpen) {
@@ -182,29 +183,26 @@ public class UserJoinService {
             });
     }
 
-    private void validateAge(MemberEntity memberEntity, CrewEntity crewEntity, Integer minAge,
-        Integer maxAge) {
+    private void validateAge(MemberEntity memberEntity, Integer maxYear, Integer minYear) {
 
-        if (minAge != null || maxAge != null) {
+        if (maxYear != null || minYear != null) {
             if (memberEntity.getBirthYear() == null) {
                 throw new CustomException(ErrorCode.AGE_REQUIRED);
             }
 
-            int memberAge = LocalDate.now().getYear() - memberEntity.getBirthYear() + 1; //한국나이
-            if (minAge != null && memberAge < minAge) {
+            int memberBirthYear = memberEntity.getBirthYear();
+            if (minYear != null && memberBirthYear > minYear) {
                 throw new CustomException(ErrorCode.AGE_RESTRICTION_NOT_MET);
             }
 
-            if (maxAge != null && memberAge > maxAge) {
+            if (maxYear != null && memberBirthYear < maxYear) {
                 throw new CustomException(ErrorCode.AGE_RESTRICTION_NOT_MET);
             }
         }
     }
 
-    private void validateGender(MemberEntity memberEntity, CrewEntity crewEntity,
-        Gender requiredGender) {
+    private void validateGender(MemberEntity memberEntity, Gender requiredGender) {
         Gender memberGender = memberEntity.getGender();
-        Visibility memberGenderVisibility = memberEntity.getGenderVisibility();
 
         if (requiredGender != null) {
             if (memberGender == null) {

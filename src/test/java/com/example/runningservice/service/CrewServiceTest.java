@@ -15,12 +15,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.runningservice.dto.crew.CrewBaseResponseDto;
+import com.example.runningservice.dto.crew.CrewCreateRequestDto;
 import com.example.runningservice.dto.crew.CrewDetailResponseDto;
 import com.example.runningservice.dto.crew.CrewFilterDto.CrewInfo;
 import com.example.runningservice.dto.crew.CrewJoinStatusResponseDto;
-import com.example.runningservice.dto.crew.CrewRequestDto.Create;
-import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewRoleResponseDto;
+import com.example.runningservice.dto.crew.CrewUpdateRequestDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -28,13 +28,13 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.CrewMemberBlackListRepository;
-import com.example.runningservice.repository.CrewMemberRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
-import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
@@ -85,8 +85,7 @@ class CrewServiceTest {
         // given
         Long leaderId = 1L;
 
-        Create create = mock(Create.class);
-        when(create.getLeaderId()).thenReturn(leaderId);
+        CrewCreateRequestDto create = mock(CrewCreateRequestDto.class);
         when(create.getCrewImage()).thenReturn(new MockMultipartFile("file", new byte[]{1, 2, 3}));
 
         MemberEntity memberEntity = MemberEntity.builder().id(leaderId).build();
@@ -98,7 +97,7 @@ class CrewServiceTest {
         doNothing().when(s3FileUtil).putObject(anyString(), any(MultipartFile.class));
 
         // when
-        CrewBaseResponseDto response = crewService.createCrew(create);
+        CrewBaseResponseDto response = crewService.createCrew(create, leaderId);
 
         // then
         assertEquals(crewEntity.getId(), response.getCrewId());
@@ -114,8 +113,7 @@ class CrewServiceTest {
         // given
         Long leaderId = 1L;
 
-        Create create = mock(Create.class);
-        when(create.getLeaderId()).thenReturn(leaderId);
+        CrewCreateRequestDto create = mock(CrewCreateRequestDto.class);
         when(create.getCrewImage()).thenReturn(new MockMultipartFile("file", new byte[0]));
 
         MemberEntity memberEntity = new MemberEntity();
@@ -126,7 +124,7 @@ class CrewServiceTest {
         given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/default");
 
         // when
-        CrewBaseResponseDto response = crewService.createCrew(create);
+        CrewBaseResponseDto response = crewService.createCrew(create, leaderId);
 
         // then
         assertEquals(crewEntity.getId(), response.getCrewId());
@@ -142,13 +140,12 @@ class CrewServiceTest {
         // given
         Long leaderId = 1L;
 
-        Create create = mock(Create.class);
-        when(create.getLeaderId()).thenReturn(leaderId);
+        CrewCreateRequestDto create = mock(CrewCreateRequestDto.class);
 
         given(memberRepository.findById(leaderId)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(CustomException.class, () -> crewService.createCrew(create));
+        assertThrows(CustomException.class, () -> crewService.createCrew(create, leaderId));
     }
 
     @Test
@@ -157,8 +154,7 @@ class CrewServiceTest {
         // given
         Long crewId = 1L;
 
-        Update update = mock(Update.class);
-        when(update.getCrewId()).thenReturn(crewId);
+        CrewUpdateRequestDto update = mock(CrewUpdateRequestDto.class);
         when(update.getCrewImage()).thenReturn(new MockMultipartFile("file", new byte[]{1, 2, 3}));
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
@@ -169,7 +165,7 @@ class CrewServiceTest {
         doNothing().when(s3FileUtil).putObject(anyString(), any(MultipartFile.class));
 
         // when
-        CrewBaseResponseDto response = crewService.updateCrew(update);
+        CrewBaseResponseDto response = crewService.updateCrew(update, crewId);
 
         // then
         assertEquals(crewEntity.getId(), response.getCrewId());
@@ -185,8 +181,7 @@ class CrewServiceTest {
         // given
         Long crewId = 1L;
 
-        Update update = mock(Update.class);
-        when(update.getCrewId()).thenReturn(crewId);
+        CrewUpdateRequestDto update = mock(CrewUpdateRequestDto.class);
         when(update.getCrewImage()).thenReturn(new MockMultipartFile("file", new byte[0]));
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
@@ -196,7 +191,7 @@ class CrewServiceTest {
         given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/default");
 
         // when
-        CrewBaseResponseDto response = crewService.updateCrew(update);
+        CrewBaseResponseDto response = crewService.updateCrew(update, crewId);
 
         // then
         assertEquals(crewEntity.getId(), response.getCrewId());
@@ -328,6 +323,7 @@ class CrewServiceTest {
 
         given(crewRepository.findFullCrewList(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(result);
+        given(memberRepository.findMemberById(loginId)).willReturn(member);
 
         List<CrewJoinStatusResponseDto> response = crewService.getCrewList(loginId, crewInfo,
             pageable);

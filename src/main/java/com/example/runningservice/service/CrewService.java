@@ -1,29 +1,29 @@
 package com.example.runningservice.service;
 
 import com.example.runningservice.dto.crew.CrewBaseResponseDto;
+import com.example.runningservice.dto.crew.CrewCreateRequestDto;
 import com.example.runningservice.dto.crew.CrewDetailResponseDto;
 import com.example.runningservice.dto.crew.CrewFilterDto;
 import com.example.runningservice.dto.crew.CrewJoinStatusResponseDto;
-import com.example.runningservice.dto.crew.CrewRequestDto.Create;
-import com.example.runningservice.dto.crew.CrewRequestDto.Update;
 import com.example.runningservice.dto.crew.CrewRoleResponseDto;
+import com.example.runningservice.dto.crew.CrewUpdateRequestDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
-import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.OccupancyStatus;
+import com.example.runningservice.enums.Region;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.CrewMemberBlackListRepository;
-import com.example.runningservice.repository.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
-import com.example.runningservice.repository.MemberRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.ArrayList;
@@ -55,8 +55,8 @@ public class CrewService {
      * 크루 생성 :: db에 크루 저장 - 이미지 s3 저장 - 생성한 크루 정보 리턴
      */
     @Transactional
-    public CrewBaseResponseDto createCrew(Create newCrew) {
-        MemberEntity memberEntity = memberRepository.findById(newCrew.getLeaderId())
+    public CrewBaseResponseDto createCrew(CrewCreateRequestDto newCrew, Long loginId) {
+        MemberEntity memberEntity = memberRepository.findById(loginId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         CrewEntity crewEntity = CrewEntity.toEntity(newCrew, memberEntity);
@@ -69,7 +69,6 @@ public class CrewService {
             .crew(crewEntity)
             .member(memberEntity)
             .role(CrewRole.LEADER)
-            .status(JoinStatus.APPROVED)
             .build());
 
         // crew 채팅방 생성
@@ -100,8 +99,8 @@ public class CrewService {
      * 크루 정보 수정 :: 크루 db 수정 - 이미지 s3 저장 - 수정된 크루 정보 리턴
      */
     @Transactional
-    public CrewBaseResponseDto updateCrew(Update updateCrew) {
-        CrewEntity crewEntity = crewRepository.findById(updateCrew.getCrewId())
+    public CrewBaseResponseDto updateCrew(CrewUpdateRequestDto updateCrew, Long crewId) {
+        CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         crewEntity.updateFromDto(updateCrew);
@@ -186,6 +185,17 @@ public class CrewService {
      */
     public List<CrewJoinStatusResponseDto> getCrewList(Long loginId,
         CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
+
+        // 로그인을 했고 따로 입력한 지역 정보가 없으면 회원이 설정한 지역 기반으로 조회한다.
+        if (crewFilter.getActivityRegion() == null && loginId != null) {
+            crewFilter.updateRegionForLoginUser(getRegionForLoginUser(loginId));
+        }
+
+        // 전국 조회 시 모든 지역 조회가 가능하므로 필터값을 없애줌
+        if (Region.NATIONWIDE.equals(crewFilter.getActivityRegion())) {
+            crewFilter.updateRegionForLoginUser(null);
+        }
+
         Page<CrewEntity> crewEntityList = (crewFilter.getOccupancyStatus() != null) ?
             crewFilter.getOccupancyStatus().getCrewList(crewRepository, crewFilter, pageable) :
             OccupancyStatus.ALL.getCrewList(crewRepository, crewFilter, pageable);
@@ -197,6 +207,13 @@ public class CrewService {
         }
 
         return crewList;
+    }
+
+    // 사용자의 활동 지역 조회
+    private Region getRegionForLoginUser(Long loginId) {
+        MemberEntity memberEntity = memberRepository.findMemberById(loginId);
+
+        return memberEntity.getActivityRegion();
     }
 
     // 조회한 크루가 가입한 크루인지 확인한다.

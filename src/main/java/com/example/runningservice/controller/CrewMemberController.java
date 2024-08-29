@@ -5,6 +5,7 @@ import com.example.runningservice.dto.crewMember.ChangeCrewRoleRequestDto;
 import com.example.runningservice.dto.crewMember.ChangeCrewRoleResponseDto;
 import com.example.runningservice.dto.crewMember.ChangedLeaderResponseDto;
 import com.example.runningservice.dto.crewMember.CrewMemberBlackListResponseDto;
+import com.example.runningservice.dto.crewMember.CrewMemberResponseDetailDto;
 import com.example.runningservice.dto.crewMember.GetCrewMemberRequestDto;
 import com.example.runningservice.dto.crewMember.CrewMemberResponseDto;
 import com.example.runningservice.service.CrewMemberService;
@@ -14,9 +15,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,14 +40,14 @@ public class CrewMemberController {
      * 크루원 리스트 조회
      */
     @GetMapping("/{crew_id}/member/list")
-    @CrewRoleCheck(role = {"LEADER", "STAFF"})
+    @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
     public ResponseEntity<Page<CrewMemberResponseDto>> getCrewMembers(@LoginUser Long userId,
-        @PathVariable Long crewId,
-        @Valid GetCrewMemberRequestDto.Filter filterDto,
-        Pageable pageable) {
+        @PathVariable("crew_id") Long crewId,
+        @ModelAttribute @Valid GetCrewMemberRequestDto.Filter filterDto,
+        @PageableDefault(page = 0, size = 10, sort = "joinedAt", direction = Direction.ASC) Pageable pageable) {
 
         Page<CrewMemberResponseDto> pageDto = crewMemberService.getCrewMembers(crewId, filterDto,
-            pageable).map(e -> CrewMemberResponseDto.of(e, aesUtil));
+            pageable).map(CrewMemberResponseDto::of);
 
         return ResponseEntity.ok(pageDto);
     }
@@ -52,11 +56,11 @@ public class CrewMemberController {
      * 크루원 개별 상세조회
      */
     @GetMapping("/{crew_id}/member")
-    @CrewRoleCheck(role = {"LEADER", "STAFF"})
-    public ResponseEntity<CrewMemberResponseDto> getCrewMember(@LoginUser Long userID,
+    @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
+    public ResponseEntity<CrewMemberResponseDetailDto> getCrewMember(@LoginUser Long userId,
         @PathVariable("crew_id") Long crewId, @RequestParam Long crewMemberId) {
 
-        CrewMemberResponseDto crewMemberDto = CrewMemberResponseDto.of(
+        CrewMemberResponseDetailDto crewMemberDto = CrewMemberResponseDetailDto.of(
             crewMemberService.getCrewMember(crewMemberId), aesUtil);
 
         return ResponseEntity.ok(crewMemberDto);

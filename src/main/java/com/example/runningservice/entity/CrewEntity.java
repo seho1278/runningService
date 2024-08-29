@@ -1,7 +1,7 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.dto.crew.CrewRequestDto.Create;
-import com.example.runningservice.dto.crew.CrewRequestDto.Update;
+import com.example.runningservice.dto.crew.CrewCreateRequestDto;
+import com.example.runningservice.dto.crew.CrewUpdateRequestDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.util.converter.GenderConverter;
@@ -46,8 +46,8 @@ public class CrewEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Region activityRegion;
     private Boolean runRecordOpen;
-    private Integer minAge;
-    private Integer maxAge;
+    private Integer minYear;
+    private Integer maxYear;
     @Convert(converter = GenderConverter.class)
     private Gender gender;
     private Boolean leaderRequired;
@@ -58,7 +58,7 @@ public class CrewEntity extends BaseEntity {
         this.crewImage = imageUrl;
     }
 
-    public static CrewEntity toEntity(Create dto, MemberEntity memberEntity) {
+    public static CrewEntity toEntity(CrewCreateRequestDto dto, MemberEntity memberEntity) {
         return CrewEntity.builder()
             .leader(memberEntity)
             .crewName(dto.getCrewName())
@@ -66,21 +66,21 @@ public class CrewEntity extends BaseEntity {
             .crewCapacity(dto.getCrewCapacity())
             .activityRegion(dto.getActivityRegion())
             .runRecordOpen(dto.getRunRecordOpen())
-            .minAge(dto.getMinAge())
-            .maxAge(dto.getMaxAge())
+            .minYear(dto.getMinYear())
+            .maxYear(dto.getMaxYear())
             .gender(dto.getGender())
             .leaderRequired(dto.getLeaderRequired())
             .build();
     }
 
-    public void updateFromDto(Update updateCrew) {
+    public void updateFromDto(CrewUpdateRequestDto updateCrew) {
         this.description = updateCrew.getDescription();
         this.activityRegion = updateCrew.getActivityRegion();
         this.crewCapacity = updateCrew.getCrewCapacity();
         this.runRecordOpen = updateCrew.getRunRecordOpen();
         this.leaderRequired = updateCrew.getLeaderRequired();
-        this.minAge = updateCrew.getMinAge();
-        this.maxAge = updateCrew.getMaxAge();
+        this.minYear = updateCrew.getMinYear();
+        this.maxYear = updateCrew.getMaxYear();
         this.gender = updateCrew.getGender();
     }
 }

@@ -10,11 +10,11 @@ public class GetCrewMemberRequestDto {
 
     @Getter
     @Builder
-    @YearRange(minYear = "minAge", maxYear = "maxAge")
+    @YearRange(minYear = "minYear", maxYear = "maxYear")
     public static class Filter {
         private Gender gender;
-        private Integer minAge;
-        private Integer maxAge;
+        private Integer minYear;
+        private Integer maxYear;
         private CrewRole crewRole;
     }
 }

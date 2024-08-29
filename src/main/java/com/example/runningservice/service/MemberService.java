@@ -60,7 +60,7 @@ public class MemberService {
             validateOldPassword(passwordRequestDto.getOldPassword(), memberEntity.getPassword());
 
             // 새 비밀번호 암호화하여 저장
-            String encryptedNewPassword = aesUtil.encrypt(passwordRequestDto.getNewPassword());
+            String encryptedNewPassword = passwordEncoder.encode(passwordRequestDto.getNewPassword());
             memberEntity.updatePassword(encryptedNewPassword);
             memberRepository.save(memberEntity);
 

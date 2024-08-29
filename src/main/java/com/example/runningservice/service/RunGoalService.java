@@ -5,6 +5,7 @@ import com.example.runningservice.dto.runGoal.RunGoalResponseDto;
 import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class RunGoalService {
     private final RunGoalRepository runGoalRepository;
     private final MemberRepository memberRepository;
 
+    @Autowired
     public RunGoalService(RunGoalRepository runGoalRepository, MemberRepository memberRepository) {
         this.runGoalRepository = runGoalRepository;
         this.memberRepository = memberRepository;
@@ -29,14 +31,23 @@ public class RunGoalService {
     }
 
     public RunGoalResponseDto findById(Long id) {
-        return runGoalRepository.findById(id)
+        RunGoalEntity entity = runGoalRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("러닝 목표를 찾을 수 없습니다."));
+
+        return entityToDto(entity);
+    }
+
+
+    public List<RunGoalResponseDto> findByUserId(Long id) {
+        List<RunGoalEntity> runGoals= runGoalRepository.findByUserId_Id(id);
+        return runGoals.stream()
             .map(this::entityToDto)
-            .orElseThrow(() -> new RuntimeException("RunGoal not found"));
+            .collect(Collectors.toList());
     }
 
     public RunGoalResponseDto createRunGoal(RunGoalRequestDto requestDto) {
         RunGoalEntity runGoalEntity = RunGoalEntity.builder()
-            .userId(memberRepository.findById(requestDto.getUserId()).orElseThrow(() -> new RuntimeException("Member not found")))
+            .userId(memberRepository.findById(requestDto.getUserId()).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다.")))
             .totalDistance(requestDto.getTotalDistance())
             .totalRunningTime(requestDto.getTotalRunningTime())
             .averagePace(requestDto.getAveragePace())
@@ -70,14 +81,19 @@ public class RunGoalService {
         return entityToDto(savedEntity);
     }
 
+
     public void deleteById(Long id) {
         runGoalRepository.deleteById(id);
     }
 
     private RunGoalResponseDto entityToDto(RunGoalEntity entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("러닝목표 엔티티는 빈 값일 수 없습니다.");
+        }
+
         return RunGoalResponseDto.builder()
             .id(entity.getId())
-            .userId(entity.getUserId().getId())
+            .userId(entity.getUserId() != null ? entity.getUserId().getId() : null) // Null check added
             .totalDistance(entity.getTotalDistance())
             .totalRunningTime(entity.getTotalRunningTime())
             .averagePace(entity.getAveragePace())
@@ -87,4 +103,6 @@ public class RunGoalService {
             .updatedAt(entity.getUpdatedAt())
             .build();
     }
+
+
 }

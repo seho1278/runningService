@@ -26,10 +26,9 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.CrewMemberRepository;
-import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.MemberRepository;
-import com.example.runningservice.repository.RegularRunMeetingRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -54,8 +53,8 @@ class ActivityServiceTest {
     private CrewMemberRepository crewMemberRepository;
     @Mock
     private MemberRepository memberRepository;
-    @Mock
-    private RegularRunMeetingRepository regularRunMeetingRepository;
+    /*@Mock
+    private RegularRunMeetingRepository regularRunMeetingRepository;*/
     @InjectMocks
     private ActivityService activityService;
 
@@ -65,31 +64,32 @@ class ActivityServiceTest {
         // given
         Long userId = 1L;
         Long crewId = 10L;
-        Long regularId = 22L;
+        // Long regularId = 22L;
 
         ActivityRequestDto.Create activityDto = mock(ActivityRequestDto.Create.class);
-        when(activityDto.getRegularId()).thenReturn(regularId);
+        // when(activityDto.getRegularId()).thenReturn(regularId);
+        when(activityDto.getCategory()).thenReturn(ActivityCategory.REGULAR);
 
         CrewMemberEntity crewMemberEntity = CrewMemberEntity.builder()
             .role(CrewRole.LEADER)
             .build();
-        RegularRunMeetingEntity regularEntity = RegularRunMeetingEntity.builder()
+        /*RegularRunMeetingEntity regularEntity = RegularRunMeetingEntity.builder()
             .id(regularId)
-            .build();
+            .build();*/
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(mock(CrewEntity.class)));
         given(memberRepository.findById(userId)).willReturn(Optional.of(mock(MemberEntity.class)));
         given(crewMemberRepository.findByCrew_IdAndMember_Id(crewId, userId)).willReturn(
             Optional.of(crewMemberEntity));
-        given(regularRunMeetingRepository.findById(activityDto.getRegularId())).willReturn(
-            Optional.of(regularEntity));
+        /*given(regularRunMeetingRepository.findById(activityDto.getRegularId())).willReturn(
+            Optional.of(regularEntity));*/
 
         // when
         ActivityResponseDto response = activityService.createRegularActivity(userId, crewId,
             activityDto);
 
         // then
-        assertEquals(response.getRegularId(), regularId);
+        // assertEquals(response.getRegularId(), regularId);
         assertEquals(response.getCategory(), ActivityCategory.REGULAR);
         assertEquals(response.getParticipant(), 0);
     }
@@ -129,6 +129,7 @@ class ActivityServiceTest {
         Long crewId = 10L;
 
         ActivityRequestDto.Create activityDto = mock(ActivityRequestDto.Create.class);
+        when(activityDto.getCategory()).thenReturn(ActivityCategory.ON_DEMAND);
 
         MemberEntity memberEntity = MemberEntity.builder().build();
 
@@ -163,6 +164,7 @@ class ActivityServiceTest {
                 .id(regularId)
                 .build())
             .author(memberEntity)
+            .category(ActivityCategory.REGULAR)
             .build();
         CrewMemberEntity crewMemberEntity = CrewMemberEntity.builder()
             .role(CrewRole.LEADER)
@@ -197,6 +199,7 @@ class ActivityServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(userId).nickName("nick").build();
         ActivityEntity activityEntity = ActivityEntity.builder()
             .author(memberEntity)
+            .category(ActivityCategory.ON_DEMAND)
             .build();
 
         given(activityRepository.findById(activityId)).willReturn(Optional.of(activityEntity));
@@ -226,6 +229,7 @@ class ActivityServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(authorId).nickName("nick").build();
         ActivityEntity activityEntity = ActivityEntity.builder()
             .author(memberEntity)
+            .category(ActivityCategory.ON_DEMAND)
             .build();
 
         given(activityRepository.findById(activityId)).willReturn(Optional.of(activityEntity));
@@ -294,6 +298,7 @@ class ActivityServiceTest {
         ActivityEntity activityEntity = ActivityEntity.builder()
             .participant(participants)
             .author(memberEntity)
+            .category(ActivityCategory.REGULAR)
             .regularRun(mock(RegularRunMeetingEntity.class))
             .build();
         given(activityRepository.findById(activityId)).willReturn(Optional.of(activityEntity));
@@ -332,6 +337,7 @@ class ActivityServiceTest {
         ActivityFilterDto equalDate = ActivityFilterDto.builder()
             .startDate(LocalDate.now())
             .endDate(LocalDate.now())
+            .category(ActivityCategory.ON_DEMAND)
             .build();
         MemberEntity memberEntity = MemberEntity.builder().nickName("nick").build();
         Pageable pageable = mock(Pageable.class);
@@ -339,17 +345,17 @@ class ActivityServiceTest {
             List.of(ActivityEntity.builder().author(memberEntity).build(),
                 ActivityEntity.builder().author(memberEntity).build()));
 
-        given(activityRepository.findByCrew_IdAndDateBetween(crewId,
-            equalDate.getStartDate(), equalDate.getEndDate(), pageable)).willReturn(
-            activityList);
+        given(activityRepository.findByCrewIdAndCategoryAndDateBetween(crewId,
+            equalDate.getCategory(), equalDate.getStartDate(), equalDate.getEndDate(), pageable))
+            .willReturn(activityList);
 
         // when
         List<ActivityResponseDto> response = activityService.getCrewActivityByDate(crewId,
             equalDate, pageable);
 
         // then
-        verify(activityRepository, times(1)).findByCrew_IdAndDateBetween(
-            crewId, equalDate.getStartDate(), equalDate.getEndDate(), pageable);
+        verify(activityRepository, times(1)).findByCrewIdAndCategoryAndDateBetween(
+            crewId, equalDate.getCategory(), equalDate.getStartDate(), equalDate.getEndDate(), pageable);
         assertEquals(response.size(), activityList.getSize());
     }
 }

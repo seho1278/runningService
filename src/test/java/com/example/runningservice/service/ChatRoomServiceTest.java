@@ -10,7 +10,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.runningservice.dto.chat.ChatRoomDetailsDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -18,17 +17,15 @@ import com.example.runningservice.entity.chat.ChatJoinEntity;
 import com.example.runningservice.entity.chat.ChatRoomEntity;
 import com.example.runningservice.enums.ChatRoom;
 import com.example.runningservice.enums.CrewRole;
-import com.example.runningservice.repository.CrewMemberRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.chat.MessageRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -317,9 +314,8 @@ public class ChatRoomServiceTest {
             .build();
 
         ChatJoinEntity chatJoinEntity = new ChatJoinEntity();
-        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
-        when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
-        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity)).thenReturn(chatJoinEntity);
+        
+        when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberAEntity.getId())).thenReturn(chatJoinEntity);
 
         doNothing().when(chatJoinRepository).delete(any(ChatJoinEntity.class));
 
@@ -353,9 +349,9 @@ public class ChatRoomServiceTest {
         ChatJoinEntity adminChatJoinEntity = new ChatJoinEntity();
         ChatJoinEntity memberChatJoinEntity = new ChatJoinEntity();
 
-        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity))
+        when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberAEntity.getId()))
             .thenReturn(adminChatJoinEntity);
-        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberBEntity))
+        when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberBEntity.getId()))
             .thenReturn(memberChatJoinEntity);
         doNothing().when(chatJoinRepository).delete(memberChatJoinEntity);
 
