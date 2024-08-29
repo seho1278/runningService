@@ -1,10 +1,27 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/app
+REPOSITORY=/home/ubuntu
+PROJECT_NAME=wadadakBackend
 
-CURRENT_PID=$(pgrep -fla java | grep hayan | awk '{print $1}')
+cd $REPOSITORY/$PROJECT_NAME/
 
-echo "현재 구동 중인 애플리케이션 pid: $CURRENT_PID"
+echo "> Git Pull"
+git pull
+
+echo "> project build start"
+./gradlew build
+
+echo "> directory 이동"
+cd $REPOSITORY
+
+echo "> build 파일 복사"
+cp $REPOSITORY/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/
+
+echo "> 현재 구동 중인 애플리케이션 pid 확인"
+
+CURRENT_PID=$(pgrep -f ${PROJECT_NAME}.*.jar)
+
+echo "> 현재 구동 중인 애플리케이션 pid: $CURRENT_PID"
 
 if [ -z "$CURRENT_PID" ]; then
   echo "현재 구동 중인 애플리케이션이 없으므로 종료하지 않습니다."
@@ -16,14 +33,7 @@ fi
 
 echo "> 새 애플리케이션 배포"
 
-JAR_NAME=$(ls -tr $REPOSITORY/*SNAPSHOT.jar | tail -n 1)
+JAR_NAME=$(ls -tr $REPOSITORY/ | grep jar | tail -n 1
 
-echo "> JAR NAME: $JAR_NAME"
-
-echo "> $JAR_NAME 에 실행권한 추가"
-
-chmod +x $JAR_NAME
-
-echo "> $JAR_NAME 실행"
-
-nohup java -jar -Duser.timezone=Asia/Seoul $JAR_NAME >> $REPOSITORY/nohup.out 2>&1 &
+echo "> Jar Name: $JAR_NAME"
+nohup java -jar $REPOSITORY/$JAR_NAME 2>&1 &
