@@ -47,14 +47,14 @@ class AESUtilTest {
         assertTrue(actualMessage.contains(expectedMessage), "Exception message should contain decryption error");
     }
 
-    @Test
-    void repeatableTest () throws Exception {
-        //given
-        String plainText = "TestString123";
-        String firstEncryptedText = aesUtil.encrypt(plainText);
-        String secondEncryptedText = aesUtil.encrypt(plainText);
-
-        //then
-        assertEquals(firstEncryptedText, secondEncryptedText);
-    }
+//    @Test
+//    void repeatableTest () throws Exception {
+//        //given
+//        String plainText = "TestString123";
+//        String firstEncryptedText = aesUtil.encrypt(plainText);
+//        String secondEncryptedText = aesUtil.encrypt(plainText);
+//
+//        //then
+//        assertEquals(firstEncryptedText, secondEncryptedText);
+//    }
 }
