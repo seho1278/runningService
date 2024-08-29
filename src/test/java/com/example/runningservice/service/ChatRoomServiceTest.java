@@ -316,7 +316,7 @@ public class ChatRoomServiceTest {
         ChatJoinEntity chatJoinEntity = new ChatJoinEntity();
         when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
         when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
-        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity)).thenReturn(chatJoinEntity);
+        when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberAEntity.getId())).thenReturn(chatJoinEntity);
 
         doNothing().when(chatJoinRepository).delete(any(ChatJoinEntity.class));
 
@@ -350,9 +350,9 @@ public class ChatRoomServiceTest {
         ChatJoinEntity adminChatJoinEntity = new ChatJoinEntity();
         ChatJoinEntity memberChatJoinEntity = new ChatJoinEntity();
 
-        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberAEntity))
+        when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberAEntity.getId()))
             .thenReturn(adminChatJoinEntity);
-        when(chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberBEntity))
+        when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberBEntity.getId()))
             .thenReturn(memberChatJoinEntity);
         doNothing().when(chatJoinRepository).delete(memberChatJoinEntity);
 

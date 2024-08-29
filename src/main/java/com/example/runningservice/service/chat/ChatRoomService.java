@@ -179,9 +179,9 @@ public class ChatRoomService {
         MemberEntity adminEntity = memberRepository.findMemberById(adminId);
 
         // 채팅방 참여중인지 확인
-        ChatJoinEntity memberChatJoinEntity = chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, memberEntity);
-        ChatJoinEntity adminChatJoinEntity = chatJoinRepository.findByChatRoomAndMember(chatRoomEntity, adminEntity);
-        if (memberChatJoinEntity == null || adminEntity == null) {
+        ChatJoinEntity memberChatJoinEntity = chatJoinRepository.findByChatRoom_IdAndMember_Id(roomId, memberId);
+        ChatJoinEntity adminChatJoinEntity = chatJoinRepository.findByChatRoom_IdAndMember_Id(roomId, adminId);
+        if (memberChatJoinEntity == null || adminChatJoinEntity == null) {
             throw new RuntimeException("멤버가 채팅방에 참여중이지 않습니다.");
         }
 
@@ -194,14 +194,14 @@ public class ChatRoomService {
 
     // 크루 멤버인지 확인
     public void validateCrewMember(CrewEntity crew, MemberEntity member) {
-        if (!crewMemberRepository.findByCrewAndMember(crew, member).isPresent()) {
+        if (crewMemberRepository.findByCrewAndMember(crew, member).isEmpty()) {
             throw new RuntimeException("해당 사용자가 크루에 가입되어 있지 않습니다.");
         }
     }
 
     public void validateCrewLeaderOrStaff(CrewEntity crew, MemberEntity member) {
         List<CrewRole> crewRoles = Arrays.asList(CrewRole.LEADER, CrewRole.STAFF);
-        if (!crewMemberRepository.findByCrewAndMemberAndRoleIn(crew, member, crewRoles).isPresent()) {
+        if (crewMemberRepository.findByCrewAndMemberAndRoleIn(crew, member, crewRoles).isEmpty()) {
             throw new RuntimeException("해당 멤버는 운영진이 아닙니다.");
         }
     }
