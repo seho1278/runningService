@@ -1,6 +1,5 @@
 package com.example.runningservice.service;
 
-
 import com.example.runningservice.dto.googleToken.GoogleAccessTokenRequestDto;
 import com.example.runningservice.dto.googleToken.GoogleAccessTokenResponseDto;
 import com.example.runningservice.dto.googleToken.GoogleAccountProfileResponseDto;
@@ -10,7 +9,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.security.auth.login.LoginException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-@RequiredArgsConstructor
 public class OAuth2Service {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
@@ -36,6 +34,11 @@ public class OAuth2Service {
     private String profileUrl;
 
     private final RestTemplate restTemplate;
+
+    @Autowired
+    public OAuth2Service(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public GoogleAccountProfileResponseDto getGoogleAccountProfile(final String code) {
         final String accessToken = requestGoogleAccessToken(code);
@@ -68,7 +71,7 @@ public class OAuth2Service {
         }
     }
 
-    private GoogleAccountProfileResponseDto requestGoogleAccountProfile(final String accessToken) {
+    protected GoogleAccountProfileResponseDto requestGoogleAccountProfile(final String accessToken) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         final HttpEntity<GoogleAccessTokenRequestDto> httpEntity = new HttpEntity<>(headers);
