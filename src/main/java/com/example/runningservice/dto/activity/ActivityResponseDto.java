@@ -35,15 +35,14 @@ public class ActivityResponseDto {
         return ActivityResponseDto.builder()
             .activityId(activityEntity.getId())
             .author(activityEntity.getAuthor().getNickName())
-            .category((activityEntity.getRegularRun() != null) ?
-                ActivityCategory.REGULAR : ActivityCategory.ON_DEMAND)
+            .category(activityEntity.getCategory())
             .regularId((activityEntity.getRegularRun() != null) ?
                 activityEntity.getRegularRun().getId() : null)
             .title(activityEntity.getTitle())
             .date(activityEntity.getDate())
             .startTime(activityEntity.getStartTime())
             .endTime(activityEntity.getEndTime())
-            .memo(activityEntity.getNotes())
+            .memo(activityEntity.getMemo())
             .location(activityEntity.getLocation())
             .participant(
                 (activityEntity.getParticipant() != null) ?

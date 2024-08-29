@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,7 +43,7 @@ public class SecurityConfig {
                 request -> request.requestMatchers(
                         "/",
                         "/login/**",
-                        "/oauth/**",
+                        "/oauth/login",
                         "/user/signup/**",
                         "/api.mailgun.net/v3/**",
                         "/h2-console/**",
@@ -89,8 +90,7 @@ public class SecurityConfig {
                         response.getWriter().flush();
                     })
             )
-            // OAuth2 로그인 기능에 대한 여러 설정
-            .oauth2Login(oauth2 -> oauth2.loginPage("/oauth/login"));
+            .oauth2Login(Customizer.withDefaults());
         return http.build();
     }
 
