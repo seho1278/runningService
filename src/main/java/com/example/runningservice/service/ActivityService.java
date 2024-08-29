@@ -8,16 +8,14 @@ import com.example.runningservice.entity.ActivityEntity;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
-import com.example.runningservice.entity.RegularRunMeetingEntity;
 import com.example.runningservice.enums.ActivityCategory;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.repository.MemberRepository;
-import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class ActivityService {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
-    private final RegularRunMeetingRepository regularRunMeetingRepository;
+    // private final RegularRunMeetingRepository regularRunMeetingRepository;
     // private final NotificationService notificationService;
     // private final ActivityNotification activityNotification;
 
@@ -50,21 +48,13 @@ public class ActivityService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REGULAR_ACCESS);
         }
 
-        RegularRunMeetingEntity regularEntity = regularRunMeetingRepository.findById(
+        // 정기러닝 id 등록 방식은 현재 기능에서 제공하지 않음
+        /*RegularRunMeetingEntity regularEntity = regularRunMeetingRepository.findById(
                 activity.getRegularId())
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REGULAR_RUN));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REGULAR_RUN));*/
 
-        ActivityEntity activityEntity = ActivityEntity.builder()
-            .author(authorEntity)
-            .crew(crewEntity)
-            .regularRun(regularEntity)
-            .title(activity.getTitle())
-            .location(activity.getLocation())
-            .date(activity.getDate())
-            .notes(activity.getMemo())
-            .startTime(activity.getStartTime())
-            .endTime(activity.getEndTime())
-            .build();
+        ActivityEntity activityEntity = ActivityEntity.toEntity(
+            activity, authorEntity, crewEntity, null);
 
         activityRepository.save(activityEntity);
 
@@ -89,16 +79,8 @@ public class ActivityService {
         MemberEntity authorEntity = memberRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        ActivityEntity activityEntity = ActivityEntity.builder()
-            .author(authorEntity)
-            .crew(crewEntity)
-            .title(activity.getTitle())
-            .location(activity.getLocation())
-            .date(activity.getDate())
-            .notes(activity.getMemo())
-            .startTime(activity.getStartTime())
-            .endTime(activity.getEndTime())
-            .build();
+        ActivityEntity activityEntity = ActivityEntity.toEntity(
+            activity, authorEntity, crewEntity, null);
 
         activityRepository.save(activityEntity);
 
@@ -146,7 +128,7 @@ public class ActivityService {
     }
 
     private boolean isRegularRun(ActivityEntity activityEntity) {
-        return activityEntity.getRegularRun() != null;
+        return activityEntity.getCategory().equals(ActivityCategory.REGULAR);
     }
 
     /**
@@ -183,18 +165,16 @@ public class ActivityService {
     /**
      * 날짜별 크루 (정기/번개)러닝 일정 조회
      */
-    public List<ActivityResponseDto> getCrewActivityByDate(Long crewId, ActivityFilterDto activityFilter,
-        Pageable pageable) {
+    public List<ActivityResponseDto> getCrewActivityByDate(Long crewId,
+        ActivityFilterDto activityFilter, Pageable pageable) {
         if (!validateDate(activityFilter.getStartDate(), activityFilter.getEndDate())) {
             throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
         }
 
-        List<ActivityEntity> activityPage = (activityFilter.getCategory() != null) ?
-            activityFilter.getCategory().findByCrewIdAndDateBetween(activityRepository, crewId,
-                activityFilter.getStartDate(), activityFilter.getEndDate(), pageable)
-            :
-                ActivityCategory.ALL.findByCrewIdAndDateBetween(activityRepository, crewId,
-                    activityFilter.getStartDate(), activityFilter.getEndDate(), pageable);
+        List<ActivityEntity> activityPage = activityRepository.findByCrewIdAndCategoryAndDateBetween(
+                crewId, activityFilter.getCategory(), activityFilter.getStartDate(),
+                activityFilter.getEndDate(), pageable)
+            .getContent();
 
         return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
     }
@@ -204,12 +184,10 @@ public class ActivityService {
      */
     public List<ActivityResponseDto> getCrewActivity(Long crewId, ActivityCategory category,
         Pageable pageable) {
-        List<ActivityEntity> activityPage = (category != null) ?
-            category.findByCrewIdOrderByUpcomingDate(activityRepository, crewId,
-                LocalDate.now(), pageable)
-            :
-                ActivityCategory.ALL.findByCrewIdOrderByUpcomingDate(activityRepository, crewId,
-                    LocalDate.now(), pageable);
+        List<ActivityEntity> activityPage = activityRepository
+            .findByCrew_IdAndCategoryAndDateGreaterThanEqualOrderByDate(
+                crewId, category, LocalDate.now(), pageable)
+            .getContent();
 
         return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
     }
