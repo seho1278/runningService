@@ -61,8 +61,8 @@ jobs:
           AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           aws deploy create-deployment \
-          --application-name runningService \
-          --deployment-group-name wadadakBackend \
+          --application-name running-service-test-codedeploy-app \
+          --deployment-group-name running-service-test-codedeploy-deployment-group \
           --file-exists-behavior OVERWRITE \
           --s3-location bucket=zerobase-bucket-test,bundleType=zip,key=runningservicetest.zip \ 
           --region ap-northeast-2 
