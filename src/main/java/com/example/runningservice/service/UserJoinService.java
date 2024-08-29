@@ -191,11 +191,11 @@ public class UserJoinService {
             }
 
             int memberBirthYear = memberEntity.getBirthYear();
-            if (maxYear != null && memberBirthYear > maxYear) {
+            if (minYear != null && memberBirthYear > minYear) {
                 throw new CustomException(ErrorCode.AGE_RESTRICTION_NOT_MET);
             }
 
-            if (minYear != null && memberBirthYear < minYear) {
+            if (maxYear != null && memberBirthYear < maxYear) {
                 throw new CustomException(ErrorCode.AGE_RESTRICTION_NOT_MET);
             }
         }
