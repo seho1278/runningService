@@ -314,8 +314,7 @@ public class ChatRoomServiceTest {
             .build();
 
         ChatJoinEntity chatJoinEntity = new ChatJoinEntity();
-        when(memberRepository.findMemberById(memberAEntity.getId())).thenReturn(memberAEntity);
-        when(chatRoomRepository.findChatRoomById(chatRoomEntity.getId())).thenReturn(chatRoomEntity);
+        
         when(chatJoinRepository.findByChatRoom_IdAndMember_Id(chatRoomEntity.getId(), memberAEntity.getId())).thenReturn(chatJoinEntity);
 
         doNothing().when(chatJoinRepository).delete(any(ChatJoinEntity.class));
