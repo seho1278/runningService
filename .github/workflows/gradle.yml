@@ -64,5 +64,5 @@ jobs:
           --application-name running-service-test-codedeploy-app \
           --deployment-group-name running-service-test-codedeploy-deployment-group \
           --file-exists-behavior OVERWRITE \
-          --s3-location bucket=zerobase-bucket-test,bundleType=zip,key=runningservicetest.zip \ 
-          --region ap-northeast-2 
+          --s3-location bucket=zerobase-bucket-test,bundleType=zip,key=runningservicetest.zip \
+          --region ap-northeast-2
