@@ -42,7 +42,7 @@ jobs:
         run: cp ./scripts/*.sh ./deploy
 
       - name: Make zip file
-        run: zip -r ./runningservicetest.zip ./deploy
+        run: zip -r ./runningservice.zip ./deploy
         shell: bash
 
       - name: Configure AWS credentials
@@ -53,7 +53,7 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./runningservicetest.zip s3://$S3_BUCKET_NAME/
+        run: aws s3 cp --region ap-northeast-2 ./runningservice.zip s3://$S3_BUCKET_NAME/
 
       - name: Deploy
         env:
