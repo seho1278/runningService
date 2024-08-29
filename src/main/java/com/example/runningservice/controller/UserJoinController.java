@@ -46,7 +46,7 @@ public class UserJoinController {
     @GetMapping("user/join/apply/list")
     public ResponseEntity<Page<SimpleResponse>> getJoinApplications(
         @LoginUser Long userId, @RequestParam(required = false) JoinStatus status,
-        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
 
         GetApplicantsRequestDto joinApplicationsDto = GetApplicantsRequestDto.builder()
                 .status(status)
