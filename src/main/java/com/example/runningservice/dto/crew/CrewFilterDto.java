@@ -15,8 +15,8 @@ public class CrewFilterDto {
 
         private Region activityRegion;
         private CrewRole role;
-        private Integer minAge;
-        private Integer maxAge;
+        private Integer minYear;
+        private Integer maxYear;
         private Gender gender;
         private Boolean runRecordPublic;
         private Boolean leaderRequired;

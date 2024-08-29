@@ -146,6 +146,7 @@ public class UserJoinService {
         Gender requiredGender = crewEntity.getGender();
         Integer maxYear = crewEntity.getMaxYear();
         Integer minYear = crewEntity.getMinYear();
+      
         Long memberId = memberEntity.getId();
         Long crewId = crewEntity.getId();
         Boolean recordOpen = crewEntity.getRunRecordOpen();

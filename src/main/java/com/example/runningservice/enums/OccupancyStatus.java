@@ -13,7 +13,7 @@ public enum OccupancyStatus {
         public Page<CrewEntity> getCrewList(CrewRepository crewRepository,
             CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
             return crewRepository.findFullCrewList(crewFilter.getActivityRegion(),
-                crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
+                crewFilter.getMinYear(), crewFilter.getMaxYear(), crewFilter.getGender(),
                 crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired(), pageable);
         }
     },
@@ -22,7 +22,7 @@ public enum OccupancyStatus {
         public Page<CrewEntity> getCrewList(CrewRepository crewRepository,
             CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
             return crewRepository.findAvailableCrewList(crewFilter.getActivityRegion(),
-                crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
+                crewFilter.getMinYear(), crewFilter.getMaxYear(), crewFilter.getGender(),
                 crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired(), pageable);
         }
     },
@@ -31,7 +31,7 @@ public enum OccupancyStatus {
         public Page<CrewEntity> getCrewList(CrewRepository crewRepository,
             CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
             return crewRepository.findAllCrewList(crewFilter.getActivityRegion(),
-                crewFilter.getMinAge(), crewFilter.getMaxAge(), crewFilter.getGender(),
+                crewFilter.getMinYear(), crewFilter.getMaxYear(), crewFilter.getGender(),
                 crewFilter.getRunRecordPublic(), crewFilter.getLeaderRequired(), pageable);
         }
     };
