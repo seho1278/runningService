@@ -359,7 +359,6 @@ class UserJoinServiceTest {
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.MALE).genderVisibility(Visibility.PUBLIC).build();
         CrewEntity crewEntity = CrewEntity.builder().id(crewId).crewName("testCrewName")
-            .minYear(1994)
             .gender(Gender.FEMALE).leaderRequired(true).build(); // 필드들 초기화
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
@@ -382,7 +381,7 @@ class UserJoinServiceTest {
         Long crewId = 1L;
         Long userId = 2L;
         MemberEntity memberEntity = MemberEntity.builder().id(userId).email("testEmail")
-            .nickName("testNickName").birthYear(1994).birthYearVisibility(Visibility.PUBLIC)
+            .nickName("testNickName").birthYear(1996).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).genderVisibility(Visibility.PUBLIC).build();
         CrewEntity crewEntity = CrewEntity.builder()
             .id(crewId)
@@ -730,7 +729,7 @@ class UserJoinServiceTest {
         MemberEntity memberEntity = MemberEntity.builder().id(1L).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
-        CrewEntity crewEntity = CrewEntity.builder().id(2L).crewName("testCrewName").minYear(1994)
+        CrewEntity crewEntity = CrewEntity.builder().id(2L).crewName("testCrewName")
             .leaderRequired(true).build(); // 필드들 초기화
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder()
             .member(memberEntity)
@@ -768,7 +767,6 @@ class UserJoinServiceTest {
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
         CrewEntity crewEntity = CrewEntity.builder().id(crewId).crewName("testCrewName")
-            .minYear(1994)
             .leaderRequired(true).build(); // 필드들 초기화
 
         JoinApplyDto.Request joinApplyDto = JoinApplyDto.Request.builder().message("testMessage")
@@ -916,7 +914,6 @@ class UserJoinServiceTest {
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
         CrewEntity crewEntity = CrewEntity.builder().id(crewId).crewName("testCrewName")
-            .minYear(1994)
             .leaderRequired(true).build(); // 필드들 초기화
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder()
             .member(memberEntity)
