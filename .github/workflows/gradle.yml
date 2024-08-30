@@ -2,12 +2,12 @@ name: RunningService server CI/CD
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ develop ]
+    branches: [ master ]
 
 env:
-  S3_BUCKET_NAME: zerobase-bucket-test
+  S3_BUCKET_NAME: running-service
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
         run: cp ./scripts/*.sh ./deploy
 
       - name: Make zip file
-        run: zip -r ./runningservicetest.zip ./deploy
+        run: zip -r ./runningservice.zip ./deploy
         shell: bash
 
       - name: Configure AWS credentials
@@ -53,11 +53,11 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./runningservicetest.zip s3://$S3_BUCKET_NAME/
+        run: aws s3 cp --region ap-northeast-2 ./runningservice.zip s3://$S3_BUCKET_NAME/
 
       - name: Deploy
         env:
           AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run:
-          aws deploy create-deployment --application-name running-service-test-codedeploy-app --deployment-group-name running-service-test-codedeploy-deployment-group --file-exists-behavior OVERWRITE --s3-location bucket=zerobase-bucket-test,bundleType=zip,key=runningservicetest.zip --region ap-northeast-2
+          aws deploy create-deployment --application-name RunningServiceCodeDeployApplication --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name RunningServiceCodeDeployGroup --file-exists-behavior OVERWRITE --s3-location bucket=running-service,bundleType=zip,key=runningservice.zip --region ap-northeast-2
