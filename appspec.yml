@@ -14,6 +14,6 @@ permissions:
 
 hooks:
   ApplicationStart:
-    - location: scripts/deploy.sh
+    - location: /home/ubuntu/wadadakBackend/scripts/deploy.sh
       timeout: 300
       runas: ubuntu
