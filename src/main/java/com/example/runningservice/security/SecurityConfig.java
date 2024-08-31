@@ -73,7 +73,6 @@ public class SecurityConfig {
                     .hasAnyAuthority("ROLE_USER")
                     .anyRequest().authenticated())
             .csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
             .headers((headerConfig) -> headerConfig.frameOptions(FrameOptionsConfig::disable))
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
