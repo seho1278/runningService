@@ -24,8 +24,14 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
         @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,
         Pageable pageable);
 
+    @Query("SELECT a "
+        + "FROM ActivityEntity a "
+        + "WHERE a.date >= CURRENT_DATE "
+        + "AND (:category IS NULL OR a.category = :category)"
+        + "AND a.crew.id = :crewId ")
     Page<ActivityEntity> findByCrew_IdAndCategoryAndDateGreaterThanEqualOrderByDate(
-        Long crewId, ActivityCategory category, LocalDate startDate, Pageable pageable);
+        @Param("crewId") Long crewId, @Param("category") ActivityCategory category,
+        Pageable pageable);
 
     int countByCrew_Id(Long crewId);
 
