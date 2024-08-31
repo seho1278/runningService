@@ -109,7 +109,7 @@ public class SignupService {
      * s3에 회원 이미지 저장 :: user-{userId}로 저장
      */
     private String uploadFileAndReturnFileName(Long userId, MultipartFile userImage) {
-        if (userImage != null) {
+        if (userImage != null && !userImage.isEmpty()) {
             String fileName = "user-" + userId;
             s3FileUtil.putObject(fileName, userImage);
 
