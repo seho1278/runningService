@@ -25,8 +25,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
+@Builder
 @Table(name = "crew_member", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"member_id", "crew_id"})
 })
@@ -44,14 +44,27 @@ public class CrewMemberEntity {
     private CrewEntity crew;
     @Enumerated(EnumType.STRING)
     private CrewRole role;
+    private Integer roleOrder;
     @CreatedDate
     private LocalDateTime joinedAt;
+
+    @Builder
+    public CrewMemberEntity(Long id, MemberEntity member, CrewEntity crew, CrewRole role,
+        LocalDateTime joinedAt) {
+        this.id = id;
+        this.member = member;
+        this.crew = crew;
+        this.role = role;
+        this.roleOrder = role != null ? role.getOrder() : null;
+        this.joinedAt = joinedAt;
+    }
 
     public static CrewMemberEntity of(MemberEntity member, CrewEntity crew) {
         return CrewMemberEntity.builder()
             .member(member)
             .crew(crew)
             .role(CrewRole.MEMBER)
+            .roleOrder(CrewRole.MEMBER.getOrder())
             .build();
     }
 
@@ -59,10 +72,12 @@ public class CrewMemberEntity {
         if (newRole == this.role) {
             throw new CustomException(ErrorCode.ROLE_NOT_CHANGED);
         }
-            this.role = newRole;
+        this.role = newRole;
+        this.roleOrder = newRole.getOrder();
     }
 
     public void acceptLeaderRole() {
         this.role = CrewRole.LEADER;
+        this.roleOrder = CrewRole.LEADER.getOrder();
     }
 }
