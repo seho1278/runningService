@@ -13,6 +13,7 @@ import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class CrewMemberService {
     private final JoinApplicationRepository joinApplicationRepository;
     private final CrewMemberBlackListRepository crewMemberBlackListRepository;
     private final ChatJoinRepository chatJoinRepository;
+    private final JPAQueryFactory queryFactory;
 
     /**
      * 크루원 조회
@@ -50,8 +52,7 @@ public class CrewMemberService {
         if (filterDto.getCrewRole() == null
             && filterDto.getGender() == null && filterDto.getMaxYear() == null
             && filterDto.getMinYear() == null) {
-            return crewMemberRepository.findByCrew_IdOrderByRoleOrderAsc(crewId,
-                pageable);
+            return crewMemberRepository.findAllByOrderByRoleOrderAscJoinedAtAsc(pageable);
         }
 
         return crewMemberRepository.findAllByCrewIdAndFilter(crewId, filterDto, pageable);
