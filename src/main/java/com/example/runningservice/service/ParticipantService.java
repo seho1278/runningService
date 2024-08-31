@@ -9,8 +9,6 @@ import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.ActivityRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.ParticipantRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,21 +74,16 @@ public class ParticipantService {
      * 활동 참석자를 조회한다.
      */
     @Transactional
-    public List<ParticipantResponseDto> getActivityParticipant(Long activityId, Pageable pageable) {
+    public Page<ParticipantResponseDto> getActivityParticipant(Long activityId, Pageable pageable) {
         Page<ParticipantEntity> participantPage = participantRepository.findByActivity_Id(
             activityId, pageable);
 
-        List<ParticipantResponseDto> response = new ArrayList<>();
-        for (ParticipantEntity participant : participantPage) {
-            response.add(ParticipantResponseDto.builder()
-                .userId(participant.getMember().getId())
-                .activityId(activityId)
-                .nickName(participant.getMember().getNickName())
-                .birthYear(participant.getMember().getBirthYear())
-                .gender(participant.getMember().getGender())
-                .build());
-        }
-
-        return response;
+        return participantPage.map(entity -> ParticipantResponseDto.builder()
+            .userId(entity.getMember().getId())
+            .activityId(activityId)
+            .nickName(entity.getMember().getNickName())
+            .birthYear(entity.getMember().getBirthYear())
+            .gender(entity.getMember().getGender())
+            .build());
     }
 }

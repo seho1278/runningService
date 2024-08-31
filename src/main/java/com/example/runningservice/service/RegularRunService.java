@@ -9,11 +9,13 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,7 +81,7 @@ public class RegularRunService {
      * 크루별 정기러닝 정보 조회
      */
     @Transactional
-    public List<CrewRegularRunResponseDto> getRegularRunList(Pageable pageable) {
+    public Page<CrewRegularRunResponseDto> getRegularRunList(Pageable pageable) {
         // 갯수만큼 크루 ID를 조회하고, 크루 ID에 해당하는 모든 정기러닝 조회
         Page<CrewEntity> crewEntities = crewRepository.findAll(pageable);
 
@@ -97,25 +99,33 @@ public class RegularRunService {
                 )
             ));
 
-        return crewRegularMap.entrySet().stream()
+        return new PageImpl<>(crewRegularMap.entrySet().stream()
             .map(entry -> CrewRegularRunResponseDto.builder()
                 .crewId(entry.getKey())
                 .data(entry.getValue())
                 .build())
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()),
+            crewEntities.getPageable(),
+            crewEntities.getSize());
     }
 
     /**
      * 특정 크루의 정기러닝 정보 조회
      */
-    public CrewRegularRunResponseDto getCrewRegularRunList(Long crewId, Pageable pageable) {
+    public Map<String, Object> getCrewRegularRunList(Long crewId, Pageable pageable) {
         Page<RegularRunMeetingEntity> crewEntities = regularRunMeetingRepository.findByCrew_Id(
             crewId, pageable);
 
-        return CrewRegularRunResponseDto.builder()
+        // 구조가 바뀌므로 페이징 값은 따로 넣어줌
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalElements", crewEntities.getTotalElements());
+        response.put("totalPages", crewEntities.getTotalPages());
+        response.put("content", CrewRegularRunResponseDto.builder()
             .crewId(crewId)
-            .data(crewEntities.stream().map(RegularRunResponseDto::fromEntity).toList())
-            .build();
+            .data(crewEntities.getContent().stream().map(RegularRunResponseDto::fromEntity).toList())
+            .build());
+
+        return response;
     }
 
     /**

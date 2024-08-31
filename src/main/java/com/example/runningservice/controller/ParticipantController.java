@@ -4,8 +4,8 @@ import com.example.runningservice.aop.CrewRoleCheck;
 import com.example.runningservice.dto.activity.ParticipantResponseDto;
 import com.example.runningservice.service.ParticipantService;
 import com.example.runningservice.util.LoginUser;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,7 +47,7 @@ public class ParticipantController {
      */
     @GetMapping("/crew/{crewId}/activity/{activityId}/attendance")
     @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
-    public ResponseEntity<List<ParticipantResponseDto>> getActivityParticipant(
+    public ResponseEntity<Page<ParticipantResponseDto>> getActivityParticipant(
         @LoginUser Long userId,
         @PathVariable("crewId") Long crewId, @PathVariable("activityId") Long activityId,
         Pageable pageable) {
