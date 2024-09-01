@@ -4,6 +4,7 @@ import com.example.runningservice.service.LogoutService;
 import com.example.runningservice.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -103,10 +104,11 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
-            Arrays.asList("https://localhost:3000", "http://localhost:3001",
-                "http://localhost:3002"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+            Arrays.asList("http://localhost:3000", "http://localhost:3001",
+                "http://localhost:3002", "http://127.0.0.1:3000", "http://127.0.0.1:3001",
+                "http://127.0.0.1:3002"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
