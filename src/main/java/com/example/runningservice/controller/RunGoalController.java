@@ -3,6 +3,7 @@ package com.example.runningservice.controller;
 import com.example.runningservice.dto.runGoal.RunGoalRequestDto;
 import com.example.runningservice.dto.runGoal.RunGoalResponseDto;
 import com.example.runningservice.service.RunGoalService;
+import com.example.runningservice.util.LoginUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +31,9 @@ public class RunGoalController {
         return ResponseEntity.ok(runGoal);
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<RunGoalResponseDto>> getRunGoalByUserId(@PathVariable Long userId) {
-        List<RunGoalResponseDto> runGoals = runGoalService.findByUserId(userId);
+    @GetMapping("/my")
+    public ResponseEntity<List<RunGoalResponseDto>> getRunGoalByUserId(@LoginUser Long loginId) {
+        List<RunGoalResponseDto> runGoals = runGoalService.findByUserId(loginId);
         return ResponseEntity.ok(runGoals);
     }
 
