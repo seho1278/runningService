@@ -6,6 +6,7 @@ import com.example.runningservice.enums.Role;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -78,6 +79,9 @@ public class JwtUtil {
         } catch (IllegalArgumentException e) {
             log.error("JWT claims string is empty: {}", e.getMessage());
             throw new CustomException(ErrorCode.INVALID_TOKEN);
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token is expired: {}", e.getMessage());
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         }
     }
 

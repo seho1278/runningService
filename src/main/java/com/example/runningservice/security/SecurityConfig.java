@@ -58,7 +58,8 @@ public class SecurityConfig {
                         "/region",
                         "/posts/**",
                         "/crew",
-                        "/comments/**")
+                        "/comments/**",
+                        "/token/refresh/**")
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "/crew/*")
                     .permitAll().requestMatchers(
@@ -66,14 +67,13 @@ public class SecurityConfig {
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "/crew/*/activity")
                     .permitAll().requestMatchers(
-                        "/token/refresh/**",
                         "/posts/new",
                         "/comments/save",
                         "/crew/search/**",
                         "/logout",
                         "/crew/participate",
                         "/user/**",
-                        "crew/**")
+                        "/crew/**")
                     .hasAnyAuthority("ROLE_USER")
                     .anyRequest().authenticated())
             .csrf(AbstractHttpConfigurer::disable)

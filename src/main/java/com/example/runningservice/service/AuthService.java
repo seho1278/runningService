@@ -19,6 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final TokenBlackList tokenBlackList;
 
+    @Transactional
     public JwtResponse authenticate(LoginRequestDto loginRequestDto) throws Exception {
         //loginId와 비밀번호 일치여부 확인 (불일치 시 예외 발생)
         Authentication authentication = null;
@@ -67,6 +69,7 @@ public class AuthService {
         return new JwtResponse(accessJwt, refreshJwt);
     }
 
+    @Transactional
     public JwtResponse refreshToken(String refreshToken, Principal principal) {
         //refresh token 이 블랙리스트에 있는지 확인
         if (tokenBlackList.isListed(refreshToken)) {
