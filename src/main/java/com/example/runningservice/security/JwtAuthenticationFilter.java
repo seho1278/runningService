@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -15,12 +16,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-
 @RequiredArgsConstructor
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtUtil jwtUtil;
     private final String ACCESS_TOKEN_HEADER = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";
@@ -33,26 +33,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         HttpServletResponse response,
         FilterChain chain
     ) throws ServletException, IOException {
-        String accessJwt = resolveToken(request, ACCESS_TOKEN_HEADER);
-        log.debug("request path: {}", request.getRequestURI());
-        log.debug("accessJwt: {}", accessJwt);
-        if (accessJwt != null) {
-            if (!jwtUtil.isTokenExpired(accessJwt)) {
-                Authentication authentication = jwtUtil.getAuthentication(accessJwt);
-                log.info("Filtering request token Authentication: {}", authentication);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info(String.format("[%s] -> %s ",
-                    jwtUtil.extractEmail(accessJwt), request.getRequestURI())
-                );
-                // LoginUserResolver에서 request를 통해 가져오기 위해 토큰에서 id를 가져와 저장한다.
-                request.setAttribute("loginId", jwtUtil.extractUserId(accessJwt));
-            } else {
-                throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        try {
+            String accessJwt = resolveToken(request, ACCESS_TOKEN_HEADER);
+            log.debug("request path: {}", request.getRequestURI());
+            log.debug("accessJwt: {}", accessJwt);
+            if (accessJwt != null) {
+                if (!jwtUtil.isTokenExpired(accessJwt)) {
+                    Authentication authentication = jwtUtil.getAuthentication(accessJwt);
+                    log.info("Filtering request token Authentication: {}", authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    log.info(String.format("[%s] -> %s ",
+                        jwtUtil.extractEmail(accessJwt), request.getRequestURI())
+                    );
+                    // LoginUserResolver에서 request를 통해 가져오기 위해 토큰에서 id를 가져와 저장한다.
+                    request.setAttribute("loginId", jwtUtil.extractUserId(accessJwt));
+                } else {
+                    throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+                }
             }
+            log.info("Filtering request token: {}", accessJwt);
+            log.info("authentication: {}", SecurityContextHolder.getContext().getAuthentication());
+            chain.doFilter(request, response);
+        } catch (CustomException e) {
+            log.error("JWT authentication failed: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401 Unauthorized
+            response.setContentType("application/json; charset=UTF-8");  // 인코딩 설정
+            response.getWriter().write(
+                "{\"errorCode\": \"" + e.getErrorCode().name() + "\", \"message\": \""
+                    + e.getMessage() + "\"}");
+            response.getWriter().flush();
         }
-        log.info("Filtering request token: {}", accessJwt);
-        log.info("authentication: {}", SecurityContextHolder.getContext().getAuthentication());
-        chain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request, String header) {
