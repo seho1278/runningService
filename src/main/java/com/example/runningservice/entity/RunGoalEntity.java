@@ -1,6 +1,6 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.util.converter.BooleanToIntegerConverter;
+import com.example.runningservice.util.converter.DurationConverter;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,15 +37,15 @@ public class RunGoalEntity {
     private MemberEntity userId;
 
     private Integer totalDistance;
-    private String totalRunningTime;
+    private Integer totalRunningTime;
 
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private String averagePace;
-    @Convert(converter = BooleanToIntegerConverter.class)
+    @Convert(converter = DurationConverter.class)
+    private Duration averagePace;
     private Integer isPublic;
     private Integer runCount;
 }
