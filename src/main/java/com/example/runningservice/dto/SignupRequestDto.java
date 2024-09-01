@@ -81,7 +81,7 @@ public class SignupRequestDto {
     public MemberEntity toEntity(PasswordEncoder passwordEncoder, AESUtil aesUtil) throws Exception {
         return MemberEntity.builder()
             .email(email)
-            .emailVerified(false)
+            .emailVerified(true) //Todo 테스트 위해 true로 설정
             .password(passwordEncoder.encode(password))
             .phoneNumber(aesUtil.encrypt(phoneNumber))
             .phoneNumberHash(aesUtil.generateHash(phoneNumber))
