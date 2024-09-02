@@ -1,6 +1,7 @@
 package com.example.runningservice.dto.crew;
 
 import com.example.runningservice.entity.CrewEntity;
+import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.Region;
 import java.util.List;
@@ -18,7 +19,9 @@ public class CrewRoleResponseDto extends CrewBaseResponseDto {
 
     private CrewRole role;
 
-    public static CrewRoleResponseDto fromEntity(CrewEntity crewEntity, CrewRole crewRole) {
+    public static CrewRoleResponseDto fromEntity(CrewMemberEntity crewMemberEntity) {
+        CrewEntity crewEntity = crewMemberEntity.getCrew();
+
         return CrewRoleResponseDto.builder()
             .crewId(crewEntity.getId())
             .leader(crewEntity.getLeader().getNickName())
@@ -31,7 +34,7 @@ public class CrewRoleResponseDto extends CrewBaseResponseDto {
             .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
                 .map(Region::getRegionName)
                 .orElse(null))
-            .role(crewRole)
+            .role(crewMemberEntity.getRole())
             .build();
     }
 }

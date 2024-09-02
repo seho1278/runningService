@@ -295,13 +295,13 @@ class CrewServiceTest {
         given(crewMemberRepository.findByMember_IdOrderByJoinedAt(loginId, pageable))
             .willReturn(result);
 
-        List<CrewRoleResponseDto> crewList = crewService.getParticipateCrewList(loginId, pageable);
+        Page<CrewRoleResponseDto> crewList = crewService.getParticipateCrewList(loginId, pageable);
 
-        assertEquals(crewList.size(), 2);
-        assertEquals(crewList.get(0).getCrewId(), 5);
-        assertEquals(crewList.get(0).getRole(), CrewRole.LEADER);
-        assertEquals(crewList.get(1).getCrewId(), 10);
-        assertEquals(crewList.get(1).getRole(), CrewRole.MEMBER);
+        assertEquals(crewList.getContent().size(), 2);
+        assertEquals(crewList.getContent().get(0).getCrewId(), 5);
+        assertEquals(crewList.getContent().get(0).getRole(), CrewRole.LEADER);
+        assertEquals(crewList.getContent().get(1).getCrewId(), 10);
+        assertEquals(crewList.getContent().get(1).getRole(), CrewRole.MEMBER);
     }
 
     @Test
@@ -325,13 +325,13 @@ class CrewServiceTest {
             .willReturn(result);
         given(memberRepository.findMemberById(loginId)).willReturn(member);
 
-        List<CrewJoinStatusResponseDto> response = crewService.getCrewList(loginId, crewInfo,
+        Page<CrewJoinStatusResponseDto> response = crewService.getCrewList(loginId, crewInfo,
             pageable);
 
         verify(crewRepository, times(1)).findFullCrewList(any(), any(), any(),
             any(), any(), any(), any());
-        assertEquals(response.size(), 2);
-        assertTrue(response.get(0).isJoined());
+        assertEquals(response.getContent().size(), 2);
+        assertTrue(response.getContent().get(0).isJoined());
     }
 
     @Test
@@ -353,12 +353,12 @@ class CrewServiceTest {
         given(crewRepository.findFullCrewList(any(), any(), any(), any(), any(), any(), any()))
             .willReturn(result);
 
-        List<CrewJoinStatusResponseDto> response = crewService.getCrewList(null, crewInfo,
+        Page<CrewJoinStatusResponseDto> response = crewService.getCrewList(null, crewInfo,
             pageable);
 
         verify(crewRepository, times(1)).findFullCrewList(any(), any(), any(),
             any(), any(), any(), any());
-        assertEquals(response.size(), 2);
-        assertFalse(response.get(0).isJoined());
+        assertEquals(response.getContent().size(), 2);
+        assertFalse(response.getContent().get(0).isJoined());
     }
 }

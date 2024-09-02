@@ -8,8 +8,8 @@ import com.example.runningservice.enums.ActivityCategory;
 import com.example.runningservice.service.ActivityService;
 import com.example.runningservice.util.LoginUser;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -84,7 +84,7 @@ public class ActivityController {
      */
     @GetMapping("/crew/{crewId}/activity/date")
     @CrewRoleCheck(role = {"LEADER", "MEMBER", "STAFF"})
-    public ResponseEntity<List<ActivityResponseDto>> getCrewActivityByDate(@LoginUser Long userId,
+    public ResponseEntity<Page<ActivityResponseDto>> getCrewActivityByDate(@LoginUser Long userId,
         @PathVariable("crewId") Long crewId, Pageable pageable,
         @RequestParam(value = "startDate", required = false) LocalDate startDate,
         @RequestParam(value = "endDate", required = false) LocalDate endDate,
@@ -102,7 +102,7 @@ public class ActivityController {
      * 다가오는 크루 (정기/번개)러닝 일정 조회
      */
     @GetMapping("/crew/{crewId}/activity")
-    public ResponseEntity<List<ActivityResponseDto>> getCrewActivity(@LoginUser Long userId,
+    public ResponseEntity<Page<ActivityResponseDto>> getCrewActivity(@LoginUser Long userId,
         @PathVariable("crewId") Long crewId, Pageable pageable,
         @RequestParam(value = "category", required = false) ActivityCategory category) {
 

@@ -12,6 +12,17 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CrewRegularRunResponseDto {
 
-    private Long crewId;
-    private List<RegularRunResponseDto> data;
+    private Object content;
+    private Integer totalPages;
+    private Long totalElements;
+
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    public static class Content {
+
+        private Long crewId;
+        private List<RegularRunResponseDto> data;
+    }
 }

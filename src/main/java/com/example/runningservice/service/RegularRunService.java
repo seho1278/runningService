@@ -1,6 +1,7 @@
 package com.example.runningservice.service;
 
 import com.example.runningservice.dto.regular_run.CrewRegularRunResponseDto;
+import com.example.runningservice.dto.regular_run.CrewRegularRunResponseDto.Content;
 import com.example.runningservice.dto.regular_run.RegularRunRequestDto;
 import com.example.runningservice.dto.regular_run.RegularRunResponseDto;
 import com.example.runningservice.entity.CrewEntity;
@@ -79,7 +80,7 @@ public class RegularRunService {
      * 크루별 정기러닝 정보 조회
      */
     @Transactional
-    public List<CrewRegularRunResponseDto> getRegularRunList(Pageable pageable) {
+    public CrewRegularRunResponseDto getRegularRunList(Pageable pageable) {
         // 갯수만큼 크루 ID를 조회하고, 크루 ID에 해당하는 모든 정기러닝 조회
         Page<CrewEntity> crewEntities = crewRepository.findAll(pageable);
 
@@ -97,12 +98,18 @@ public class RegularRunService {
                 )
             ));
 
-        return crewRegularMap.entrySet().stream()
-            .map(entry -> CrewRegularRunResponseDto.builder()
+        List<Content> content = crewRegularMap.entrySet().stream()
+            .map(entry -> CrewRegularRunResponseDto.Content.builder()
                 .crewId(entry.getKey())
                 .data(entry.getValue())
                 .build())
-            .collect(Collectors.toList());
+            .toList();
+
+        return CrewRegularRunResponseDto.builder()
+            .content(content)
+            .totalElements(crewEntities.getTotalElements())
+            .totalPages(crewEntities.getTotalPages())
+            .build();
     }
 
     /**
@@ -112,9 +119,16 @@ public class RegularRunService {
         Page<RegularRunMeetingEntity> crewEntities = regularRunMeetingRepository.findByCrew_Id(
             crewId, pageable);
 
-        return CrewRegularRunResponseDto.builder()
+        Content content = CrewRegularRunResponseDto.Content.builder()
             .crewId(crewId)
-            .data(crewEntities.stream().map(RegularRunResponseDto::fromEntity).toList())
+            .data(crewEntities
+                .map(RegularRunResponseDto::fromEntity)
+                .toList()).build();
+
+        return CrewRegularRunResponseDto.builder()
+            .totalPages(crewEntities.getTotalPages())
+            .totalElements(crewEntities.getTotalElements())
+            .content(content)
             .build();
     }
 

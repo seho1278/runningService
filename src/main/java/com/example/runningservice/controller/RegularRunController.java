@@ -6,7 +6,6 @@ import com.example.runningservice.dto.regular_run.RegularRunRequestDto;
 import com.example.runningservice.dto.regular_run.RegularRunResponseDto;
 import com.example.runningservice.service.RegularRunService;
 import com.example.runningservice.util.LoginUser;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +66,7 @@ public class RegularRunController {
      * 크루별 정기러닝 정보 조회
      */
     @GetMapping("/crew/regular")
-    public ResponseEntity<List<CrewRegularRunResponseDto>> getRegularRunList(Pageable pageable) {
+    public ResponseEntity<CrewRegularRunResponseDto> getRegularRunList(Pageable pageable) {
         return ResponseEntity.ok(regularRunService.getRegularRunList(pageable));
     }
 

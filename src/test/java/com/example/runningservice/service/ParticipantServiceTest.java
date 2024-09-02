@@ -100,12 +100,12 @@ class ParticipantServiceTest {
             participantPage);
 
         // when
-        List<ParticipantResponseDto> response = participantService.getActivityParticipant(
+        Page<ParticipantResponseDto> response = participantService.getActivityParticipant(
             activityId, pageable);
 
         // then
-        Assertions.assertEquals(response.size(), participantList.size());
-        Assertions.assertEquals(response.get(0).getNickName(), member1.getNickName());
-        Assertions.assertEquals(response.get(1).getNickName(), member2.getNickName());
+        Assertions.assertEquals(response.getContent().size(), participantList.size());
+        Assertions.assertEquals(response.getContent().get(0).getNickName(), member1.getNickName());
+        Assertions.assertEquals(response.getContent().get(1).getNickName(), member2.getNickName());
     }
 }

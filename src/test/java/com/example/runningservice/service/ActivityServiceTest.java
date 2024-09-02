@@ -350,12 +350,13 @@ class ActivityServiceTest {
             .willReturn(activityList);
 
         // when
-        List<ActivityResponseDto> response = activityService.getCrewActivityByDate(crewId,
+        Page<ActivityResponseDto> response = activityService.getCrewActivityByDate(crewId,
             equalDate, pageable);
 
         // then
         verify(activityRepository, times(1)).findByCrewIdAndCategoryAndDateBetween(
-            crewId, equalDate.getCategory(), equalDate.getStartDate(), equalDate.getEndDate(), pageable);
-        assertEquals(response.size(), activityList.getSize());
+            crewId, equalDate.getCategory(), equalDate.getStartDate(), equalDate.getEndDate(),
+            pageable);
+        assertEquals(response.getContent().size(), activityList.getSize());
     }
 }

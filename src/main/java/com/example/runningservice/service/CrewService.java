@@ -26,7 +26,6 @@ import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepos
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -167,23 +166,17 @@ public class CrewService {
     /**
      * 참가 중인 크루 리스트 조회
      */
-    public List<CrewRoleResponseDto> getParticipateCrewList(Long loginId, Pageable pageable) {
-        Page<CrewMemberEntity> crewMemberEntities;
-        crewMemberEntities = crewMemberRepository.findByMember_IdOrderByJoinedAt(loginId, pageable);
+    public Page<CrewRoleResponseDto> getParticipateCrewList(Long loginId, Pageable pageable) {
+        Page<CrewMemberEntity> crewMemberEntities = crewMemberRepository
+            .findByMember_IdOrderByJoinedAt(loginId, pageable);
 
-        List<CrewRoleResponseDto> crewList = new ArrayList<>();
-        for (CrewMemberEntity crewMemberEntity : crewMemberEntities) {
-            crewList.add(CrewRoleResponseDto.fromEntity(
-                crewMemberEntity.getCrew(), crewMemberEntity.getRole()));
-        }
-
-        return crewList;
+        return crewMemberEntities.map(CrewRoleResponseDto::fromEntity);
     }
 
     /**
      * 전체 크루 필터링 조회
      */
-    public List<CrewJoinStatusResponseDto> getCrewList(Long loginId,
+    public Page<CrewJoinStatusResponseDto> getCrewList(Long loginId,
         CrewFilterDto.CrewInfo crewFilter, Pageable pageable) {
 
         // 로그인을 했고 따로 입력한 지역 정보가 없으면 회원이 설정한 지역 기반으로 조회한다.
@@ -200,13 +193,8 @@ public class CrewService {
             crewFilter.getOccupancyStatus().getCrewList(crewRepository, crewFilter, pageable) :
             OccupancyStatus.ALL.getCrewList(crewRepository, crewFilter, pageable);
 
-        List<CrewJoinStatusResponseDto> crewList = new ArrayList<>();
-        for (CrewEntity crewEntity : crewEntityList.getContent()) {
-            crewList.add(CrewJoinStatusResponseDto.fromEntity(crewEntity,
-                checkJoinedCrew(crewEntity.getCrewMember(), loginId)));
-        }
-
-        return crewList;
+        return crewEntityList.map(entity -> CrewJoinStatusResponseDto.fromEntity(entity,
+            checkJoinedCrew(entity.getCrewMember(), loginId)));
     }
 
     // 사용자의 활동 지역 조회
@@ -222,12 +210,7 @@ public class CrewService {
             return false;
         }
 
-        for (CrewMemberEntity crewMemberEntity : crewMemberList) {
-            if (crewMemberEntity.getMember().getId().equals(userId)) {
-                return true;
-            }
-        }
-
-        return false;
+        return crewMemberList.stream()
+            .anyMatch(crewMemberEntity -> crewMemberEntity.getMember().getId().equals(userId));
     }
 }
