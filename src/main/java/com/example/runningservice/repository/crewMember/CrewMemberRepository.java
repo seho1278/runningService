@@ -31,4 +31,8 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
     List<CrewMemberEntity> findByCrew(CrewEntity crew);
 
     Page<CrewMemberEntity> findAllByOrderByRoleOrderAscJoinedAtAsc(Pageable pageable);
+
+    List<CrewMemberEntity> findAllByMember_Id(Long memberId);
+
+    void deleteAllByMember_Id(Long memberId);
 }

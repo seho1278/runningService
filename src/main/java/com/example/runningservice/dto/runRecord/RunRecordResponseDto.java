@@ -14,7 +14,7 @@ public class RunRecordResponseDto {
     private String totalRunningTime;
     private String averagePace;
     private Integer distance;
-    private Duration runningTime;
+    private Integer runningTime;
     private Duration pace;
     private Integer isPublic;
     private Integer runCount;

@@ -67,18 +67,17 @@ public class RunRecordService {
             .findById(runningId)
             .orElseThrow(() -> new NoSuchElementException("해당 기록을 찾을 수 없습니다."));
 
-        // 빌더 패턴을 사용하여 새 객체를 생성합니다.
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
-            .id(existingEntity.getId()) // 기존 ID 유지
-            .userId(existingEntity.getUserId()) // 기존 사용자 유지
-            .goalId(runGoalRepository.getReferenceById(requestDto.getGoalId())) // 새로운 목표 설정
-            .distance(requestDto.getDistance()) // 거리 설정
-            .runningTime(requestDto.getRunningTime()) // 실행 시간 설정
-            .pace(requestDto.getPace()) // 페이스 설정
-            .createdAt(existingEntity.getCreatedAt()) // 생성 일자 유지
-            .updatedAt(LocalDateTime.now()) // 현재 시간으로 업데이트
-            .isPublic(requestDto.getIsPublic()) // 공개 여부 설정
-            .build(); // 빌더 패턴으로 객체 생성
+            .id(existingEntity.getId())
+            .userId(existingEntity.getUserId())
+            .goalId(runGoalRepository.getReferenceById(requestDto.getGoalId()))
+            .distance(requestDto.getDistance())
+            .runningTime(requestDto.getRunningTime())
+            .pace(requestDto.getPace())
+            .createdAt(existingEntity.getCreatedAt())
+            .updatedAt(LocalDateTime.now())
+            .isPublic(requestDto.getIsPublic())
+            .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(updatedEntity);
         return entityToDto(savedEntity);
@@ -104,9 +103,9 @@ public class RunRecordService {
             .mapToInt(RunRecordEntity::getDistance)
             .sum();
 
-        Duration totalRunningTime = runRecords.stream()
-            .map(RunRecordEntity::getRunningTime)
-            .reduce(Duration.ZERO, Duration::plus);
+        int totalRunningTime = runRecords.stream()
+            .mapToInt(RunRecordEntity::getRunningTime)
+            .sum();
 
         Duration totalPace = runRecords.stream()
             .map(RunRecordEntity::getPace)
