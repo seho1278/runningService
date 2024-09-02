@@ -18,6 +18,6 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
 
 
 
-    List<MessageEntity> findByChatJoin(ChatJoinEntity chatJoin);
+    List<MessageEntity> findAllByChatJoin(ChatJoinEntity chatJoin);
 
 }
