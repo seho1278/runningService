@@ -103,6 +103,4 @@ public class RunGoalService {
             .updatedAt(entity.getUpdatedAt())
             .build();
     }
-
-
 }
