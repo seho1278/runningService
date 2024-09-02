@@ -25,4 +25,6 @@ public interface JoinApplicationRepository extends JpaRepository<JoinApplyEntity
     Optional<JoinApplyEntity> findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(Long userId, Long crewId);
 
     void deleteByCrew_Id(Long crewId);
+
+    void deleteAllByMember_Id(Long memberId);
 }

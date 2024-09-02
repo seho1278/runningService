@@ -159,7 +159,7 @@ public class ChatRoomService {
             throw new RuntimeException("멤버가 채팅방에 참여중이지 않습니다.");
         }
 
-        List<MessageEntity> messages = messageRepository.findByChatJoin(chatJoinEntity);
+        List<MessageEntity> messages = messageRepository.findAllByChatJoin(chatJoinEntity);
         for (MessageEntity message : messages) {
             message.setChatJoinNull(null);
         }

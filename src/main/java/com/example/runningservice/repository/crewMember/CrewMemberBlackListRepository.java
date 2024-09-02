@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface CrewMemberBlackListRepository extends JpaRepository<CrewMemberBlackListEntity, Long> {
 
     void deleteByCrew_Id(Long crewId);
+
+    void deleteAllByMember_Id(Long memberId);
 }
