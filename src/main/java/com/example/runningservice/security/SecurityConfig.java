@@ -4,6 +4,7 @@ import com.example.runningservice.service.LogoutService;
 import com.example.runningservice.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
