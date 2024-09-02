@@ -6,6 +6,7 @@ import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.MemberRepository;
+import java.time.Duration;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,8 +48,8 @@ class RunGoalServiceTest {
             .id(1L)
             .userId(memberEntity)
             .totalDistance(100)
-            .totalRunningTime("01:00:00")
-            .averagePace("06:00")
+            .totalRunningTime(3600)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .createdAt(LocalDateTime.now())
@@ -78,8 +79,8 @@ class RunGoalServiceTest {
             .id(id)
             .userId(memberEntity) // 널값 체크
             .totalDistance(100)
-            .totalRunningTime("10:00:00")
-            .averagePace("5:00")
+            .totalRunningTime(3600)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .createdAt(LocalDateTime.now())
@@ -114,8 +115,8 @@ class RunGoalServiceTest {
         RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
             .userId(1L)
             .totalDistance(100)
-            .totalRunningTime("01:00:00")
-            .averagePace("06:00")
+            .totalRunningTime(3600)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .build();
@@ -142,8 +143,8 @@ class RunGoalServiceTest {
             .id(id)
             .userId(memberEntity)
             .totalDistance(100)
-            .totalRunningTime("05:00:00")
-            .averagePace("5:00")
+            .totalRunningTime(3600)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .createdAt(LocalDateTime.now())
@@ -154,8 +155,8 @@ class RunGoalServiceTest {
             .id(id)
             .userId(memberEntity)
             .totalDistance(150)
-            .totalRunningTime("06:00:00")
-            .averagePace("4:30")
+            .totalRunningTime(18000)
+            .averagePace(Duration.ofMinutes(5))
             .isPublic(1)
             .runCount(12)
             .createdAt(existingEntity.getCreatedAt())
@@ -167,8 +168,8 @@ class RunGoalServiceTest {
 
         RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
             .totalDistance(150)
-            .totalRunningTime("06:00:00")
-            .averagePace("4:30")
+            .totalRunningTime(18000)
+            .averagePace(Duration.ofSeconds(270))
             .isPublic(1)
             .runCount(12)
             .build();
@@ -177,8 +178,8 @@ class RunGoalServiceTest {
 
         assertNotNull(responseDto);
         assertEquals(150, responseDto.getTotalDistance());
-        assertEquals("06:00:00", responseDto.getTotalRunningTime());
-        assertEquals("4:30", responseDto.getAveragePace());
+        assertEquals(18000, responseDto.getTotalRunningTime());
+        assertEquals(Duration.ofMinutes(5), responseDto.getAveragePace());
         assertEquals(1, responseDto.getIsPublic());
         assertEquals(12, responseDto.getRunCount());
         verify(runGoalRepository, times(1)).save(any(RunGoalEntity.class));

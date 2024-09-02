@@ -18,30 +18,30 @@ public class MemberController {
     private final MemberService memberService;
 
     // 사용자 정보 조회
-    @GetMapping("/{user_id}/profile")
-    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("user_id") Long userId) {
-        return ResponseEntity.ok(memberService.getMemberProfile(userId));
+    @GetMapping("/{member_id}/profile")
+    public ResponseEntity<MemberResponseDto> getMemberProfile(@PathVariable("member_id") Long memberId) {
+        return ResponseEntity.ok(memberService.getMemberProfile(memberId));
     }
 
     // 사용자 정보 수정
-    @PutMapping("/{user_id}/profile")
+    @PutMapping("/profile")
     public ResponseEntity<MemberResponseDto> updateMemberProfile(
-        @PathVariable("user_id") @LoginUser Long userId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) {
-        return ResponseEntity.ok(memberService.updateMemberProfile(userId, updateMemberRequestDto));
+        @LoginUser Long memberId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) {
+        return ResponseEntity.ok(memberService.updateMemberProfile(memberId, updateMemberRequestDto));
     }
 
     // 비밀번호 변경
-    @PutMapping("/{user_id}/password")
+    @PutMapping("/password")
     public ResponseEntity<Void> updateMemberPassword(
-        @PathVariable("user_id") @LoginUser Long userId, @RequestBody @Valid PasswordRequestDto passwordRequestDto) {
-        memberService.updateMemberPassword(userId, passwordRequestDto);
+        @LoginUser Long memberId, @RequestBody @Valid PasswordRequestDto passwordRequestDto) {
+        memberService.updateMemberPassword(memberId, passwordRequestDto);
         return ResponseEntity.ok().build();
     }
 
     // 회원 탈퇴
-    @DeleteMapping("/{user_id}")
-    public ResponseEntity<Void> deleteMember(@PathVariable("user_id") @LoginUser Long userId, @RequestBody DeleteRequestDto deleteRequestDto) {
-        memberService.deleteMember(userId, deleteRequestDto);
+    @DeleteMapping("")
+    public ResponseEntity<Void> deleteMember(@LoginUser Long memberId, @RequestBody DeleteRequestDto deleteRequestDto) {
+        memberService.deleteMember(memberId, deleteRequestDto);
         return ResponseEntity.ok().build();
     }
 }

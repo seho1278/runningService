@@ -1,6 +1,6 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.util.converter.BooleanToIntegerConverter;
+import com.example.runningservice.util.converter.DurationConverter;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -41,13 +41,13 @@ public class RunRecordEntity {
     private MemberEntity userId;
 
     private Integer distance;
+    @Convert(converter = DurationConverter.class)
     private Duration pace;
-    private Duration runningTime;
+    private Integer runningTime;
 
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    @Convert(converter = BooleanToIntegerConverter.class)
     private Integer isPublic;
 }

@@ -10,6 +10,13 @@ import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.repository.MemberRepository;
+import com.example.runningservice.repository.RunGoalRepository;
+import com.example.runningservice.repository.RunRecordRepository;
+import com.example.runningservice.repository.chat.ChatJoinRepository;
+import com.example.runningservice.repository.chat.MessageRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.S3FileUtil;
 import org.junit.jupiter.api.Test;
@@ -32,6 +39,27 @@ public class MemberServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private RunGoalRepository runGoalRepository;
+
+    @Mock
+    private RunRecordRepository runRecordRepository;
+
+    @Mock
+    private CrewMemberRepository crewMemberRepository;
+
+    @Mock
+    private CrewRepository crewRepository;
+
+    @Mock
+    private ChatJoinRepository chatJoinRepository;
+
+    @Mock
+    private MessageRepository messageRepository;
+
+    @Mock
+    private CrewMemberBlackListRepository crewMemberBlackListRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
