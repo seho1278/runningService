@@ -26,4 +26,4 @@ else
 fi
 
 echo "> 새 애플리케이션 배포"
-nohup java -jar ./$JAR_NAME > output.log 2>&1 &
+nohup java -jar $JAR_NAME > output.log 2>&1 &
