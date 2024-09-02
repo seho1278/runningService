@@ -13,8 +13,8 @@ import com.example.runningservice.enums.Region;
 import com.example.runningservice.service.CrewService;
 import com.example.runningservice.util.LoginUser;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +74,7 @@ public class CrewController {
      * 참가 중인 크루 리스트 조회
      */
     @GetMapping("/participate")
-    public ResponseEntity<List<CrewRoleResponseDto>> getParticipateCrewList(@LoginUser Long userId,
+    public ResponseEntity<Page<CrewRoleResponseDto>> getParticipateCrewList(@LoginUser Long userId,
         Pageable pageable) {
 
         return ResponseEntity.ok(crewService.getParticipateCrewList(userId, pageable));
@@ -84,7 +84,7 @@ public class CrewController {
      * 전체 크루 필터링 조회
      */
     @GetMapping
-    public ResponseEntity<List<CrewJoinStatusResponseDto>> getCrewList(@LoginUser Long userId,
+    public ResponseEntity<Page<CrewJoinStatusResponseDto>> getCrewList(@LoginUser Long userId,
         @RequestParam(value = "activityRegion", required = false) Region activityRegion,
         @RequestParam(value = "minYear", required = false) Integer minYear,
         @RequestParam(value = "maxYear", required = false) Integer maxYear,

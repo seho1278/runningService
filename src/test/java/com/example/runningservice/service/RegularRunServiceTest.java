@@ -9,13 +9,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.runningservice.dto.regular_run.CrewRegularRunResponseDto;
+import com.example.runningservice.dto.regular_run.CrewRegularRunResponseDto.Content;
 import com.example.runningservice.dto.regular_run.RegularRunRequestDto;
 import com.example.runningservice.dto.regular_run.RegularRunResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.RegularRunMeetingEntity;
 import com.example.runningservice.enums.Region;
-import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
+import com.example.runningservice.repository.crew.CrewRepository;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ class RegularRunServiceTest {
         when(regularRunDto.getCount()).thenReturn(2);
         when(regularRunDto.getWeek()).thenReturn(3);
         when(regularRunDto.getDayOfWeek()).thenReturn(List.of("월요일", "화요일"));
-        when(regularRunDto.getTime()).thenReturn(LocalTime.of(1,1));
+        when(regularRunDto.getTime()).thenReturn(LocalTime.of(1, 1));
         when(regularRunDto.getActivityRegion()).thenReturn(Region.SEOUL);
         CrewEntity mockCrewEntity = new CrewEntity();
         given(crewRepository.findById(crewId)).willReturn(Optional.of(mockCrewEntity));
@@ -93,7 +94,8 @@ class RegularRunServiceTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(regularRunDto.getActivityRegion().getRegionName(), response.getActivityRegion());
+        assertEquals(regularRunDto.getActivityRegion().getRegionName(),
+            response.getActivityRegion());
         assertEquals(List.of("월요일", "화요일"), response.getDayOfWeek());
     }
 
@@ -145,14 +147,16 @@ class RegularRunServiceTest {
         given(regularRunMeetingRepository.findByCrewIdIn(crewIdList)).willReturn(regularList);
 
         // When
-        List<CrewRegularRunResponseDto> response = regularRunService.getRegularRunList(pageable);
+        CrewRegularRunResponseDto response = regularRunService.getRegularRunList(pageable);
+        List<CrewRegularRunResponseDto.Content> content = (List<Content>) response.getContent();
 
         // Then
         assertNotNull(response);
-        assertEquals(2, response.size());
-        assertEquals(crewIdList.get(0), response.get(0).getCrewId());
-        assertEquals(1, response.get(0).getData().size());
-        assertEquals(Region.SEOUL.getRegionName(), response.get(0).getData().get(0).getActivityRegion());
+        assertEquals(content, response.getContent());
+        assertEquals(crewIdList.get(0), content.get(0).getCrewId());
+        assertEquals(1, content.get(0).getData().size());
+        assertEquals(Region.SEOUL.getRegionName(),
+            content.get(0).getData().get(0).getActivityRegion());
     }
 
     @Test
@@ -172,11 +176,12 @@ class RegularRunServiceTest {
         // when
         CrewRegularRunResponseDto result = regularRunService.getCrewRegularRunList(crewId,
             Pageable.unpaged());
+        CrewRegularRunResponseDto.Content content = (Content) result.getContent();
 
         // then
         assertNotNull(result);
-        assertEquals(crewId, result.getCrewId());
-        assertEquals(1, result.getData().size());
+        assertEquals(crewId, content.getCrewId());
+        assertEquals(1, content.getData().size());
         verify(regularRunMeetingRepository).findByCrew_Id(crewId, Pageable.unpaged());
     }
 

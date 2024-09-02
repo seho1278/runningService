@@ -17,8 +17,8 @@ import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -165,31 +165,29 @@ public class ActivityService {
     /**
      * 날짜별 크루 (정기/번개)러닝 일정 조회
      */
-    public List<ActivityResponseDto> getCrewActivityByDate(Long crewId,
+    public Page<ActivityResponseDto> getCrewActivityByDate(Long crewId,
         ActivityFilterDto activityFilter, Pageable pageable) {
         if (!validateDate(activityFilter.getStartDate(), activityFilter.getEndDate())) {
             throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
         }
 
-        List<ActivityEntity> activityPage = activityRepository.findByCrewIdAndCategoryAndDateBetween(
-                crewId, activityFilter.getCategory(), activityFilter.getStartDate(),
-                activityFilter.getEndDate(), pageable)
-            .getContent();
+        Page<ActivityEntity> activityPage = activityRepository.findByCrewIdAndCategoryAndDateBetween(
+            crewId, activityFilter.getCategory(), activityFilter.getStartDate(),
+            activityFilter.getEndDate(), pageable);
 
-        return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
+        return activityPage.map(ActivityResponseDto::fromEntity);
     }
 
     /**
      * 다가오는 크루 (정기/번개)러닝 일정 조회
      */
-    public List<ActivityResponseDto> getCrewActivity(Long crewId, ActivityCategory category,
+    public Page<ActivityResponseDto> getCrewActivity(Long crewId, ActivityCategory category,
         Pageable pageable) {
-        List<ActivityEntity> activityPage = activityRepository
+        Page<ActivityEntity> activityPage = activityRepository
             .findByCrew_IdAndCategoryAndDateGreaterThanEqualOrderByDate(
-                crewId, category, LocalDate.now(), pageable)
-            .getContent();
+                crewId, category, pageable);
 
-        return activityPage.stream().map(ActivityResponseDto::fromEntity).toList();
+        return activityPage.map(ActivityResponseDto::fromEntity);
     }
 
     // 시작 날짜가 종료 날짜보다 빠르거나 같은지 체크한다.
