@@ -3,7 +3,7 @@
 REPOSITORY=/home/ubuntu
 PROJECT_NAME=wadadakBackend
 
-JAR_NAME=$(ls -tr $REPOSITORY/$PROJECT_NAME/ | grep jar | tail -n 1)
+JAR_NAME=$(ls -tr $REPOSITORY/$PROJECT_NAME/*.jar | grep -v 'plain' | tail -n 1)
 echo "> Jar Name: $JAR_NAME"
 
 echo "> directory 이동"
