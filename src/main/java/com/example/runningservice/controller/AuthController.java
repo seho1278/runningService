@@ -38,8 +38,7 @@ public class AuthController {
 
     @PostMapping("/token/refresh")
     public ResponseEntity<String> refreshToken(
-        HttpServletRequest request, Principal principal,
-        HttpServletResponse response) {
+        HttpServletRequest request, HttpServletResponse response) {
 
         String refreshToken = extractTokenFromCookie(request);
 
@@ -47,7 +46,7 @@ public class AuthController {
             throw new CustomException(ErrorCode.NO_VALID_REFRESH_TOKEN);
         }
 
-        JwtResponse jwtResponse = authService.refreshToken(refreshToken, principal);
+        JwtResponse jwtResponse = authService.refreshToken(refreshToken);
 
         setResponseHeader(response, jwtResponse);
 
