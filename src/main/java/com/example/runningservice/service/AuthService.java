@@ -7,7 +7,6 @@ import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.security.CustomUserDetails;
 import com.example.runningservice.security.CustomUserDetailsService;
 import com.example.runningservice.util.JwtUtil;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -70,22 +69,25 @@ public class AuthService {
     }
 
     @Transactional
-    public JwtResponse refreshToken(String refreshToken, Principal principal) {
+    public JwtResponse refreshToken(String refreshToken) {
         //refresh token 이 블랙리스트에 있는지 확인
         if (tokenBlackList.isListed(refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         //토큰 유효성 검사(올바른 서명 & 유효기간)
-        String email = principal.getName();
-        if (!jwtUtil.validateToken(email, refreshToken)) {
+        if (jwtUtil.isTokenExpired(refreshToken)) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
 
         // 새로운 accessToken, refreshToken 생성
-        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
+        String email = jwtUtil.extractEmail(refreshToken);
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(
+            email);
         List<GrantedAuthority> authorities = new ArrayList<>(userDetails.getAuthorities());
-        final String newAccessToken = jwtUtil.generateToken(email, userDetails.getId(), authorities);
-        final String newRefreshToken = jwtUtil.generateRefreshToken(email, userDetails.getId(), authorities);
+        final String newAccessToken = jwtUtil.generateToken(email, userDetails.getId(),
+            authorities);
+        final String newRefreshToken = jwtUtil.generateRefreshToken(email, userDetails.getId(),
+            authorities);
 
         //기존 refreshToken을 blackList에 추가
         tokenBlackList.add(refreshToken);
