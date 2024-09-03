@@ -26,7 +26,7 @@ public class MemberController {
     // 사용자 정보 수정
     @PutMapping("/profile")
     public ResponseEntity<MemberResponseDto> updateMemberProfile(
-        @LoginUser Long memberId, @RequestBody @Valid UpdateMemberRequestDto updateMemberRequestDto) {
+        @LoginUser Long memberId, @Valid UpdateMemberRequestDto updateMemberRequestDto) {
         return ResponseEntity.ok(memberService.updateMemberProfile(memberId, updateMemberRequestDto));
     }
 

@@ -6,6 +6,7 @@ import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Role;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.util.AESUtil;
+import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,23 +38,24 @@ public class MemberResponseDto {
     private Visibility genderVisibility;
     private Visibility birthYearVisibility;
 
-    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil) {
+    public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil,
+        S3FileUtil s3FileUtil) {
 
         return MemberResponseDto.builder()
-                    .id(memberEntity.getId())
-                    .email(memberEntity.getEmail())
-                    .phoneNumber(aesUtil.decrypt(memberEntity.getPhoneNumber()))
-                    .name(memberEntity.getName())
-                    .nickName(memberEntity.getNickName())
-                    .birthYear(memberEntity.getBirthYear())
-                    .gender(memberEntity.getGender())
-                    .roles(memberEntity.getRoles())
-                    .activityRegion(memberEntity.getActivityRegion())
-                    .imageUrl(memberEntity.getProfileImageUrl())
-                    .nameVisibility(memberEntity.getNameVisibility())
-                    .phoneNumberVisibility(memberEntity.getPhoneNumberVisibility())
-                    .genderVisibility(memberEntity.getGenderVisibility())
-                    .birthYearVisibility(memberEntity.getBirthYearVisibility())
-                    .build();
+            .id(memberEntity.getId())
+            .email(memberEntity.getEmail())
+            .phoneNumber(aesUtil.decrypt(memberEntity.getPhoneNumber()))
+            .name(memberEntity.getName())
+            .nickName(memberEntity.getNickName())
+            .birthYear(memberEntity.getBirthYear())
+            .gender(memberEntity.getGender())
+            .roles(memberEntity.getRoles())
+            .activityRegion(memberEntity.getActivityRegion())
+            .imageUrl(s3FileUtil.createPresignedUrl(memberEntity.getProfileImageUrl()))
+            .nameVisibility(memberEntity.getNameVisibility())
+            .phoneNumberVisibility(memberEntity.getPhoneNumberVisibility())
+            .genderVisibility(memberEntity.getGenderVisibility())
+            .birthYearVisibility(memberEntity.getBirthYearVisibility())
+            .build();
     }
 }
