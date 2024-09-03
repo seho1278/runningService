@@ -70,8 +70,9 @@ public class CrewController {
      * 크루 싱세 정보 조회
      */
     @GetMapping("/{crewId}")
-    public ResponseEntity<CrewDetailResponseDto> getCrew(@PathVariable("crewId") Long crewId) {
-        return ResponseEntity.ok(crewService.getCrew(crewId));
+    public ResponseEntity<CrewDetailResponseDto> getCrew(@LoginUser Long loginId,
+        @PathVariable("crewId") Long crewId) {
+        return ResponseEntity.ok(crewService.getCrew(loginId, crewId));
     }
 
     /**

@@ -250,21 +250,22 @@ class CrewServiceTest {
     @DisplayName("크루 상세 조회_성공")
     public void getCrew() {
         Long crewId = 1L;
+        Long userId = 2L;
         int runningCount = 20;
 
-        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        MemberEntity memberEntity = MemberEntity.builder().id(userId).nickName("hi").build();
         CrewEntity crewEntity = CrewEntity.builder()
             .id(crewId)
             .leader(memberEntity)
             .leaderRequired(true)
             .runRecordOpen(true)
-            .crewMember(List.of(CrewMemberEntity.builder().build()))
+            .crewMember(List.of(CrewMemberEntity.builder().member(memberEntity).build()))
             .build();
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
         given(activityRepository.countByCrew_Id(crewId)).willReturn(runningCount);
 
-        CrewDetailResponseDto detail = crewService.getCrew(crewId);
+        CrewDetailResponseDto detail = crewService.getCrew(userId, crewId);
 
         assertEquals(detail.getLeader(), "hi");
         assertEquals(detail.getCrewOccupancy(), 1);
@@ -331,7 +332,7 @@ class CrewServiceTest {
         verify(crewRepository, times(1)).findFullCrewList(any(), any(), any(),
             any(), any(), any(), any());
         assertEquals(response.getContent().size(), 2);
-        assertTrue(response.getContent().get(0).isJoined());
+        assertTrue(response.getContent().getFirst().isJoined());
     }
 
     @Test
@@ -359,6 +360,6 @@ class CrewServiceTest {
         verify(crewRepository, times(1)).findFullCrewList(any(), any(), any(),
             any(), any(), any(), any());
         assertEquals(response.getContent().size(), 2);
-        assertFalse(response.getContent().get(0).isJoined());
+        assertFalse(response.getContent().getFirst().isJoined());
     }
 }

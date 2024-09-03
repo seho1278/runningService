@@ -182,7 +182,9 @@ class SignupServiceTest {
         });
 
         String defaultImageUrl = "http://test-url.com/user-default";
+        String signedImageUrl = "http://signed-url.com/user-default";
         when(s3FileUtil.getImgUrl("user-default")).thenReturn(defaultImageUrl);
+        when(s3FileUtil.createPresignedUrl(defaultImageUrl)).thenReturn(signedImageUrl);
 
         // When
         MemberResponseDto responseDto = signupService.signup(signupRequestDto);
@@ -190,7 +192,7 @@ class SignupServiceTest {
         // Then
         verify(s3FileUtil, times(1)).getImgUrl("user-default");
         verify(s3FileUtil, never()).putObject(anyString(), any(MultipartFile.class));
-        assertEquals(defaultImageUrl, responseDto.getImageUrl());
+        assertEquals(signedImageUrl, responseDto.getImageUrl());
     }
 
     @Test

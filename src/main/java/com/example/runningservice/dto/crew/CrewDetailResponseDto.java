@@ -3,6 +3,8 @@ package com.example.runningservice.dto.crew;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
+import com.example.runningservice.repository.ActivityRepository;
+import com.example.runningservice.util.S3FileUtil;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,12 +20,14 @@ public class CrewDetailResponseDto extends CrewBaseResponseDto {
     private String description;
     private int runningCount;
     private Limit limit;
+    private boolean isJoined;
 
-    public static CrewDetailResponseDto fromEntity(CrewEntity crewEntity) {
+    public static CrewDetailResponseDto fromEntity(CrewEntity crewEntity, boolean isJoined,
+        ActivityRepository activityRepository, S3FileUtil s3FileUtil) {
         return CrewDetailResponseDto.builder()
             .crewId(crewEntity.getId())
             .crewName(crewEntity.getCrewName())
-            .crewImage(crewEntity.getCrewImage())
+            .crewImage(s3FileUtil.createPresignedUrl(crewEntity.getCrewImage()))
             .description(crewEntity.getDescription())
             .crewCapacity(crewEntity.getCrewCapacity())
             .activityRegion(Optional.ofNullable(crewEntity.getActivityRegion())
@@ -38,11 +42,9 @@ public class CrewDetailResponseDto extends CrewBaseResponseDto {
                 .build())
             .leader(crewEntity.getLeader().getNickName())
             .crewOccupancy(crewEntity.getCrewMember().size())
+            .runningCount(activityRepository.countByCrew_Id(crewEntity.getId()))
+            .isJoined(isJoined)
             .build();
-    }
-
-    public void setRunningCount(int runningCount) {
-        this.runningCount = runningCount;
     }
 
     @AllArgsConstructor

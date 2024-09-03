@@ -36,7 +36,7 @@ public class JwtUtil {
     private String secretStr;
     private SecretKey SECRET_KEY;
     private final Long REFRESH_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 7; //7일
-    private final Long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 1; //1분
+    private final Long ACCESS_TOKEN_EXPIRATION = 1000L * 60 * 60 * 24; //1일
 
     @PostConstruct
     public void init() {
