@@ -39,7 +39,7 @@ public class SignupService {
             registerForm.getProfileImage());
         memberEntity.updateProfileImageUrl(imageUrl);
 
-        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil);
+        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil, s3FileUtil);
     }
 
     @Transactional
@@ -134,6 +134,6 @@ public class SignupService {
 
         memberEntity.updateAdditionalInfo(form, aesUtil);
 
-        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil);
+        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil, s3FileUtil);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.runningservice.controller;
 
+import com.example.runningservice.aop.CrewRoleCheck;
 import com.example.runningservice.dto.crew.CrewBaseResponseDto;
 import com.example.runningservice.dto.crew.CrewCreateRequestDto;
 import com.example.runningservice.dto.crew.CrewDetailResponseDto;
@@ -48,17 +49,20 @@ public class CrewController {
     /**
      * 크루 정보 수정
      */
+    @CrewRoleCheck(role = {"LEADER", "STAFF"})
     @PutMapping("/{crewId}")
-    public ResponseEntity<CrewBaseResponseDto> updateCrew(@PathVariable("crewId") Long crewId,
-        @Valid CrewUpdateRequestDto request) {
+    public ResponseEntity<CrewBaseResponseDto> updateCrew(@LoginUser Long userId,
+        @PathVariable("crewId") Long crewId, @Valid CrewUpdateRequestDto request) {
         return ResponseEntity.ok(crewService.updateCrew(request, crewId));
     }
 
     /**
      * 크루 삭제
      */
+    @CrewRoleCheck(role = "LEADER")
     @DeleteMapping("/{crewId}")
-    public ResponseEntity<CrewBaseResponseDto> deleteCrew(@PathVariable("crewId") Long crewId) {
+    public ResponseEntity<CrewBaseResponseDto> deleteCrew(@LoginUser Long userId,
+        @PathVariable("crewId") Long crewId) {
         return ResponseEntity.ok(crewService.deleteCrew(crewId));
     }
 
@@ -66,8 +70,9 @@ public class CrewController {
      * 크루 싱세 정보 조회
      */
     @GetMapping("/{crewId}")
-    public ResponseEntity<CrewDetailResponseDto> getCrew(@PathVariable("crewId") Long crewId) {
-        return ResponseEntity.ok(crewService.getCrew(crewId));
+    public ResponseEntity<CrewDetailResponseDto> getCrew(@LoginUser Long loginId,
+        @PathVariable("crewId") Long crewId) {
+        return ResponseEntity.ok(crewService.getCrew(loginId, crewId));
     }
 
     /**

@@ -3,6 +3,11 @@ package com.example.runningservice.util;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 
 @Component
@@ -22,17 +31,25 @@ public class S3FileUtil {
 
     private final S3Client amazonS3Client;
 
-    @Value("${aws.s3.region}")
-    private String region;
-
     @Value("${aws.s3.bucketName}")
     private String bucketName;
+
+    private final Map<String, PresignedUrl> signedUrlCache = new HashMap<>();
+
+    private final Duration duration = Duration.ofMinutes(10);
+
+    @AllArgsConstructor
+    private static class PresignedUrl {
+
+        private String url;
+        private LocalDateTime expiration;
+    }
 
     /**
      * fileName을 이용해 이미지 url을 조회한다.
      */
     public String getImgUrl(String fileName) {
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
+        return fileName;
     }
 
     /**
@@ -66,5 +83,43 @@ public class S3FileUtil {
             .bucket(bucketName)
             .key(fileName)
             .build());
+    }
+
+    /**
+     * 인증된 파일 URL 조회
+     */
+    public String createPresignedUrl(String keyName) {
+        if (verifyUrl(keyName)) {
+            return signedUrlCache.get(keyName).url;
+        }
+
+        try (S3Presigner presigner = S3Presigner.create()) {
+
+            GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(keyName)
+                .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(duration) // 10분 간 해당 링크로 이미지 조회가 가능
+                .getObjectRequest(objectRequest)
+                .build();
+
+            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+
+            LocalDateTime expirationDate = LocalDateTime.now().plus(duration);
+
+            String presignedUrl = presignedRequest.url().toExternalForm();
+            signedUrlCache.put(keyName, new PresignedUrl(presignedUrl, expirationDate));
+
+            return presignedUrl;
+        }
+    }
+
+    private boolean verifyUrl(String keyName) {
+        PresignedUrl presignedUrl = signedUrlCache.get(keyName);
+
+        return presignedUrl != null &&
+            presignedUrl.expiration.isAfter(LocalDateTime.now().plusMinutes(1));
     }
 }
