@@ -15,6 +15,7 @@ import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Role;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
+import com.example.runningservice.exception.NotVerifiedEmailException;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.security.CustomUserDetails;
 import com.example.runningservice.security.CustomUserDetailsService;
@@ -162,13 +163,13 @@ class AuthServiceTest {
             .emailVerified(false)
             .build();
 
-        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(memberEntity));
+        when(memberRepository.findByEmail("test@example.com")).thenReturn(Optional.of(memberEntity));
         customUserDetailsService = new CustomUserDetailsService(memberRepository);
 
         try {
-            when(customUserDetailsService.loadUserByUsername(anyString())).thenCallRealMethod();
-        } catch (CustomException ex) {
-            assertEquals(ErrorCode.INVALID_EMAIL, ex.getErrorCode());
+            when(customUserDetailsService.loadUserByUsername("test@example.com")).thenCallRealMethod();
+        } catch (NotVerifiedEmailException ex) {
+            assertEquals(ErrorCode.INVALID_EMAIL.getMessage(), ex.getMessage());
         }
     }
 
