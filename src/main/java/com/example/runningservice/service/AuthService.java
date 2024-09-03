@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,14 +42,12 @@ public class AuthService {
 
             log.debug("Authentication successful");
 
-        } catch (CustomException e) {
-            if (e.getErrorCode() == ErrorCode.INVALID_EMAIL) {
+        } catch (UsernameNotFoundException e) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        } catch (AuthenticationException e) {
+            if (e.getMessage().equals(ErrorCode.INVALID_EMAIL.getMessage())) {
                 throw new CustomException(ErrorCode.INVALID_EMAIL);
             }
-            if (e.getErrorCode() == ErrorCode.NOT_FOUND_USER) {
-                throw new CustomException(ErrorCode.NOT_FOUND_USER);
-            }
-        } catch (AuthenticationException e) {
             throw new CustomException(ErrorCode.INVALID_LOGIN);
         }
 

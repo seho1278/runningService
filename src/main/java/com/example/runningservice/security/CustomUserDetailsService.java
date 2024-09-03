@@ -3,6 +3,7 @@ package com.example.runningservice.security;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
+import com.example.runningservice.exception.NotVerifiedEmailException;
 import com.example.runningservice.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         MemberEntity memberEntity = memberRepository.findByEmail(email)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
         //이메일 인증여부 확인
-        if (!memberEntity.isEmailVerified()) throw new CustomException(ErrorCode.INVALID_EMAIL);
+        if (!memberEntity.isEmailVerified()) {
+            throw new NotVerifiedEmailException(ErrorCode.INVALID_EMAIL.getMessage());
+        }
 
         log.debug("User found: {}", email);
 
