@@ -141,26 +141,14 @@ public class CrewService {
     }
 
     /**
-     * url의 가장 끝 path를 리턴한다.
-     */
-    private String findLastPath(String url) {
-        String[] paths = url.split("/");
-
-        return paths[paths.length - 1];
-    }
-
-    /**
      * 크루 싱세 정보 조회
      */
-    public CrewDetailResponseDto getCrew(Long crewId) {
+    public CrewDetailResponseDto getCrew(Long loginId, Long crewId) {
         CrewEntity crewEntity = crewRepository.findById(crewId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
-        CrewDetailResponseDto detail = CrewDetailResponseDto.fromEntity(crewEntity);
-
-        detail.setRunningCount(activityRepository.countByCrew_Id(crewId));
-
-        return detail;
+        return CrewDetailResponseDto.fromEntity(crewEntity,
+            checkJoinedCrew(crewEntity.getCrewMember(), loginId), activityRepository, s3FileUtil);
     }
 
     /**
@@ -170,7 +158,7 @@ public class CrewService {
         Page<CrewMemberEntity> crewMemberEntities = crewMemberRepository
             .findByMember_IdOrderByJoinedAt(loginId, pageable);
 
-        return crewMemberEntities.map(CrewRoleResponseDto::fromEntity);
+        return crewMemberEntities.map(entity -> CrewRoleResponseDto.fromEntity(entity, s3FileUtil));
     }
 
     /**
@@ -194,7 +182,16 @@ public class CrewService {
             OccupancyStatus.ALL.getCrewList(crewRepository, crewFilter, pageable);
 
         return crewEntityList.map(entity -> CrewJoinStatusResponseDto.fromEntity(entity,
-            checkJoinedCrew(entity.getCrewMember(), loginId)));
+            checkJoinedCrew(entity.getCrewMember(), loginId), s3FileUtil));
+    }
+
+    /**
+     * url의 가장 끝 path를 리턴한다.
+     */
+    private String findLastPath(String url) {
+        String[] paths = url.split("/");
+
+        return paths[paths.length - 1];
     }
 
     // 사용자의 활동 지역 조회

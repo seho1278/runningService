@@ -31,7 +31,7 @@ public class MemberService {
     @Transactional
     public MemberResponseDto getMemberProfile(Long userId) {
         MemberEntity memberEntity = memberRepository.findMemberById(userId);
-        return MemberResponseDto.of(memberEntity, aesUtil);
+        return MemberResponseDto.of(memberEntity, aesUtil, s3FileUtil);
     }
 
     // 사용자 정보 수정
@@ -47,7 +47,7 @@ public class MemberService {
 
         memberRepository.save(memberEntity);
 
-        return MemberResponseDto.of(memberEntity, aesUtil);
+        return MemberResponseDto.of(memberEntity, aesUtil, s3FileUtil);
     }
 
     // 비밀번호 변경

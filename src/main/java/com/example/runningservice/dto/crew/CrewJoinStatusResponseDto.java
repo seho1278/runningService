@@ -2,6 +2,7 @@ package com.example.runningservice.dto.crew;
 
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.enums.Region;
+import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -17,12 +18,13 @@ public class CrewJoinStatusResponseDto extends CrewBaseResponseDto {
 
     private boolean isJoined;
 
-    public static CrewJoinStatusResponseDto fromEntity(CrewEntity crewEntity, boolean isJoined) {
+    public static CrewJoinStatusResponseDto fromEntity(CrewEntity crewEntity, boolean isJoined,
+        S3FileUtil s3FileUtil) {
         return CrewJoinStatusResponseDto.builder()
             .crewId(crewEntity.getId())
             .leader(crewEntity.getLeader().getNickName())
             .crewName(crewEntity.getCrewName())
-            .crewImage(crewEntity.getCrewImage())
+            .crewImage(s3FileUtil.createPresignedUrl(crewEntity.getCrewImage()))
             .crewCapacity(crewEntity.getCrewCapacity())
             .crewOccupancy(Optional.ofNullable(crewEntity.getCrewMember())
                 .map(List::size)
