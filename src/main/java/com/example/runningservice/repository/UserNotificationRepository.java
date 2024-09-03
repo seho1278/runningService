@@ -11,4 +11,6 @@ public interface UserNotificationRepository extends JpaRepository<UserNotificati
 
     Page<UserNotificationEntity> findByMember_IdOrderByNotification_CreatedAtDesc(Long memberId,
         Pageable pageable);
+
+    void deleteAllByMember_Id(Long memberId);
 }
