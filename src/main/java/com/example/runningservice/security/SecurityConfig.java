@@ -46,6 +46,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 request -> request.requestMatchers(
                         "/",
+                        "index.html",
                         "/login/**",
                         "/oauth/login",
                         "/user/signup/**",
