@@ -47,8 +47,8 @@ public class RunGoalController {
      * 러닝 목표 생성
      */
     @PostMapping
-    public ResponseEntity<RunGoalResponseDto> createRunGoal(@RequestBody RunGoalRequestDto runGoalRequestDto) {
-        RunGoalResponseDto runGoal = runGoalService.createRunGoal(runGoalRequestDto);
+    public ResponseEntity<RunGoalResponseDto> createRunGoal(@LoginUser Long loginId, @RequestBody RunGoalRequestDto runGoalRequestDto) {
+        RunGoalResponseDto runGoal = runGoalService.createRunGoal(loginId, runGoalRequestDto);
         return ResponseEntity.status(201).body(runGoal);
     }
 

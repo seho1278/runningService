@@ -45,9 +45,9 @@ public class RunGoalService {
             .collect(Collectors.toList());
     }
 
-    public RunGoalResponseDto createRunGoal(RunGoalRequestDto requestDto) {
+    public RunGoalResponseDto createRunGoal(Long userId, RunGoalRequestDto requestDto) {
         RunGoalEntity runGoalEntity = RunGoalEntity.builder()
-            .userId(memberRepository.findById(requestDto.getUserId()).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다.")))
+            .userId(memberRepository.findById(userId).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다.")))
             .totalDistance(requestDto.getTotalDistance())
             .totalRunningTime(requestDto.getTotalRunningTime())
             .averagePace(requestDto.getAveragePace())

@@ -124,7 +124,7 @@ class RunGoalServiceTest {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
         when(runGoalRepository.save(any(RunGoalEntity.class))).thenReturn(runGoalEntity);
 
-        RunGoalResponseDto result = runGoalService.createRunGoal(requestDto);
+        RunGoalResponseDto result = runGoalService.createRunGoal(1L, requestDto);
 
         assertNotNull(result);
         assertEquals(runGoalEntity.getId(), result.getId());
