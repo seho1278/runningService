@@ -145,7 +145,8 @@ class SignupServiceTest {
 
         given(memberRepository.existsByEmail(signupRequestDto.getEmail())).willReturn(false);
         given(memberRepository.existsByNickName(signupRequestDto.getNickName())).willReturn(false);
-        given(aesUtil.generateHash(signupRequestDto.getPhoneNumber())).willReturn("HashedPhoneNumber");
+        given(aesUtil.generateHash(signupRequestDto.getPhoneNumber())).willReturn(
+            "HashedPhoneNumber");
         given(memberRepository.existsByPhoneNumberHash("HashedPhoneNumber")).willReturn(true);
 
         // When & Then
@@ -182,7 +183,9 @@ class SignupServiceTest {
         });
 
         String defaultImageUrl = "http://test-url.com/user-default";
+        String signedImageUrl = "http://signed-url.com/user-default";
         when(s3FileUtil.getImgUrl("user-default")).thenReturn(defaultImageUrl);
+        when(s3FileUtil.createPresignedUrl(defaultImageUrl)).thenReturn(signedImageUrl);
 
         // When
         MemberResponseDto responseDto = signupService.signup(signupRequestDto);
@@ -190,7 +193,7 @@ class SignupServiceTest {
         // Then
         verify(s3FileUtil, times(1)).getImgUrl("user-default");
         verify(s3FileUtil, never()).putObject(anyString(), any(MultipartFile.class));
-        assertEquals(defaultImageUrl, responseDto.getImageUrl());
+        assertEquals(signedImageUrl, responseDto.getImageUrl());
     }
 
     @Test
@@ -208,13 +211,13 @@ class SignupServiceTest {
         signupService.sendEmail(email);
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-
         // Then
         verify(memberRepository, times(1)).findByEmail(email);
 
         assertNotNull(memberEntity.getVerificationCode());
 
-        verify(mailgunClient).sendEmail(captor.capture(), captor.capture(), captor.capture(), captor.capture());
+        verify(mailgunClient).sendEmail(captor.capture(), captor.capture(), captor.capture(),
+            captor.capture());
 
         String fromCaptured = captor.getAllValues().get(0);
         String toCaptured = captor.getAllValues().get(1);
@@ -224,7 +227,8 @@ class SignupServiceTest {
         assertEquals("simzoo93@naver.com", fromCaptured);
         assertEquals(email, toCaptured);
         assertEquals("Email 인증메일입니다.", subjectCaptured);
-        assertTrue(textCaptured.contains("http://13.209.127.192:8080/user/signup/email-verify?email=" + email));
+        assertTrue(textCaptured.contains(
+            "http://13.209.127.192:8080/user/signup/email-verify?email=" + email));
         assertTrue(textCaptured.contains(memberEntity.getName()));
         assertTrue(textCaptured.contains(memberEntity.getVerificationCode()));
     }
@@ -236,9 +240,11 @@ class SignupServiceTest {
         given(memberRepository.findByEmail(email)).willReturn(Optional.empty());
 
         // When & Then
-        CustomException exception = assertThrows(CustomException.class, () -> signupService.sendEmail(email));
+        CustomException exception = assertThrows(CustomException.class,
+            () -> signupService.sendEmail(email));
         assertEquals(ErrorCode.NOT_FOUND_USER, exception.getErrorCode());
-        verify(mailgunClient, times(0)).sendEmail(anyString(), anyString(), anyString(), anyString());
+        verify(mailgunClient, times(0)).sendEmail(anyString(), anyString(), anyString(),
+            anyString());
     }
 
     @Test
