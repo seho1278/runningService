@@ -46,7 +46,7 @@ public class SignupController {
     }
 
     @GetMapping("/signup/nickname-verify")
-    ResponseEntity<?> verifyNickname(@RequestParam String nickname) {
+    ResponseEntity<Void> verifyNickname(@RequestParam String nickname) {
 
         signupService.verifyNickName(nickname);
         return ResponseEntity.ok().build();
@@ -55,7 +55,8 @@ public class SignupController {
     //필수정보 확인
     //채워지지 않은 필수정보 입력하도록 함
     @GetMapping("/additional-info")
-    public ResponseEntity<Oauth2DataDto> showAdditionalInfoForm(@RequestParam("email") String email) {
+    public ResponseEntity<Oauth2DataDto> showAdditionalInfoForm(
+        @RequestParam("email") String email) {
         // 이메일을 통해 기존 회원 정보를 가져옴
         MemberEntity memberEntity = memberRepository.findByEmail(email)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
@@ -71,7 +72,8 @@ public class SignupController {
     }
 
     @PostMapping("/additional-info")
-    public ResponseEntity<?> processAdditionalInfo(@ModelAttribute @Valid SignupRequestDto form) {
+    public ResponseEntity<MemberResponseDto> processAdditionalInfo(
+        @ModelAttribute @Valid SignupRequestDto form) {
 
         return ResponseEntity.ok(signupService.saveAdditionalInfo(form));
     }

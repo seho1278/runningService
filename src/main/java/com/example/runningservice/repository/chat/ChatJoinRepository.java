@@ -33,4 +33,8 @@ public interface ChatJoinRepository extends JpaRepository<ChatJoinEntity, Long>,
 
     List<ChatJoinEntity> findByChatRoom_Id(Long chatRoomId);
 
+    List<ChatJoinEntity> findAllByMember_Id(Long memberId);
+
+    void deleteAllByMember_Id(Long memberId);
+
 }

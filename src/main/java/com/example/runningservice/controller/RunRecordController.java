@@ -4,6 +4,7 @@ import com.example.runningservice.dto.runRecord.RunRecordRequestDto;
 import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.service.RunRecordService;
 import com.example.runningservice.util.LoginUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/run")
 public class RunRecordController {
 
     private final RunRecordService runRecordService;
-
-    public RunRecordController(RunRecordService runRecordService) {
-        this.runRecordService = runRecordService;
-    }
 
     /**
      * 러닝 누적 목록 조회
@@ -83,5 +81,14 @@ public class RunRecordController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * 러닝 기록 공개 설정
+     */
+    @PutMapping("/records/visibility/{runRecordId}")
+    public ResponseEntity<RunRecordResponseDto> updateRunRecordVisibility(
+        @PathVariable Long runRecordId, @RequestBody RunRecordRequestDto updatedRunRecord) {
+        return ResponseEntity.ok(runRecordService.updateRunRecord(runRecordId, updatedRunRecord));
     }
 }
