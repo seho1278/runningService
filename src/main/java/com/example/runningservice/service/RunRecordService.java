@@ -5,6 +5,8 @@ import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.entity.RunRecordEntity;
+import com.example.runningservice.exception.CustomException;
+import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,10 +43,10 @@ public class RunRecordService {
 
     public RunRecordResponseDto createRunRecord(Long userId, RunRecordRequestDto requestDto) {
         MemberEntity member = memberRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         RunGoalEntity goal = runGoalRepository.findById(requestDto.getGoalId())
-            .orElseThrow(() -> new NoSuchElementException("목표를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_GOAL));
 
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
@@ -65,7 +66,7 @@ public class RunRecordService {
     public RunRecordResponseDto updateRunRecord(Long runningId, RunRecordRequestDto requestDto) {
         RunRecordEntity existingEntity = runRecordRepository
             .findById(runningId)
-            .orElseThrow(() -> new NoSuchElementException("해당 기록을 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_RECORD));
 
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
             .id(existingEntity.getId())
@@ -96,7 +97,7 @@ public class RunRecordService {
         List<RunRecordEntity> runRecords = runRecordRepository.findByUserId_Id(userId);
 
         if (runRecords.isEmpty()) {
-            throw new NoSuchElementException("런 기록이 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_RUN_RECORD);
         }
 
         int totalDistance = runRecords.stream()
