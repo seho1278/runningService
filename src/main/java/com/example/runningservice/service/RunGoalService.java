@@ -5,6 +5,8 @@ import com.example.runningservice.dto.runGoal.RunGoalResponseDto;
 import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.MemberRepository;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,11 +48,14 @@ public class RunGoalService {
     }
 
     public RunGoalResponseDto createRunGoal(RunGoalRequestDto requestDto) {
+
+        Map<String, Integer> map = transformDTO(requestDto);
+
         RunGoalEntity runGoalEntity = RunGoalEntity.builder()
             .userId(memberRepository.findById(requestDto.getUserId()).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다.")))
             .totalDistance(requestDto.getTotalDistance())
-            .totalRunningTime(requestDto.getTotalRunningTime())
-            .averagePace(requestDto.getAveragePace())
+            .totalRunningTime(map.get("totalRunningTime"))
+            .averagePace(map.get("averagePace"))
             .isPublic(requestDto.getIsPublic())
             .runCount(requestDto.getRunCount())
             .createdAt(LocalDateTime.now())
@@ -65,12 +70,14 @@ public class RunGoalService {
         RunGoalEntity existingEntity = runGoalRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("RunGoal not found"));
 
+        Map<String, Integer> map = transformDTO(requestDto);
+
         RunGoalEntity updatedEntity = RunGoalEntity.builder()
             .id(existingEntity.getId())
             .userId(existingEntity.getUserId())
             .totalDistance(requestDto.getTotalDistance())
-            .totalRunningTime(requestDto.getTotalRunningTime())
-            .averagePace(requestDto.getAveragePace())
+            .totalRunningTime(map.get("totalRunningTime"))
+            .averagePace(map.get("averagePace"))
             .isPublic(requestDto.getIsPublic())
             .runCount(requestDto.getRunCount())
             .createdAt(existingEntity.getCreatedAt())
@@ -102,5 +109,22 @@ public class RunGoalService {
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
             .build();
+    }
+
+    public Map<String,Integer> transformDTO (RunGoalRequestDto runGoalRequestDto) {
+
+        Map<String,Integer> map = new HashMap<>();
+        // runningTime 시:분:초 -> sec 변환
+        String[] runningTimes = runGoalRequestDto.getTotalRunningTime().split(":");
+        int runningTime = Integer.parseInt(runningTimes[0])*3600+Integer.parseInt(runningTimes[1])*60+Integer.parseInt(runningTimes[2]);
+
+        map.put("totalRunningTime", runningTime);
+
+        // pace 분:초 -> sec 변환
+        String[] paces = runGoalRequestDto.getAveragePace().split(":");
+        int pace = Integer.parseInt(paces[0])*60+Integer.parseInt(paces[1]);
+        map.put("AveragePace", pace);
+
+        return map;
     }
 }

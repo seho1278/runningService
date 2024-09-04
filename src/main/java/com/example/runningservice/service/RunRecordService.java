@@ -8,10 +8,11 @@ import com.example.runningservice.entity.RunRecordEntity;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -40,43 +41,47 @@ public class RunRecordService {
             .collect(Collectors.toList());
     }
 
-    public RunRecordResponseDto createRunRecord(Long userId, RunRecordRequestDto requestDto) {
+    public RunRecordResponseDto createRunRecord(Long userId, RunRecordRequestDto runRecordRequestDto) {
         MemberEntity member = memberRepository.findById(userId)
             .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
 
-        RunGoalEntity goal = runGoalRepository.findById(requestDto.getGoalId())
+        RunGoalEntity goal = runGoalRepository.findById(runRecordRequestDto.getGoalId())
             .orElseThrow(() -> new NoSuchElementException("목표를 찾을 수 없습니다."));
+
+        Map<String,Integer> map = transformDTO(runRecordRequestDto);
 
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
             .goalId(goal)
-            .distance(requestDto.getDistance())
-            .runningTime(requestDto.getRunningTime())
-            .pace(requestDto.getPace())
+            .distance(runRecordRequestDto.getDistance())
+            .runningTime(map.get("runningTime"))
+            .pace(map.get("pace"))
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(requestDto.getIsPublic())
+            .isPublic(runRecordRequestDto.getIsPublic())
             .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(runRecordEntity);
         return entityToDto(savedEntity);
     }
 
-    public RunRecordResponseDto updateRunRecord(Long runningId, RunRecordRequestDto requestDto) {
+    public RunRecordResponseDto updateRunRecord(Long runningId, RunRecordRequestDto runRecordRequestDto) {
         RunRecordEntity existingEntity = runRecordRepository
             .findById(runningId)
             .orElseThrow(() -> new NoSuchElementException("해당 기록을 찾을 수 없습니다."));
 
+        Map<String,Integer> map = transformDTO(runRecordRequestDto);
+
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
             .id(existingEntity.getId())
             .userId(existingEntity.getUserId())
-            .goalId(runGoalRepository.getReferenceById(requestDto.getGoalId()))
-            .distance(requestDto.getDistance())
-            .runningTime(requestDto.getRunningTime())
-            .pace(requestDto.getPace())
+            .goalId(runGoalRepository.getReferenceById(runRecordRequestDto.getGoalId()))
+            .distance(runRecordRequestDto.getDistance())
+            .runningTime(map.get("runningTime"))
+            .pace(map.get("pace"))
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
-            .isPublic(requestDto.getIsPublic())
+            .isPublic(runRecordRequestDto.getIsPublic())
             .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(updatedEntity);
@@ -99,19 +104,19 @@ public class RunRecordService {
             throw new NoSuchElementException("런 기록이 존재하지 않습니다.");
         }
 
-        int totalDistance = runRecords.stream()
-            .mapToInt(RunRecordEntity::getDistance)
+        Double totalDistance = runRecords.stream()
+            .mapToDouble(RunRecordEntity::getDistance)
             .sum();
 
         int totalRunningTime = runRecords.stream()
             .mapToInt(RunRecordEntity::getRunningTime)
             .sum();
 
-        Duration totalPace = runRecords.stream()
-            .map(RunRecordEntity::getPace)
-            .reduce(Duration.ZERO, Duration::plus);
+        int totalPace = runRecords.stream()
+            .mapToInt(RunRecordEntity::getPace)
+            .sum();
 
-        Duration averagePace = totalPace.dividedBy(runRecords.size());
+        int averagePace = totalPace / (runRecords.size());
 
         return RunRecordResponseDto.builder()
             .userId(userId)
@@ -138,6 +143,23 @@ public class RunRecordService {
             .updatedAt(entity.getUpdatedAt())
             .isPublic(entity.getIsPublic())
             .build();
+    }
+
+    public Map<String,Integer> transformDTO (RunRecordRequestDto runRecordRequestDto) {
+
+        Map<String,Integer> map = new HashMap<>();
+        // runningTime 시:분:초 -> sec 변환
+        String[] runningTimes = runRecordRequestDto.getRunningTime().split(":");
+        int runningTime = Integer.parseInt(runningTimes[0])*3600+Integer.parseInt(runningTimes[1])*60+Integer.parseInt(runningTimes[2]);
+
+        map.put("runningTime", runningTime);
+
+        // pace 분:초 -> sec 변환
+        String[] paces = runRecordRequestDto.getPace().split(":");
+        int pace = Integer.parseInt(paces[0])*60+Integer.parseInt(paces[1]);
+        map.put("pace", pace);
+
+        return map;
     }
 
 }
