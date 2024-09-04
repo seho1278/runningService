@@ -39,6 +39,7 @@ public class RunRecordEntity {
 
     private Double distance;
     private Integer pace;
+
     private Integer runningTime;
 
     @CreatedDate

@@ -52,6 +52,7 @@ public class RunRecordService {
 
         Map<String,Integer> map = transformDTO(runRecordRequestDto);
 
+
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
             .goalId(goal)
@@ -71,6 +72,7 @@ public class RunRecordService {
         RunRecordEntity existingEntity = runRecordRepository
             .findById(runningId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_RECORD));
+
 
         Map<String,Integer> map = transformDTO(runRecordRequestDto);
 
@@ -106,7 +108,8 @@ public class RunRecordService {
             throw new CustomException(ErrorCode.NOT_FOUND_RUN_RECORD);
         }
 
-        Double totalDistance = runRecords.stream()
+
+        double totalDistance = runRecords.stream()
             .mapToDouble(RunRecordEntity::getDistance)
             .sum();
 

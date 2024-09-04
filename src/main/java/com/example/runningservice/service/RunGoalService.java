@@ -49,12 +49,12 @@ public class RunGoalService {
             .collect(Collectors.toList());
     }
 
-    public RunGoalResponseDto createRunGoal(RunGoalRequestDto requestDto) {
-
+    public RunGoalResponseDto createRunGoal(Long userId, RunGoalRequestDto requestDto) {
         Map<String, Integer> map = transformDTO(requestDto);
 
         RunGoalEntity runGoalEntity = RunGoalEntity.builder()
-            .userId(memberRepository.findById(requestDto.getUserId())
+
+            .userId(memberRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER)))
             .totalDistance(requestDto.getTotalDistance())
             .totalRunningTime(map.get("totalRunningTime"))

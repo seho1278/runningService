@@ -129,7 +129,9 @@ public class RunRecordServiceTest {
             .updatedAt(LocalDateTime.now())
             .isPublic(0)
             .build();
+
         Map<String, Integer> map =  runRecordService.transformDTO(requestDto);
+
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
             .id(runningId)
             .userId(memberEntity)
@@ -195,8 +197,8 @@ public class RunRecordServiceTest {
         assertEquals(900, result.getPace()); // 평균 페이스 확인
     }
 
-    private RunRecordEntity createMockRunRecordEntity(Long id, Long userId, double distance, int runningTime, int pace) {
 
+    private RunRecordEntity createMockRunRecordEntity(Long id, Long userId, double distance, int runningTime, int pace) {
 
         return RunRecordEntity.builder()
             .id(id)

@@ -11,5 +11,6 @@ public class RunRecordRequestDto {
     private Double distance;
     private String runningTime;
     private String pace;
+
     private Integer isPublic;
 }
