@@ -31,11 +31,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 public class RunRecordServiceTest {
 
@@ -111,6 +106,7 @@ public class RunRecordServiceTest {
             .distance(15.0)
             .runningTime("00:30:00")
             .pace("06:00")
+            .runningDate(LocalDateTime.of(2024,10,1, 0,0,0))
             .isPublic(1)
             .build();
 
@@ -159,7 +155,8 @@ public class RunRecordServiceTest {
             entity.getId().equals(runningId) &&
                 entity.getDistance().equals(requestDto.getDistance()) &&
                 entity.getRunningTime().equals(map.get("runningTime")) &&
-                entity.getPace().equals(map.get("pace"))
+                entity.getPace().equals(map.get("pace")) &&
+                entity.getRunningDate().equals(LocalDateTime.of(2024,10,1, 0,0,0))
         ));
     }
 
@@ -171,7 +168,7 @@ public class RunRecordServiceTest {
 
         when(runRecordRepository.findById(runningId)).thenReturn(Optional.empty());
 
-        CustomException exception = assertThrows(CustomException.class,
+        assertThrows(CustomException.class,
             () -> runRecordService.updateRunRecord(runningId, requestDto));
 
         verify(runRecordRepository, never()).save(any(RunRecordEntity.class));
@@ -207,6 +204,7 @@ public class RunRecordServiceTest {
             .distance(distance)
             .runningTime(runningTime)
             .pace(pace)
+            .runningDate(LocalDateTime.now())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .isPublic(1)

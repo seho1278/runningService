@@ -42,6 +42,7 @@ public class RunRecordEntity {
 
     private Integer runningTime;
 
+    private LocalDateTime runningDate;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate
