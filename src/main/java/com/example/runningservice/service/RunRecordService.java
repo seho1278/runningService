@@ -48,11 +48,15 @@ public class RunRecordService {
         RunGoalEntity goal = runGoalRepository.findById(requestDto.getGoalId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_GOAL));
 
+        //runningTime 변환
+        String[] runningTimes = requestDto.getRunningTime().split(":");
+        int runningTimesec = Integer.parseInt(runningTimes[0])*60+Integer.parseInt(runningTimes[1]);
+
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
             .goalId(goal)
             .distance(requestDto.getDistance())
-            .runningTime(requestDto.getRunningTime())
+            .runningTime(runningTimesec)
             .pace(requestDto.getPace())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -68,12 +72,16 @@ public class RunRecordService {
             .findById(runningId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_RECORD));
 
+        //runningTime 변환
+        String[] runningTimes = requestDto.getRunningTime().split(":");
+        int runningTimesec = Integer.parseInt(runningTimes[0])*60+Integer.parseInt(runningTimes[1]);
+
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
             .id(existingEntity.getId())
             .userId(existingEntity.getUserId())
             .goalId(runGoalRepository.getReferenceById(requestDto.getGoalId()))
             .distance(requestDto.getDistance())
-            .runningTime(requestDto.getRunningTime())
+            .runningTime(runningTimesec)
             .pace(requestDto.getPace())
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
@@ -100,8 +108,8 @@ public class RunRecordService {
             throw new CustomException(ErrorCode.NOT_FOUND_RUN_RECORD);
         }
 
-        int totalDistance = runRecords.stream()
-            .mapToInt(RunRecordEntity::getDistance)
+        double totalDistance = runRecords.stream()
+            .mapToDouble(RunRecordEntity::getDistance)
             .sum();
 
         int totalRunningTime = runRecords.stream()
