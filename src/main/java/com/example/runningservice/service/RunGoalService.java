@@ -3,6 +3,8 @@ package com.example.runningservice.service;
 import com.example.runningservice.dto.runGoal.RunGoalRequestDto;
 import com.example.runningservice.dto.runGoal.RunGoalResponseDto;
 import com.example.runningservice.entity.RunGoalEntity;
+import com.example.runningservice.exception.CustomException;
+import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +34,14 @@ public class RunGoalService {
 
     public RunGoalResponseDto findById(Long id) {
         RunGoalEntity entity = runGoalRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("러닝 목표를 찾을 수 없습니다."));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_GOAL));
 
         return entityToDto(entity);
     }
 
 
     public List<RunGoalResponseDto> findByUserId(Long id) {
-        List<RunGoalEntity> runGoals= runGoalRepository.findByUserId_Id(id);
+        List<RunGoalEntity> runGoals = runGoalRepository.findByUserId_Id(id);
         return runGoals.stream()
             .map(this::entityToDto)
             .collect(Collectors.toList());
@@ -47,7 +49,8 @@ public class RunGoalService {
 
     public RunGoalResponseDto createRunGoal(RunGoalRequestDto requestDto) {
         RunGoalEntity runGoalEntity = RunGoalEntity.builder()
-            .userId(memberRepository.findById(requestDto.getUserId()).orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다.")))
+            .userId(memberRepository.findById(requestDto.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER)))
             .totalDistance(requestDto.getTotalDistance())
             .totalRunningTime(requestDto.getTotalRunningTime())
             .averagePace(requestDto.getAveragePace())
@@ -63,7 +66,7 @@ public class RunGoalService {
 
     public RunGoalResponseDto updateRunGoal(Long id, RunGoalRequestDto requestDto) {
         RunGoalEntity existingEntity = runGoalRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("RunGoal not found"));
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_RUN_GOAL));
 
         RunGoalEntity updatedEntity = RunGoalEntity.builder()
             .id(existingEntity.getId())
@@ -93,7 +96,8 @@ public class RunGoalService {
 
         return RunGoalResponseDto.builder()
             .id(entity.getId())
-            .userId(entity.getUserId() != null ? entity.getUserId().getId() : null) // Null check added
+            .userId(
+                entity.getUserId() != null ? entity.getUserId().getId() : null) // Null check added
             .totalDistance(entity.getTotalDistance())
             .totalRunningTime(entity.getTotalRunningTime())
             .averagePace(entity.getAveragePace())
