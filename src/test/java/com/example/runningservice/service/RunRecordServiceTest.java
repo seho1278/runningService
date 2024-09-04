@@ -1,28 +1,35 @@
 package com.example.runningservice.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.example.runningservice.dto.runRecord.RunRecordRequestDto;
 import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.entity.RunRecordEntity;
+import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class RunRecordServiceTest {
 
@@ -156,7 +163,8 @@ public class RunRecordServiceTest {
 
         when(runRecordRepository.findById(runningId)).thenReturn(Optional.empty());
 
-        assertThrows(NoSuchElementException.class, () -> runRecordService.updateRunRecord(runningId, requestDto));
+        CustomException exception = assertThrows(CustomException.class,
+            () -> runRecordService.updateRunRecord(runningId, requestDto));
 
         verify(runRecordRepository, never()).save(any(RunRecordEntity.class));
     }

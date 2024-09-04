@@ -44,24 +44,29 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService)
         throws Exception {
         http.authorizeHttpRequests(
-                request -> request.requestMatchers(
-                        "/",
+                request -> request
+                    .requestMatchers(
                         "/index.html",
-                        "/login/**",
-                        "/oauth/login",
+                        "/css/**",
+                        "/images/**",
+                        "/js/**"
+                        ).permitAll()
+                    .requestMatchers(
+                        "/",
                         "/user/signup/**",
                         "/api.mailgun.net/v3/**",
+                        "/login/**",
+                        "/oauth/login",
+                        "/oauth/token",
+                        "/oauth/authorization/**",
                         "/h2-console/**",
-                        "/css/**",
-                        "/ws/**",
-                        "/images/**",
-                        "/js/**",
                         "/region",
-                        "/posts/**",
                         "/crew",
                         "/comments/**",
-                        "/token/refresh/**")
-                    .permitAll().requestMatchers(
+                        "/token/refresh/**",
+                        "/posts/**")
+                    .permitAll()
+                    .requestMatchers(
                         HttpMethod.GET, "/crew/*")
                     .permitAll().requestMatchers(
                         HttpMethod.GET, "**/regular/**")
