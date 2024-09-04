@@ -30,8 +30,9 @@ public class ActivityResponseDto {
     private String memo;
     private String location;
     private int participant;
+    private boolean isAuthor;
 
-    public static ActivityResponseDto fromEntity(ActivityEntity activityEntity) {
+    public static ActivityResponseDto fromEntity(ActivityEntity activityEntity, Long loginId) {
         return ActivityResponseDto.builder()
             .activityId(activityEntity.getId())
             .author(activityEntity.getAuthor().getNickName())
@@ -47,6 +48,11 @@ public class ActivityResponseDto {
             .participant(
                 (activityEntity.getParticipant() != null) ?
                     activityEntity.getParticipant().size() : 0)
+            .isAuthor(activityEntity.getAuthor().getId().equals(loginId))
             .build();
+    }
+
+    public boolean getIsAuthor() {
+        return isAuthor;
     }
 }
