@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,7 +14,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -46,13 +44,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService)
         throws Exception {
         http.authorizeHttpRequests(
-                request -> request.requestMatchers(
+                request -> request
+                    .requestMatchers(
+                        "/index.html",
+                        "/css/**",
+                        "/images/**",
+                        "/js/**"
+                        ).permitAll()
+                    .requestMatchers(
                         "/",
                         "/user/signup/**",
                         "/api.mailgun.net/v3/**",
                         "/login/**",
                         "/oauth/login",
                         "/oauth/token",
+                        "/oauth/authorization/**",
                         "/h2-console/**",
                         "/region",
                         "/crew",
@@ -113,12 +119,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-            .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
