@@ -77,7 +77,7 @@ public class CrewService {
         chatRoomService.createChatRoom(crewEntity.getId(),
             crewEntity.getCrewName(), ChatRoom.CREW_STAFF);
 
-        return CrewBaseResponseDto.fromEntity(crewEntity);
+        return CrewBaseResponseDto.fromEntity(crewEntity, s3FileUtil);
     }
 
     /**
@@ -107,7 +107,7 @@ public class CrewService {
         crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getId(),
             updateCrew.getCrewImage()));
 
-        return CrewBaseResponseDto.fromEntity(crewEntity);
+        return CrewBaseResponseDto.fromEntity(crewEntity, s3FileUtil);
     }
 
     /**
@@ -119,7 +119,7 @@ public class CrewService {
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW));
 
         // 삭제하기 전에 리턴하기 위한 데이터를 미리 저장해둔다.
-        CrewBaseResponseDto crewData = CrewBaseResponseDto.fromEntity(crewEntity);
+        CrewBaseResponseDto crewData = CrewBaseResponseDto.fromEntity(crewEntity, s3FileUtil);
 
         // 이미지가 디폴트가 아닌 경우에만 삭제
         String fileName = findLastPath(crewEntity.getCrewImage());
