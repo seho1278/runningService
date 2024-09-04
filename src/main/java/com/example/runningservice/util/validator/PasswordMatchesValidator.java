@@ -1,6 +1,6 @@
 package com.example.runningservice.util.validator;
 
-import com.example.runningservice.dto.SignupRequestDto;
+import com.example.runningservice.dto.auth.SignupRequestDto;
 import com.example.runningservice.dto.member.PasswordRequestDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

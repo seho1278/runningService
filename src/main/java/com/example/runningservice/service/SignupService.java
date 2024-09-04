@@ -2,7 +2,7 @@ package com.example.runningservice.service;
 
 import com.example.runningservice.client.MailgunClient;
 import com.example.runningservice.dto.member.MemberResponseDto;
-import com.example.runningservice.dto.SignupRequestDto;
+import com.example.runningservice.dto.auth.SignupRequestDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
@@ -124,16 +124,5 @@ public class SignupService {
         if (memberRepository.existsByNickName(nickname)) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_NICKNAME);
         }
-    }
-
-    @Transactional
-    public MemberResponseDto saveAdditionalInfo(SignupRequestDto form) {
-        // 기존 회원 정보 업데이트
-        MemberEntity memberEntity = memberRepository.findByEmail(form.getEmail())
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
-        memberEntity.updateAdditionalInfo(form, aesUtil);
-
-        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil, s3FileUtil);
     }
 }

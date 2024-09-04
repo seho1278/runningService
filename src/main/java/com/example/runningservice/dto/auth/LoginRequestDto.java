@@ -1,4 +1,4 @@
-package com.example.runningservice.dto;
+package com.example.runningservice.dto.auth;
 
 import lombok.Getter;
 import lombok.Setter;

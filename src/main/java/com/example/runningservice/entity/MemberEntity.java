@@ -1,6 +1,6 @@
 package com.example.runningservice.entity;
 
-import com.example.runningservice.dto.SignupRequestDto;
+import com.example.runningservice.dto.auth.AdditionalInfoRequestDto;
 import com.example.runningservice.dto.member.UpdateMemberRequestDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Notification;
@@ -49,15 +49,13 @@ public class MemberEntity extends BaseEntity {
     private String verificationCode;
     private boolean emailVerified;
     private LocalDateTime verifiedAt;
-    @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
+    @Column(unique = true)
     private String phoneNumber;
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String phoneNumberHash;
-    @Column(nullable = false)
     private String name;
-    @Column(nullable = false)
+    @Column(unique = true)
     private String nickName;
     private Integer birthYear;
     //성별값을 코드로 변환
@@ -131,7 +129,7 @@ public class MemberEntity extends BaseEntity {
         this.birthYearVisibility = form.getBirthYearVisibility();
     }
 
-    public void updateAdditionalInfo(SignupRequestDto form, AESUtil aesUtil) {
+    public void updateAdditionalInfo(AdditionalInfoRequestDto form, AESUtil aesUtil) {
         this.name = form.getName();
         this.phoneNumber = form.getPhoneNumber();
         this.phoneNumberHash = aesUtil.generateHash(form.getPhoneNumber());
