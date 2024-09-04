@@ -42,6 +42,7 @@ public class CrewMemberController {
     @GetMapping("/{crew_id}/member/list")
     @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
     public ResponseEntity<Page<CrewMemberResponseDto>> getCrewMembers(
+        @LoginUser Long userId,
         @PathVariable("crew_id") Long crewId,
         @ModelAttribute @Valid GetCrewMemberRequestDto.Filter filterDto,
         @PageableDefault(page = 0, size = 10, sort = "joinedAt", direction = Direction.ASC) Pageable pageable) {
