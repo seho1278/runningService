@@ -47,8 +47,9 @@ public class RunGoalService {
             .collect(Collectors.toList());
     }
 
-    public RunGoalResponseDto createRunGoal(RunGoalRequestDto requestDto) {
+    public RunGoalResponseDto createRunGoal(Long userId, RunGoalRequestDto requestDto) {
         RunGoalEntity runGoalEntity = RunGoalEntity.builder()
+
             .userId(memberRepository.findById(requestDto.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER)))
             .totalDistance(requestDto.getTotalDistance())
