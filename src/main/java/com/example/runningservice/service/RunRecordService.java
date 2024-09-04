@@ -47,11 +47,15 @@ public class RunRecordService {
         RunGoalEntity goal = runGoalRepository.findById(requestDto.getGoalId())
             .orElseThrow(() -> new NoSuchElementException("목표를 찾을 수 없습니다."));
 
+        //runningTime 변환
+        String[] runningTimes = requestDto.getRunningTime().split(":");
+        int runningTimesec = Integer.parseInt(runningTimes[0])*60+Integer.parseInt(runningTimes[1]);
+
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
             .goalId(goal)
             .distance(requestDto.getDistance())
-            .runningTime(requestDto.getRunningTime())
+            .runningTime(runningTimesec)
             .pace(requestDto.getPace())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -67,12 +71,16 @@ public class RunRecordService {
             .findById(runningId)
             .orElseThrow(() -> new NoSuchElementException("해당 기록을 찾을 수 없습니다."));
 
+        //runningTime 변환
+        String[] runningTimes = requestDto.getRunningTime().split(":");
+        int runningTimesec = Integer.parseInt(runningTimes[0])*60+Integer.parseInt(runningTimes[1]);
+
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
             .id(existingEntity.getId())
             .userId(existingEntity.getUserId())
             .goalId(runGoalRepository.getReferenceById(requestDto.getGoalId()))
             .distance(requestDto.getDistance())
-            .runningTime(requestDto.getRunningTime())
+            .runningTime(runningTimesec)
             .pace(requestDto.getPace())
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
@@ -99,8 +107,8 @@ public class RunRecordService {
             throw new NoSuchElementException("런 기록이 존재하지 않습니다.");
         }
 
-        int totalDistance = runRecords.stream()
-            .mapToInt(RunRecordEntity::getDistance)
+        double totalDistance = runRecords.stream()
+            .mapToDouble(RunRecordEntity::getDistance)
             .sum();
 
         int totalRunningTime = runRecords.stream()

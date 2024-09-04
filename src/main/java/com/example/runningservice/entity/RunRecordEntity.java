@@ -40,7 +40,7 @@ public class RunRecordEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private MemberEntity userId;
 
-    private Integer distance;
+    private Double distance;
     @Convert(converter = DurationConverter.class)
     private Duration pace;
     private Integer runningTime;

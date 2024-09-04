@@ -9,8 +9,8 @@ import lombok.Getter;
 public class RunRecordRequestDto {
     private Long userId;
     private Long goalId;
-    private Integer distance;
-    private Integer runningTime;
+    private Double distance;
+    private String runningTime;
     private Duration pace;
     private Integer isPublic;
 }
