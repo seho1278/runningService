@@ -21,6 +21,7 @@ import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.PageUtil;
+import com.example.runningservice.util.S3FileUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,9 @@ class CrewApplicantServiceTest {
 
     @Mock
     private AESUtil aesUtil;
+
+    @Mock
+    private S3FileUtil s3FileUtil;
 
     @InjectMocks
     private CrewApplicantService crewApplicantService;
@@ -126,6 +130,7 @@ class CrewApplicantServiceTest {
     void approveJoinApplication_Success() {
         // given
         Long joinApplyId = 1L;
+        String signedUrl = "signedUrl";
 
         MemberEntity memberEntity = MemberEntity.builder()
             .nickName("testNick")
@@ -157,13 +162,15 @@ class CrewApplicantServiceTest {
         when(crewMemberRepository.save(any(CrewMemberEntity.class)))
             .thenReturn(newCrewMember);
 
+        when(s3FileUtil.createPresignedUrl(memberEntity.getProfileImageUrl())).thenReturn(signedUrl);
+
         // when
         CrewMemberResponseDto result = crewApplicantService.approveJoinApplication(joinApplyId);
 
         // then
         assertNotNull(result);
         assertEquals(memberEntity.getNickName(), result.getMemberNickName());
-        assertEquals(memberEntity.getProfileImageUrl(), result.getMemberProfileImage());
+        assertEquals(signedUrl, result.getMemberProfileImage());
     }
 
     @Test
