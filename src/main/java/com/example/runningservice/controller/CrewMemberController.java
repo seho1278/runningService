@@ -11,6 +11,7 @@ import com.example.runningservice.dto.crewMember.CrewMemberResponseDto;
 import com.example.runningservice.service.CrewMemberService;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.LoginUser;
+import com.example.runningservice.util.S3FileUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,7 @@ public class CrewMemberController {
 
     private final CrewMemberService crewMemberService;
     private final AESUtil aesUtil;
+    private final S3FileUtil s3FileUtil;
 
     /**
      * 크루원 리스트 조회
@@ -48,7 +50,7 @@ public class CrewMemberController {
         @PageableDefault(page = 0, size = 10, sort = "joinedAt", direction = Direction.ASC) Pageable pageable) {
 
         Page<CrewMemberResponseDto> pageDto = crewMemberService.getCrewMembers(crewId, filterDto,
-            pageable).map(CrewMemberResponseDto::of);
+            pageable).map(entity -> CrewMemberResponseDto.of(entity, s3FileUtil));
 
         return ResponseEntity.ok(pageDto);
     }

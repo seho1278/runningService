@@ -26,6 +26,7 @@ public class CrewCreateRequestDto {
     private final String description;
     @Min(value = 1, message = "크루 정원은 1 이상 입력해야 합니다.")
     private final Integer crewCapacity;
+    @NotNull(message = "활동 지역은 필수 선택입니다.")
     private final Region activityRegion;
     private final MultipartFile crewImage;
     @NotNull(message = "러닝 공개 여부는 필수 선택입니다.")

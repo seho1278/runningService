@@ -131,7 +131,7 @@ class ActivityServiceTest {
         ActivityRequestDto.Create activityDto = mock(ActivityRequestDto.Create.class);
         when(activityDto.getCategory()).thenReturn(ActivityCategory.ON_DEMAND);
 
-        MemberEntity memberEntity = MemberEntity.builder().build();
+        MemberEntity memberEntity = MemberEntity.builder().id(userId).build();
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(mock(CrewEntity.class)));
         given(memberRepository.findById(userId)).willReturn(Optional.of(memberEntity));
@@ -292,9 +292,10 @@ class ActivityServiceTest {
     void getActivity() {
         // given
         Long activityId = 1L;
+        Long userId = 11L;
         List<ParticipantEntity> participants = List.of(
             mock(ParticipantEntity.class), mock(ParticipantEntity.class));
-        MemberEntity memberEntity = MemberEntity.builder().nickName("nick").build();
+        MemberEntity memberEntity = MemberEntity.builder().id(userId).nickName("nick").build();
         ActivityEntity activityEntity = ActivityEntity.builder()
             .participant(participants)
             .author(memberEntity)
@@ -304,7 +305,7 @@ class ActivityServiceTest {
         given(activityRepository.findById(activityId)).willReturn(Optional.of(activityEntity));
 
         // when
-        ActivityResponseDto response = activityService.getActivity(activityId);
+        ActivityResponseDto response = activityService.getActivity(activityId, userId);
 
         // then
         assertEquals(response.getParticipant(), participants.size());
@@ -316,6 +317,7 @@ class ActivityServiceTest {
     void getCrewActivity_FailedValidateDate() {
         // given
         Long crewId = 1L;
+        Long userId = 11L;
         ActivityFilterDto wrongDate = ActivityFilterDto.builder()
             .startDate(LocalDate.now().plusDays(1))
             .endDate(LocalDate.now().minusDays(1))
@@ -323,7 +325,7 @@ class ActivityServiceTest {
 
         // when
         CustomException customException = assertThrows(CustomException.class,
-            () -> activityService.getCrewActivityByDate(crewId, wrongDate, Pageable.ofSize(1)));
+            () -> activityService.getCrewActivityByDate(crewId, userId, wrongDate, Pageable.ofSize(1)));
 
         // then
         assertEquals(customException.getErrorCode(), ErrorCode.INVALID_DATE_RANGE);
@@ -334,12 +336,13 @@ class ActivityServiceTest {
     void getCrewActivity_SuccessValidateDate() {
         // given
         Long crewId = 1L;
+        Long userId = 11L;
         ActivityFilterDto equalDate = ActivityFilterDto.builder()
             .startDate(LocalDate.now())
             .endDate(LocalDate.now())
             .category(ActivityCategory.ON_DEMAND)
             .build();
-        MemberEntity memberEntity = MemberEntity.builder().nickName("nick").build();
+        MemberEntity memberEntity = MemberEntity.builder().id(userId).nickName("nick").build();
         Pageable pageable = mock(Pageable.class);
         Page<ActivityEntity> activityList = new PageImpl<>(
             List.of(ActivityEntity.builder().author(memberEntity).build(),
@@ -350,7 +353,7 @@ class ActivityServiceTest {
             .willReturn(activityList);
 
         // when
-        Page<ActivityResponseDto> response = activityService.getCrewActivityByDate(crewId,
+        Page<ActivityResponseDto> response = activityService.getCrewActivityByDate(crewId, userId,
             equalDate, pageable);
 
         // then

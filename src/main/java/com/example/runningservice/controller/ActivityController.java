@@ -76,7 +76,7 @@ public class ActivityController {
     public ResponseEntity<ActivityResponseDto> getActivity(@LoginUser Long userId,
         @PathVariable("crewId") Long crewId, @PathVariable("activityId") Long activityId) {
 
-        return ResponseEntity.ok(activityService.getActivity(activityId));
+        return ResponseEntity.ok(activityService.getActivity(activityId, userId));
     }
 
     /**
@@ -90,7 +90,7 @@ public class ActivityController {
         @RequestParam(value = "endDate", required = false) LocalDate endDate,
         @RequestParam(value = "category", required = false) ActivityCategory category) {
 
-        return ResponseEntity.ok(activityService.getCrewActivityByDate(crewId,
+        return ResponseEntity.ok(activityService.getCrewActivityByDate(crewId, userId,
             ActivityFilterDto.builder()
                 .startDate(startDate)
                 .endDate(endDate)
@@ -106,6 +106,6 @@ public class ActivityController {
         @PathVariable("crewId") Long crewId, Pageable pageable,
         @RequestParam(value = "category", required = false) ActivityCategory category) {
 
-        return ResponseEntity.ok(activityService.getCrewActivity(crewId, category, pageable));
+        return ResponseEntity.ok(activityService.getCrewActivity(crewId, userId, category, pageable));
     }
 }
