@@ -6,6 +6,7 @@ import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.MemberRepository;
+import java.time.Duration;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,9 +47,9 @@ class RunGoalServiceTest {
         runGoalEntity = RunGoalEntity.builder()
             .id(1L)
             .userId(memberEntity)
-            .totalDistance(10.0)
+            .totalDistance(100)
             .totalRunningTime(3600)
-            .averagePace(300)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .createdAt(LocalDateTime.now())
@@ -77,9 +78,9 @@ class RunGoalServiceTest {
         RunGoalEntity entity = RunGoalEntity.builder()
             .id(id)
             .userId(memberEntity) // 널값 체크
-            .totalDistance(10.0)
+            .totalDistance(100)
             .totalRunningTime(3600)
-            .averagePace(300)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .createdAt(LocalDateTime.now())
@@ -113,9 +114,9 @@ class RunGoalServiceTest {
     void testCreateRunGoal() {
         RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
             .userId(1L)
-            .totalDistance(10.0)
-            .totalRunningTime("00:36:00")
-            .averagePace("06:00")
+            .totalDistance(100)
+            .totalRunningTime(3600)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .build();
@@ -123,7 +124,7 @@ class RunGoalServiceTest {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(memberEntity));
         when(runGoalRepository.save(any(RunGoalEntity.class))).thenReturn(runGoalEntity);
 
-        RunGoalResponseDto result = runGoalService.createRunGoal(1L, requestDto);
+        RunGoalResponseDto result = runGoalService.createRunGoal(requestDto);
 
         assertNotNull(result);
         assertEquals(runGoalEntity.getId(), result.getId());
@@ -141,9 +142,9 @@ class RunGoalServiceTest {
         RunGoalEntity existingEntity = RunGoalEntity.builder()
             .id(id)
             .userId(memberEntity)
-            .totalDistance(10.0)
+            .totalDistance(100)
             .totalRunningTime(3600)
-            .averagePace(300)
+            .averagePace(Duration.ofSeconds(300))
             .isPublic(1)
             .runCount(10)
             .createdAt(LocalDateTime.now())
@@ -153,9 +154,9 @@ class RunGoalServiceTest {
         RunGoalEntity updatedEntity = RunGoalEntity.builder()
             .id(id)
             .userId(memberEntity)
-            .totalDistance(15.0)
+            .totalDistance(150)
             .totalRunningTime(18000)
-            .averagePace(300)
+            .averagePace(Duration.ofMinutes(5))
             .isPublic(1)
             .runCount(12)
             .createdAt(existingEntity.getCreatedAt())
@@ -166,9 +167,9 @@ class RunGoalServiceTest {
         when(runGoalRepository.save(any(RunGoalEntity.class))).thenReturn(updatedEntity);
 
         RunGoalRequestDto requestDto = RunGoalRequestDto.builder()
-            .totalDistance(15.0)
-            .totalRunningTime("05:00:00")
-            .averagePace("05:00")
+            .totalDistance(150)
+            .totalRunningTime(18000)
+            .averagePace(Duration.ofSeconds(270))
             .isPublic(1)
             .runCount(12)
             .build();
@@ -176,9 +177,9 @@ class RunGoalServiceTest {
         RunGoalResponseDto responseDto = runGoalService.updateRunGoal(id, requestDto);
 
         assertNotNull(responseDto);
-        assertEquals(15.0, responseDto.getTotalDistance());
+        assertEquals(150, responseDto.getTotalDistance());
         assertEquals(18000, responseDto.getTotalRunningTime());
-        assertEquals(300, responseDto.getAveragePace());
+        assertEquals(Duration.ofMinutes(5), responseDto.getAveragePace());
         assertEquals(1, responseDto.getIsPublic());
         assertEquals(12, responseDto.getRunCount());
         verify(runGoalRepository, times(1)).save(any(RunGoalEntity.class));

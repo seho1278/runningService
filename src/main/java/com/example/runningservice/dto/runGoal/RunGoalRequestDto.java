@@ -1,5 +1,6 @@
 package com.example.runningservice.dto.runGoal;
 
+import java.time.Duration;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -7,9 +8,9 @@ import lombok.Getter;
 @Builder
 public class RunGoalRequestDto {
     private Long userId;
-    private Double totalDistance;
-    private String totalRunningTime;
-    private String averagePace;
+    private Integer totalDistance;
+    private Integer totalRunningTime;
+    private Duration averagePace;
     private Integer isPublic;
     private Integer runCount;
 }
