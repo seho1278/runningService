@@ -1,5 +1,7 @@
 package com.example.runningservice.entity;
 
+import com.example.runningservice.util.converter.DurationConverter;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +36,7 @@ public class RunGoalEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private MemberEntity userId;
 
-    private Double totalDistance;
+    private Integer totalDistance;
     private Integer totalRunningTime;
 
     @CreatedDate
@@ -41,7 +44,8 @@ public class RunGoalEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private Integer averagePace;
+    @Convert(converter = DurationConverter.class)
+    private Duration averagePace;
     private Integer isPublic;
     private Integer runCount;
 }

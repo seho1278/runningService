@@ -20,17 +20,16 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 public class RunRecordServiceTest {
 
@@ -59,8 +58,8 @@ public class RunRecordServiceTest {
     public void testFindByUserId() {
         Long userId = 1L;
 
-        RunRecordEntity record1 = createMockRunRecordEntity(1L, userId, 10, 1800, 900);
-        RunRecordEntity record2 = createMockRunRecordEntity(2L, userId, 10, 900, 900);
+        RunRecordEntity record1 = createMockRunRecordEntity(1L, userId, 10, 1800, Duration.ofMinutes(15));
+        RunRecordEntity record2 = createMockRunRecordEntity(2L, userId, 10, 900, Duration.ofMinutes(15));
         List<RunRecordEntity> mockRecords = Arrays.asList(record1, record2);
 
         when(runRecordRepository.findByUserId_Id(userId)).thenReturn(mockRecords);
@@ -82,7 +81,7 @@ public class RunRecordServiceTest {
         MemberEntity mockMember = MemberEntity.builder().id(userId).build();
         RunGoalEntity mockGoal = RunGoalEntity.builder().id(goalId).build();
 
-        RunRecordEntity mockEntity = createMockRunRecordEntity(1L, userId, 10, 1800, 900);
+        RunRecordEntity mockEntity = createMockRunRecordEntity(1L, userId, 10, 1800, Duration.ofMinutes(15));
 
         when(memberRepository.findById(userId)).thenReturn(Optional.of(mockMember));
         when(runGoalRepository.findById(goalId)).thenReturn(Optional.of(mockGoal));
@@ -103,10 +102,9 @@ public class RunRecordServiceTest {
 
         RunRecordRequestDto requestDto = RunRecordRequestDto.builder()
             .goalId(goalId)
-            .distance(15.0)
-            .runningTime("00:30:00")
-            .pace("06:00")
-            .runningDate(LocalDateTime.of(2024,10,1, 0,0,0))
+            .distance(150)
+            .runningTime(1800)
+            .pace(Duration.ofMinutes(6))
             .isPublic(1)
             .build();
 
@@ -118,23 +116,21 @@ public class RunRecordServiceTest {
             .id(runningId)
             .userId(memberEntity)
             .goalId(null)
-            .distance(10.0)
+            .distance(100)
             .runningTime(900)
-            .pace(480)
+            .pace(Duration.ofMinutes(8))
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .isPublic(0)
             .build();
-
-        Map<String, Integer> map =  runRecordService.transformDTO(requestDto);
 
         RunRecordEntity updatedEntity = RunRecordEntity.builder()
             .id(runningId)
             .userId(memberEntity)
             .goalId(existingEntity.getGoalId())
             .distance(requestDto.getDistance())
-            .runningTime(map.get("runningTime"))
-            .pace(map.get("pace"))
+            .runningTime(requestDto.getRunningTime())
+            .pace(requestDto.getPace())
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
             .isPublic(requestDto.getIsPublic())
@@ -147,16 +143,15 @@ public class RunRecordServiceTest {
 
         assertNotNull(responseDto);
         assertEquals(requestDto.getDistance(), responseDto.getDistance());
-        assertEquals(map.get("runningTime"), responseDto.getRunningTime());
-        assertEquals(map.get("pace"), responseDto.getPace());
+        assertEquals(requestDto.getRunningTime(), responseDto.getRunningTime());
+        assertEquals(requestDto.getPace(), responseDto.getPace());
 
-
+        // Verify that the save method was called with the updated entity
         verify(runRecordRepository).save(argThat(entity ->
             entity.getId().equals(runningId) &&
                 entity.getDistance().equals(requestDto.getDistance()) &&
-                entity.getRunningTime().equals(map.get("runningTime")) &&
-                entity.getPace().equals(map.get("pace")) &&
-                entity.getRunningDate().equals(LocalDateTime.of(2024,10,1, 0,0,0))
+                entity.getRunningTime().equals(requestDto.getRunningTime()) &&
+                entity.getPace().equals(requestDto.getPace())
         ));
     }
 
@@ -168,7 +163,7 @@ public class RunRecordServiceTest {
 
         when(runRecordRepository.findById(runningId)).thenReturn(Optional.empty());
 
-        assertThrows(CustomException.class,
+        CustomException exception = assertThrows(CustomException.class,
             () -> runRecordService.updateRunRecord(runningId, requestDto));
 
         verify(runRecordRepository, never()).save(any(RunRecordEntity.class));
@@ -179,8 +174,8 @@ public class RunRecordServiceTest {
         Long userId = 1L;
 
         // Mock 데이터 생성 - 누적 시간이 45분, 평균 페이스가 15분이 되도록 수정
-        RunRecordEntity record1 = createMockRunRecordEntity(1L, userId, 10, 1800, 900);
-        RunRecordEntity record2 = createMockRunRecordEntity(2L, userId, 10, 900, 900);
+        RunRecordEntity record1 = createMockRunRecordEntity(1L, userId, 10, 1800, Duration.ofMinutes(15));
+        RunRecordEntity record2 = createMockRunRecordEntity(2L, userId, 10, 900, Duration.ofMinutes(15));
         List<RunRecordEntity> mockRecords = Arrays.asList(record1, record2);
 
         when(runRecordRepository.findByUserId_Id(userId)).thenReturn(mockRecords);
@@ -191,12 +186,10 @@ public class RunRecordServiceTest {
         assertEquals(userId, result.getUserId());
         assertEquals(20, result.getDistance()); // 총 거리 확인
         assertEquals(2700, result.getRunningTime()); // 총 러닝 시간 확인
-        assertEquals(900, result.getPace()); // 평균 페이스 확인
+        assertEquals(Duration.ofMinutes(15), result.getPace()); // 평균 페이스 확인
     }
 
-
-    private RunRecordEntity createMockRunRecordEntity(Long id, Long userId, double distance, int runningTime, int pace) {
-
+    private RunRecordEntity createMockRunRecordEntity(Long id, Long userId, int distance, int runningTime, Duration pace) {
         return RunRecordEntity.builder()
             .id(id)
             .userId(MemberEntity.builder().id(userId).build())
@@ -204,7 +197,6 @@ public class RunRecordServiceTest {
             .distance(distance)
             .runningTime(runningTime)
             .pace(pace)
-            .runningDate(LocalDateTime.now())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .isPublic(1)
@@ -215,9 +207,9 @@ public class RunRecordServiceTest {
     private RunRecordRequestDto createMockRunRecordRequestDto(Long goalId) {
         return RunRecordRequestDto.builder()
             .goalId(goalId)
-            .distance(10.0)
-            .runningTime("00:30:00")
-            .pace("15:00")
+            .distance(10)
+            .runningTime(1800)
+            .pace(Duration.ofMinutes(15))
             .isPublic(1)
             .build();
     }

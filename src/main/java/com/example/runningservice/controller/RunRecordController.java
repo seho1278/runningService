@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/run/records")
+@RequestMapping("/run")
 public class RunRecordController {
 
     private final RunRecordService runRecordService;
@@ -45,7 +45,7 @@ public class RunRecordController {
     /**
      * 러닝 기록 조회
       */
-    @GetMapping("/{runningId}")
+    @GetMapping("/records/{runningId}")
     public ResponseEntity<RunRecordResponseDto> getRunRecordById(@PathVariable Long runningId) {
         return runRecordService.findById(runningId)
             .map(ResponseEntity::ok)
@@ -55,7 +55,7 @@ public class RunRecordController {
     /**
      * 러닝 기록 생성
       */
-    @PostMapping("/")
+    @PostMapping("/records")
     public ResponseEntity<RunRecordResponseDto> createRunRecord(@LoginUser Long userId, @RequestBody RunRecordRequestDto runRecord) {
         RunRecordResponseDto createdRecord = runRecordService.createRunRecord(userId, runRecord);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRecord); // 201 Created 반환
@@ -64,7 +64,7 @@ public class RunRecordController {
     /**
      * 러닝 기록 수정
       */
-    @PutMapping("/{runRecordId}")
+    @PutMapping("/records/{runRecordId}")
     public ResponseEntity<RunRecordResponseDto> updateRunRecord(
         @PathVariable Long runRecordId, @RequestBody RunRecordRequestDto updatedRunRecord) {
         return ResponseEntity.ok(runRecordService.updateRunRecord(runRecordId, updatedRunRecord));
@@ -73,7 +73,7 @@ public class RunRecordController {
     /**
      * 러닝 기록 삭제
       */
-    @DeleteMapping("/{runRecordId}")
+    @DeleteMapping("/records/{runRecordId}")
     public ResponseEntity<Void> deleteRunRecord(@PathVariable Long runRecordId) {
         if (runRecordService.findById(runRecordId).isPresent()) {
             runRecordService.deleteById(runRecordId);
@@ -86,7 +86,7 @@ public class RunRecordController {
     /**
      * 러닝 기록 공개 설정
      */
-    @PutMapping("/visibility/{runRecordId}")
+    @PutMapping("/records/visibility/{runRecordId}")
     public ResponseEntity<RunRecordResponseDto> updateRunRecordVisibility(
         @PathVariable Long runRecordId, @RequestBody RunRecordRequestDto updatedRunRecord) {
         return ResponseEntity.ok(runRecordService.updateRunRecord(runRecordId, updatedRunRecord));
