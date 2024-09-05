@@ -17,6 +17,7 @@ public class RunRecordResponseDto {
     private Integer pace;
     private Integer isPublic;
     private Integer runCount;
+    private LocalDateTime runningDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
