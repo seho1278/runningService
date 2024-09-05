@@ -9,14 +9,10 @@ import lombok.Getter;
 public class RunRecordResponseDto {
     private Long id;
     private Long userId;
-    private Integer totalDistance;
-    private Integer totalRunningTime;
-    private String averagePace;
     private Double distance;
     private Integer runningTime;
     private Integer pace;
     private Integer isPublic;
-    private Integer runCount;
     private LocalDateTime runningDate;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
