@@ -123,16 +123,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public LogoutFilter logoutFilter() {
-        return new LogoutFilter((request, response, authentication) -> {
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().write("{\"message\":\"Successfully logged out\"}");
-            response.setContentType("application/json");
-            response.getWriter().flush();
-        }, logoutService);
-    }
-
-    @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtUtil);
     }
