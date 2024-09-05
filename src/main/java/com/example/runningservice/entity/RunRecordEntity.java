@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,7 +44,7 @@ public class RunRecordEntity {
 
     private Integer runningTime;
 
-    private LocalDateTime runningDate;
+    private LocalDate runningDate;
     @CreatedDate
     private LocalDateTime createdAt;
     @LastModifiedDate

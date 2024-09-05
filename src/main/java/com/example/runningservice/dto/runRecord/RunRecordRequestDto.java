@@ -1,6 +1,6 @@
 package com.example.runningservice.dto.runRecord;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
