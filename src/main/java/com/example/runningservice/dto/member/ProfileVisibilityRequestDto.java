@@ -1,8 +1,10 @@
 package com.example.runningservice.dto.member;
 
-import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Visibility;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -13,4 +15,5 @@ public class ProfileVisibilityRequestDto {
     private Visibility phoneNumber;
     private Visibility gender;
     private Visibility birthYear;
+    private Visibility runProfile;
 }

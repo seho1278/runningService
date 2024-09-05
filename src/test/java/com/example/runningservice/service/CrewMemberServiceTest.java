@@ -14,12 +14,15 @@ import static org.mockito.Mockito.when;
 
 import com.example.runningservice.dto.crewMember.ChangeCrewRoleRequestDto;
 import com.example.runningservice.dto.crewMember.ChangedLeaderResponseDto;
+import com.example.runningservice.dto.crewMember.CrewMemberResponseDetailDto;
 import com.example.runningservice.dto.crewMember.GetCrewMemberRequestDto;
+import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberBlackListEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
 import com.example.runningservice.entity.MemberEntity;
+import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.JoinStatus;
@@ -27,6 +30,7 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
@@ -58,6 +62,12 @@ class CrewMemberServiceTest {
 
     @Mock
     private JoinApplicationRepository joinApplicationRepository;
+
+    @Mock
+    private RunGoalRepository runGoalRepository;
+
+    @Mock
+    private RunRecordService runRecordService;
 
     @Mock
     private CrewMemberBlackListRepository crewMemberBlackListRepository;
@@ -168,20 +178,25 @@ class CrewMemberServiceTest {
         // given
         CrewMemberEntity crewMember = CrewMemberEntity.builder()
             .crew(CrewEntity.builder().id(1L).crewName("crew1").build())
-            .member(MemberEntity.builder().nickName("nick1").name("name1").nameVisibility(
-                Visibility.PRIVATE).build())
+            .member(MemberEntity.builder().id(1L).nickName("nick1").name("name1").nameVisibility(
+                Visibility.PRIVATE)
+                .runProfileVisibility(Visibility.PRIVATE).build())
             .role(CrewRole.MEMBER)
+            .build();
+
+        RunGoalEntity runGoalEntity = RunGoalEntity.builder().id(1L).build();
+        RunRecordResponseDto runRecordResponseDto = RunRecordResponseDto.builder()
+            .id(1L)
             .build();
 
         when(crewMemberRepository.findById(crewMember.getId())).thenReturn(Optional.of(crewMember));
 
         // when
-        CrewMemberEntity result = crewMemberService.getCrewMember(crewMember.getId());
+        CrewMemberResponseDetailDto result = crewMemberService.getCrewMember(crewMember.getId());
 
         // then
         assertNotNull(result);
-        assertEquals(crewMember.getId(), result.getId());
-        assertEquals("nick1", result.getMember().getNickName());
+        assertEquals(crewMember.getId(), result.getCrewMemberId());
     }
 
     @Test

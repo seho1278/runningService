@@ -49,5 +49,4 @@ public class RunRecordEntity {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    private Integer isPublic;
 }

@@ -47,7 +47,6 @@ public class RunRecordService {
 
         Map<String,Integer> map = transformDTO(runRecordRequestDto);
 
-
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
             .goalId(goal)
@@ -57,7 +56,6 @@ public class RunRecordService {
             .runningDate(runRecordRequestDto.getRunningDate())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(runRecordRequestDto.getIsPublic())
             .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(runRecordEntity);
@@ -82,7 +80,6 @@ public class RunRecordService {
             .runningDate(runRecordRequestDto.getRunningDate())
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
-            .isPublic(runRecordRequestDto.getIsPublic())
             .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(updatedEntity);
@@ -127,7 +124,6 @@ public class RunRecordService {
             .pace(averagePace)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(1) // 임의로 공개 설정
             .build();
     }
 
@@ -144,7 +140,6 @@ public class RunRecordService {
             .runningDate(entity.getRunningDate())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
-            .isPublic(entity.getIsPublic())
             .build();
     }
 

@@ -42,6 +42,5 @@ public class RunGoalEntity {
     private LocalDateTime updatedAt;
 
     private Integer averagePace;
-    private Integer isPublic;
     private Integer runCount;
 }

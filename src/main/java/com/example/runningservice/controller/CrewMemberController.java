@@ -62,11 +62,7 @@ public class CrewMemberController {
     @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
     public ResponseEntity<CrewMemberResponseDetailDto> getCrewMember(@LoginUser Long userId,
         @PathVariable("crew_id") Long crewId, @RequestParam Long crewMemberId) {
-
-        CrewMemberResponseDetailDto crewMemberDto = CrewMemberResponseDetailDto.of(
-            crewMemberService.getCrewMember(crewMemberId), aesUtil);
-
-        return ResponseEntity.ok(crewMemberDto);
+        return ResponseEntity.ok(crewMemberService.getCrewMember(crewMemberId));
     }
 
     /**

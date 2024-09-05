@@ -3,8 +3,11 @@ package com.example.runningservice.dto.member;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Visibility;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
@@ -23,4 +26,5 @@ public class UpdateMemberRequestDto {
     private Visibility phoneNumberVisibility;
     private Visibility genderVisibility;
     private Visibility birthYearVisibility;
+    private Visibility runProfileVisibility;
 }
