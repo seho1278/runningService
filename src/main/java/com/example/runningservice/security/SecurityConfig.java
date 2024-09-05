@@ -89,7 +89,7 @@ public class SecurityConfig {
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(logoutFilter(), JwtAuthenticationFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter(), LogoutFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .logout(
                 (logoutConfig) -> logoutConfig
