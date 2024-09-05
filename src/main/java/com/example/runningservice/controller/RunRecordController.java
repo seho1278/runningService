@@ -55,7 +55,7 @@ public class RunRecordController {
     /**
      * 러닝 기록 생성
       */
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<RunRecordResponseDto> createRunRecord(@LoginUser Long userId, @RequestBody RunRecordRequestDto runRecord) {
         RunRecordResponseDto createdRecord = runRecordService.createRunRecord(userId, runRecord);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRecord); // 201 Created 반환
