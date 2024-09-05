@@ -203,7 +203,7 @@ public class RunRecordServiceTest {
             .distance(distance)
             .runningTime(runningTime)
             .pace(pace)
-            .runningDate(LocalDate.now())
+            .runningDate(LocalDateTime.now())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
