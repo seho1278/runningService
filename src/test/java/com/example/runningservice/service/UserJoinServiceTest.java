@@ -949,7 +949,7 @@ class UserJoinServiceTest {
 
         MemberEntity memberEntity = MemberEntity.builder().id(userId).email("testEmail")
             .nickName("testNickName").birthYear(1995).birthYearVisibility(Visibility.PUBLIC)
-            .runRecordVisibility(Visibility.PUBLIC)
+            .runProfileVisibility(Visibility.PUBLIC)
             .gender(Gender.FEMALE).build();
         CrewEntity crewEntity = CrewEntity.builder()
             .id(crewId)
