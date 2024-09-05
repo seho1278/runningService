@@ -20,6 +20,8 @@ import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
+
+import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,7 +108,7 @@ public class RunRecordServiceTest {
             .distance(15.0)
             .runningTime("00:30:00")
             .pace("06:00")
-            .runningDate(LocalDateTime.of(2024,10,1, 0,0,0))
+            .runningDate(LocalDate.of(2024,10,1))
             .isPublic(1)
             .build();
 
@@ -156,7 +158,7 @@ public class RunRecordServiceTest {
                 entity.getDistance().equals(requestDto.getDistance()) &&
                 entity.getRunningTime().equals(map.get("runningTime")) &&
                 entity.getPace().equals(map.get("pace")) &&
-                entity.getRunningDate().equals(LocalDateTime.of(2024,10,1, 0,0,0))
+                entity.getRunningDate().equals(LocalDate.of(2024,10,1))
         ));
     }
 
@@ -204,7 +206,7 @@ public class RunRecordServiceTest {
             .distance(distance)
             .runningTime(runningTime)
             .pace(pace)
-            .runningDate(LocalDateTime.now())
+            .runningDate(LocalDate.now())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .isPublic(1)
