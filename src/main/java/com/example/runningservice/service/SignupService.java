@@ -33,13 +33,14 @@ public class SignupService {
 
         // 사용자 엔티티 생성 및 저장(비밀번호와 전화번호는 암호화)
         MemberEntity memberEntity = registerForm.toEntity(passwordEncoder, aesUtil);
+        memberRepository.save(memberEntity);
 
         //imageUrl을 엔티티에 저장
         String imageUrl = uploadFileAndReturnFileName(memberEntity.getId(),
             registerForm.getProfileImage());
         memberEntity.updateProfileImageUrl(imageUrl);
 
-        return MemberResponseDto.of(memberRepository.save(memberEntity), aesUtil, s3FileUtil);
+        return MemberResponseDto.of(memberEntity, aesUtil, s3FileUtil);
     }
 
     @Transactional

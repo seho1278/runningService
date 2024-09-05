@@ -35,8 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try {
             String accessJwt = resolveToken(request, ACCESS_TOKEN_HEADER);
-            log.debug("request path: {}", request.getRequestURI());
-            log.debug("accessJwt: {}", accessJwt);
+            log.info("request path: {}", request.getRequestURI());
+            log.info("accessJwt: {}", accessJwt);
             if (accessJwt != null) {
                 if (!jwtUtil.isTokenExpired(accessJwt)) {
                     Authentication authentication = jwtUtil.getAuthentication(accessJwt);

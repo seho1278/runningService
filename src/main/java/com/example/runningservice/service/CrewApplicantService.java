@@ -14,6 +14,7 @@ import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.PageUtil;
+import com.example.runningservice.util.S3FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ public class CrewApplicantService {
 
     private final CrewMemberRepository crewMemberRepository;
     private final JoinApplicationRepository joinApplicationRepository;
+    private final S3FileUtil s3FileUtil;
 
     @Transactional
     public Page<CrewApplicantResponseDto> getAllJoinApplications(Long crewId,
@@ -73,7 +75,7 @@ public class CrewApplicantService {
         CrewMemberEntity newMember = CrewMemberEntity.of(memberEntity, crewEntity);
         //DTO 변환
         CrewMemberEntity savedCrewMember = crewMemberRepository.save(newMember);
-        return CrewMemberResponseDto.of(savedCrewMember);
+        return CrewMemberResponseDto.of(savedCrewMember, s3FileUtil);
     }
 
 

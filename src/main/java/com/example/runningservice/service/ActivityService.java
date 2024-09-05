@@ -67,7 +67,7 @@ public class ActivityService {
                 .relatedId(activityEntity.getId())
                 .build());*/
 
-        return ActivityResponseDto.fromEntity(activityEntity);
+        return ActivityResponseDto.fromEntity(activityEntity, userId);
     }
 
     // 번개 러닝 일정 생성
@@ -93,7 +93,7 @@ public class ActivityService {
                 .relatedId(activityEntity.getId())
                 .build());*/
 
-        return ActivityResponseDto.fromEntity(activityEntity);
+        return ActivityResponseDto.fromEntity(activityEntity, userId);
     }
 
     // 리더 또는 스탭 권한이 없는지 확인한다.
@@ -124,7 +124,7 @@ public class ActivityService {
 
         activityEntity.update(activityDto);
 
-        return ActivityResponseDto.fromEntity(activityEntity);
+        return ActivityResponseDto.fromEntity(activityEntity, userId);
     }
 
     private boolean isRegularRun(ActivityEntity activityEntity) {
@@ -145,7 +145,7 @@ public class ActivityService {
             }
         }
 
-        ActivityResponseDto response = ActivityResponseDto.fromEntity(activityEntity);
+        ActivityResponseDto response = ActivityResponseDto.fromEntity(activityEntity, userId);
 
         activityRepository.delete(activityEntity);
 
@@ -155,17 +155,17 @@ public class ActivityService {
     /**
      * 특정 (정기/번개)러닝 일정 조회
      */
-    public ActivityResponseDto getActivity(Long activityId) {
+    public ActivityResponseDto getActivity(Long activityId, Long userId) {
         ActivityEntity activityEntity = activityRepository.findById(activityId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACTIVITY));
 
-        return ActivityResponseDto.fromEntity(activityEntity);
+        return ActivityResponseDto.fromEntity(activityEntity, userId);
     }
 
     /**
      * 날짜별 크루 (정기/번개)러닝 일정 조회
      */
-    public Page<ActivityResponseDto> getCrewActivityByDate(Long crewId,
+    public Page<ActivityResponseDto> getCrewActivityByDate(Long crewId, Long userId,
         ActivityFilterDto activityFilter, Pageable pageable) {
         if (!validateDate(activityFilter.getStartDate(), activityFilter.getEndDate())) {
             throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
@@ -175,19 +175,19 @@ public class ActivityService {
             crewId, activityFilter.getCategory(), activityFilter.getStartDate(),
             activityFilter.getEndDate(), pageable);
 
-        return activityPage.map(ActivityResponseDto::fromEntity);
+        return activityPage.map(entity -> ActivityResponseDto.fromEntity(entity, userId));
     }
 
     /**
      * 다가오는 크루 (정기/번개)러닝 일정 조회
      */
-    public Page<ActivityResponseDto> getCrewActivity(Long crewId, ActivityCategory category,
-        Pageable pageable) {
+    public Page<ActivityResponseDto> getCrewActivity(Long crewId, Long userId,
+        ActivityCategory category, Pageable pageable) {
         Page<ActivityEntity> activityPage = activityRepository
             .findByCrew_IdAndCategoryAndDateGreaterThanEqualOrderByDate(
                 crewId, category, pageable);
 
-        return activityPage.map(ActivityResponseDto::fromEntity);
+        return activityPage.map(entity -> ActivityResponseDto.fromEntity(entity, userId));
     }
 
     // 시작 날짜가 종료 날짜보다 빠르거나 같은지 체크한다.
