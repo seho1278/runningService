@@ -41,7 +41,7 @@ public class CrewMemberResponseDetailDto extends CrewMemberResponseDto {
 
         private Double totalDistance;
         private Integer totalRunningTime;
-        private String averagePace;
+        private Integer averagePace;
         private Integer runCount;
     }
 
@@ -85,8 +85,8 @@ public class CrewMemberResponseDetailDto extends CrewMemberResponseDto {
             .averagePaceGoal(runGoal.getAveragePace())
             .totalRunningTimeGoal(runGoal.getTotalRunningTime())
             .totalDistance(runRecord.getDistance())
-            .totalRunningTime(runRecord.getTotalRunningTime())
-            .averagePace(runRecord.getAveragePace())
+            .totalRunningTime(runRecord.getRunningTime())
+            .averagePace(runRecord.getPace())
             .runCount(runRecord.getRunCount())
             .build();
     }
