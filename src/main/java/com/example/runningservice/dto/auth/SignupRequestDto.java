@@ -1,4 +1,4 @@
-package com.example.runningservice.dto;
+package com.example.runningservice.dto.auth;
 
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;

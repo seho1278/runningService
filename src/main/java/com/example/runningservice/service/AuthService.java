@@ -1,7 +1,7 @@
 package com.example.runningservice.service;
 
-import com.example.runningservice.dto.JwtResponse;
-import com.example.runningservice.dto.LoginRequestDto;
+import com.example.runningservice.dto.auth.JwtResponse;
+import com.example.runningservice.dto.auth.LoginRequestDto;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.security.CustomUserDetails;

@@ -3,6 +3,7 @@ package com.example.runningservice.dto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.example.runningservice.dto.auth.SignupRequestDto;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
 import com.example.runningservice.enums.Visibility;
