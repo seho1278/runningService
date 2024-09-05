@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.runningservice.client.MailgunClient;
-import com.example.runningservice.dto.SignupRequestDto;
+import com.example.runningservice.dto.auth.SignupRequestDto;
 import com.example.runningservice.dto.member.MemberResponseDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Gender;

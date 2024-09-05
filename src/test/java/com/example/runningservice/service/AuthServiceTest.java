@@ -9,8 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.runningservice.dto.JwtResponse;
-import com.example.runningservice.dto.LoginRequestDto;
+import com.example.runningservice.dto.auth.JwtResponse;
+import com.example.runningservice.dto.auth.LoginRequestDto;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.Role;
 import com.example.runningservice.exception.CustomException;
