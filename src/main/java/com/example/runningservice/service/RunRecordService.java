@@ -12,7 +12,8 @@ import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,18 +22,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RunRecordService {
 
     private final RunRecordRepository runRecordRepository;
     private final MemberRepository memberRepository;
     private final RunGoalRepository runGoalRepository;
-
-    @Autowired
-    public RunRecordService(RunRecordRepository runRecordRepository, MemberRepository memberRepository, RunGoalRepository runGoalRepository) {
-        this.runRecordRepository = runRecordRepository;
-        this.memberRepository = memberRepository;
-        this.runGoalRepository = runGoalRepository;
-    }
 
     public List<RunRecordResponseDto> findByUserId(Long userId) {
         List<RunRecordEntity> runRecords = runRecordRepository.findByUserId_Id(userId);
@@ -52,7 +47,6 @@ public class RunRecordService {
 
         Map<String,Integer> map = transformDTO(runRecordRequestDto);
 
-
         RunRecordEntity runRecordEntity = RunRecordEntity.builder()
             .userId(member)
             .goalId(goal)
@@ -62,7 +56,6 @@ public class RunRecordService {
             .runningDate(runRecordRequestDto.getRunningDate())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(runRecordRequestDto.getIsPublic())
             .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(runRecordEntity);
@@ -87,7 +80,6 @@ public class RunRecordService {
             .runningDate(runRecordRequestDto.getRunningDate())
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
-            .isPublic(runRecordRequestDto.getIsPublic())
             .build();
 
         RunRecordEntity savedEntity = runRecordRepository.save(updatedEntity);
@@ -132,7 +124,6 @@ public class RunRecordService {
             .pace(averagePace)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(1) // 임의로 공개 설정
             .build();
     }
 
@@ -149,7 +140,6 @@ public class RunRecordService {
             .runningDate(entity.getRunningDate())
             .createdAt(entity.getCreatedAt())
             .updatedAt(entity.getUpdatedAt())
-            .isPublic(entity.getIsPublic())
             .build();
     }
 

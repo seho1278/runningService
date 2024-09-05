@@ -2,17 +2,24 @@ package com.example.runningservice.service;
 
 import com.example.runningservice.dto.crewMember.ChangeCrewRoleRequestDto;
 import com.example.runningservice.dto.crewMember.ChangedLeaderResponseDto;
+import com.example.runningservice.dto.crewMember.CrewMemberResponseDetailDto;
 import com.example.runningservice.dto.crewMember.GetCrewMemberRequestDto;
+import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.CrewMemberBlackListEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
+import com.example.runningservice.entity.MemberEntity;
+import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.enums.CrewRole;
+import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.JoinApplicationRepository;
+import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
+import com.example.runningservice.util.AESUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +37,9 @@ public class CrewMemberService {
     private final JoinApplicationRepository joinApplicationRepository;
     private final CrewMemberBlackListRepository crewMemberBlackListRepository;
     private final ChatJoinRepository chatJoinRepository;
+    private final RunGoalRepository runGoalRepository;
+    private final RunRecordService runRecordService;
+    private final AESUtil aesUtil;
 
     /**
      * 크루원 조회
@@ -60,9 +70,29 @@ public class CrewMemberService {
      * 크루원 개별조회(상세조회)
      */
     @Transactional
-    public CrewMemberEntity getCrewMember(Long crewMemberId) {
-        return crewMemberRepository.findById(crewMemberId)
+    public CrewMemberResponseDetailDto getCrewMember(Long crewMemberId) {
+        CrewMemberEntity crewMemberEntity = crewMemberRepository.findById(crewMemberId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
+
+        MemberEntity memberEntity = crewMemberEntity.getMember();
+        if (memberEntity.getRunProfileVisibility() == Visibility.PRIVATE) {
+            return CrewMemberResponseDetailDto.of(crewMemberEntity, aesUtil);
+        }
+
+        Long userId = memberEntity.getId();
+        RunGoalEntity runGoalEntity = runGoalRepository.findFirstByUserId_IdOrderByCreatedAtDesc(
+                userId)
+            .orElseThrow(() -> new CustomException(
+                ErrorCode.NOT_FOUND_RUN_GOAL));
+        RunRecordResponseDto runRecordResponseDto = runRecordService.calculateTotalRunRecords(
+            userId);
+
+        CrewMemberResponseDetailDto crewMemberResponseDetailDto = CrewMemberResponseDetailDto.of(
+            crewMemberEntity, aesUtil);
+
+        crewMemberResponseDetailDto.addRunProfile(runGoalEntity, runRecordResponseDto);
+
+        return crewMemberResponseDetailDto;
     }
 
     /**

@@ -12,7 +12,6 @@ public class RunGoalResponseDto {
     private Double totalDistance;
     private Integer totalRunningTime;
     private Integer averagePace;
-    private Integer isPublic;
     private Integer runCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

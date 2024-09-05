@@ -16,6 +16,7 @@ public class ProfileVisibilityResponseDto {
     private Visibility phoneNumber;
     private Visibility gender;
     private Visibility birthYear;
+    private Visibility runProfile;
 
     public static ProfileVisibilityResponseDto of(MemberEntity memberEntity) {
         return ProfileVisibilityResponseDto.builder()
@@ -23,6 +24,7 @@ public class ProfileVisibilityResponseDto {
             .phoneNumber(memberEntity.getPhoneNumberVisibility())
             .gender(memberEntity.getGenderVisibility())
             .birthYear(memberEntity.getBirthYearVisibility())
+            .runProfile(memberEntity.getRunProfileVisibility())
             .build();
     }
 }

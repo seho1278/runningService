@@ -37,6 +37,7 @@ public class MemberResponseDto {
     private Visibility phoneNumberVisibility;
     private Visibility genderVisibility;
     private Visibility birthYearVisibility;
+    private Visibility runProfileVisibility;
 
     public static MemberResponseDto of(MemberEntity memberEntity, AESUtil aesUtil,
         S3FileUtil s3FileUtil) {
@@ -56,6 +57,7 @@ public class MemberResponseDto {
             .phoneNumberVisibility(memberEntity.getPhoneNumberVisibility())
             .genderVisibility(memberEntity.getGenderVisibility())
             .birthYearVisibility(memberEntity.getBirthYearVisibility())
+            .runProfileVisibility(memberEntity.getRunProfileVisibility())
             .build();
     }
 }
