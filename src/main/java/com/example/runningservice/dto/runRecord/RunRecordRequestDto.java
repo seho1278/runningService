@@ -1,6 +1,6 @@
 package com.example.runningservice.dto.runRecord;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +12,6 @@ public class RunRecordRequestDto {
     private Double distance;
     private String runningTime;
     private String pace;
-    private LocalDateTime runningDate;
-
+    private LocalDate runningDate;
     private Integer isPublic;
 }
