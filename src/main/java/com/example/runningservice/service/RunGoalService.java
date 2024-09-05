@@ -120,7 +120,7 @@ public class RunGoalService {
         // pace 분:초 -> sec 변환
         String[] paces = runGoalRequestDto.getAveragePace().split(":");
         int pace = Integer.parseInt(paces[0])*60+Integer.parseInt(paces[1]);
-        map.put("AveragePace", pace);
+        map.put("averagePace", pace);
 
         return map;
     }
