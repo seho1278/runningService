@@ -18,7 +18,8 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
         + "WHERE (:startDate IS NULL OR a.date >= :startDate) "
         + "AND (:endDate IS NULL OR a.date <= :endDate) "
         + "AND (:category IS NULL OR a.category = :category)"
-        + "AND a.crew.id = :crewId ")
+        + "AND a.crew.id = :crewId "
+        + "ORDER BY a.date")
     Page<ActivityEntity> findByCrewIdAndCategoryAndDateBetween(
         @Param("crewId") Long crewId, @Param("category") ActivityCategory category,
         @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate,
@@ -28,7 +29,8 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
         + "FROM ActivityEntity a "
         + "WHERE a.date >= CURRENT_DATE "
         + "AND (:category IS NULL OR a.category = :category)"
-        + "AND a.crew.id = :crewId ")
+        + "AND a.crew.id = :crewId "
+        + "ORDER BY a.date")
     Page<ActivityEntity> findByCrew_IdAndCategoryAndDateGreaterThanEqualOrderByDate(
         @Param("crewId") Long crewId, @Param("category") ActivityCategory category,
         Pageable pageable);
