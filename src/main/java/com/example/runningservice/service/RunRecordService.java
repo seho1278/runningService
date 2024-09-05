@@ -12,7 +12,8 @@ import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,18 +22,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RunRecordService {
 
     private final RunRecordRepository runRecordRepository;
     private final MemberRepository memberRepository;
     private final RunGoalRepository runGoalRepository;
-
-    @Autowired
-    public RunRecordService(RunRecordRepository runRecordRepository, MemberRepository memberRepository, RunGoalRepository runGoalRepository) {
-        this.runRecordRepository = runRecordRepository;
-        this.memberRepository = memberRepository;
-        this.runGoalRepository = runGoalRepository;
-    }
 
     public List<RunRecordResponseDto> findByUserId(Long userId) {
         List<RunRecordEntity> runRecords = runRecordRepository.findByUserId_Id(userId);
