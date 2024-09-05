@@ -162,7 +162,7 @@ public class UserJoinService {
         }
         // 기록공개여부 검증
         if (recordOpen != null && recordOpen) {
-            if (memberEntity.getRunRecordVisibility() != Visibility.PUBLIC) {
+            if (memberEntity.getRunProfileVisibility() != Visibility.PUBLIC) {
                 throw new CustomException(ErrorCode.RECORD_OPEN_REQUIRED);
             }
         }

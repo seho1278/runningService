@@ -15,7 +15,6 @@ public class RunRecordResponseDto {
     private Double distance;
     private Integer runningTime;
     private Integer pace;
-    private Integer isPublic;
     private Integer runCount;
     private LocalDateTime runningDate;
     private LocalDateTime createdAt;

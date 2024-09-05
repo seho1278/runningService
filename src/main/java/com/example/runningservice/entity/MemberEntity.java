@@ -22,7 +22,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +79,7 @@ public class MemberEntity extends BaseEntity {
     @Column(name = "birth_year_visibility")
     private Visibility birthYearVisibility;
     @Column(name = "run_record_visibility")
-    private Visibility runRecordVisibility;
+    private Visibility runProfileVisibility;
 
     // 알림 설정
     @Column(name = "post_noti")
@@ -96,9 +95,9 @@ public class MemberEntity extends BaseEntity {
     @OneToMany
     @JoinColumn(name = "run_record_id")
     private List<RunRecordEntity> runRecordEntities = new ArrayList<>();
-    @OneToOne
+    @OneToMany
     @JoinColumn(name = "run_goal_id")
-    private RunGoalEntity runGoalEntity;
+    private List<RunGoalEntity> runGoalEntities = new ArrayList<>();
 
 
     public void markEmailVerified() {

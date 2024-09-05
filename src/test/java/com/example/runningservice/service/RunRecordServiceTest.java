@@ -107,7 +107,6 @@ public class RunRecordServiceTest {
             .runningTime("00:30:00")
             .pace("06:00")
             .runningDate(LocalDateTime.of(2024,10,1, 0,0,0))
-            .isPublic(1)
             .build();
 
         MemberEntity memberEntity = MemberEntity.builder()
@@ -123,7 +122,6 @@ public class RunRecordServiceTest {
             .pace(480)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(0)
             .build();
 
         Map<String, Integer> map =  runRecordService.transformDTO(requestDto);
@@ -137,7 +135,6 @@ public class RunRecordServiceTest {
             .pace(map.get("pace"))
             .createdAt(existingEntity.getCreatedAt())
             .updatedAt(LocalDateTime.now())
-            .isPublic(requestDto.getIsPublic())
             .build();
 
         when(runRecordRepository.findById(runningId)).thenReturn(Optional.of(existingEntity));
@@ -168,7 +165,7 @@ public class RunRecordServiceTest {
 
         when(runRecordRepository.findById(runningId)).thenReturn(Optional.empty());
 
-        assertThrows(CustomException.class,
+        CustomException exception = assertThrows(CustomException.class,
             () -> runRecordService.updateRunRecord(runningId, requestDto));
 
         verify(runRecordRepository, never()).save(any(RunRecordEntity.class));
@@ -207,7 +204,6 @@ public class RunRecordServiceTest {
             .runningDate(LocalDateTime.now())
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
-            .isPublic(1)
             .build();
     }
 
@@ -218,7 +214,6 @@ public class RunRecordServiceTest {
             .distance(10.0)
             .runningTime("00:30:00")
             .pace("15:00")
-            .isPublic(1)
             .build();
     }
 }

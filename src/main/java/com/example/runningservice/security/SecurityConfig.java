@@ -39,6 +39,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final LogoutService logoutService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, LogoutService logoutService)
@@ -88,7 +89,7 @@ public class SecurityConfig {
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthenticationFilter(), LogoutFilter.class)
+            .addFilterAfter(logoutFilter(), JwtAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .logout(
                 (logoutConfig) -> logoutConfig
@@ -119,6 +120,16 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public LogoutFilter logoutFilter() {
+        return new LogoutFilter((request, response, authentication) -> {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().write("{\"message\":\"Successfully logged out\"}");
+            response.setContentType("application/json");
+            response.getWriter().flush();
+        }, logoutService);
     }
 
     @Bean
