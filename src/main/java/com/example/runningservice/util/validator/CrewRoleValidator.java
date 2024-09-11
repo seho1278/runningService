@@ -6,11 +6,11 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 import java.util.List;
 
-public class CrewRoleValidator implements ConstraintValidator<CrewRoleValid,CrewRole> {
+public class CrewRoleValidator implements ConstraintValidator<CrewRoleChangeValid,CrewRole> {
     private List<String> acceptedRoles;
 
     @Override
-    public void initialize(CrewRoleValid annotation) {
+    public void initialize(CrewRoleChangeValid annotation) {
         acceptedRoles = Arrays.asList(annotation.roles());
     }
 

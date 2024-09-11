@@ -70,8 +70,12 @@ public class CrewMemberEntity {
 
     public void changeRoleTo(CrewRole newRole) {
         if (newRole == this.role) {
-            throw new CustomException(ErrorCode.ROLE_NOT_CHANGED);
+            throw new CustomException(ErrorCode.NOT_ALLOWED_CHANGE_TO_SAME_ROLE);
         }
+        if (newRole == CrewRole.LEADER) {
+            throw new CustomException(ErrorCode.NOT_ALLOWED_CHANGE_TO_LEADER);
+        }
+
         this.role = newRole;
         this.roleOrder = newRole.getOrder();
     }
