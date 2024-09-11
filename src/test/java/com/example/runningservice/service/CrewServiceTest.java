@@ -185,10 +185,12 @@ class CrewServiceTest {
         when(update.getCrewImage()).thenReturn(null);
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
-        CrewEntity crewEntity = CrewEntity.builder().id(crewId).leader(memberEntity).crewImage("oldImage").build();
+        CrewEntity crewEntity = CrewEntity.builder().id(crewId).leader(memberEntity)
+            .crewImage("oldImage").build();
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
-        given(s3FileUtil.createPresignedUrl(crewEntity.getCrewImage())).willReturn("signedOldImage");
+        given(s3FileUtil.createPresignedUrl(crewEntity.getCrewImage())).willReturn(
+            "signedOldImage");
 
         // when
         CrewBaseResponseDto response = crewService.updateCrew(update, crewId);
@@ -196,6 +198,36 @@ class CrewServiceTest {
         // then
         assertEquals(crewEntity.getId(), response.getCrewId());
         assertEquals("signedOldImage", response.getCrewImage());
+    }
+
+    @Test
+    @DisplayName("크루 수정 - 이미지 삭제")
+    public void updateCrew_DeleteImage() {
+        // given
+        Long crewId = 1L;
+
+        CrewUpdateRequestDto update = mock(CrewUpdateRequestDto.class);
+        when(update.getCrewImage()).thenReturn(null);
+        when(update.getDeleteCrewImage()).thenReturn(true);
+
+        MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
+        CrewEntity crewEntity = CrewEntity.builder()
+            .id(crewId)
+            .leader(memberEntity)
+            .crewImage("oldImage")
+            .build();
+
+        given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
+        given(s3FileUtil.getImgUrl("crew-default")).willReturn("http://example.com/default");
+        given(s3FileUtil.createPresignedUrl("http://example.com/default")).willReturn(
+            "signed-defaultUrl");
+
+        // when
+        CrewBaseResponseDto response = crewService.updateCrew(update, crewId);
+
+        // then
+        assertEquals(crewEntity.getId(), response.getCrewId());
+        assertEquals("signed-defaultUrl", response.getCrewImage());
     }
 
     @Test
