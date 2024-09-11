@@ -28,13 +28,13 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.OccupancyStatus;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.repository.ActivityRepository;
-import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
-import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RegularRunMeetingRepository;
 import com.example.runningservice.repository.chat.ChatRoomRepository;
 import com.example.runningservice.repository.crew.CrewRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
+import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.service.chat.ChatRoomService;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
@@ -182,22 +182,20 @@ class CrewServiceTest {
         Long crewId = 1L;
 
         CrewUpdateRequestDto update = mock(CrewUpdateRequestDto.class);
-        when(update.getCrewImage()).thenReturn(new MockMultipartFile("file", new byte[0]));
+        when(update.getCrewImage()).thenReturn(null);
 
         MemberEntity memberEntity = MemberEntity.builder().nickName("hi").build();
-        CrewEntity crewEntity = CrewEntity.builder().id(crewId).leader(memberEntity).build();
+        CrewEntity crewEntity = CrewEntity.builder().id(crewId).leader(memberEntity).crewImage("oldImage").build();
 
         given(crewRepository.findById(crewId)).willReturn(Optional.of(crewEntity));
-        given(s3FileUtil.getImgUrl(anyString())).willReturn("http://example.com/default");
+        given(s3FileUtil.createPresignedUrl(crewEntity.getCrewImage())).willReturn("signedOldImage");
 
         // when
         CrewBaseResponseDto response = crewService.updateCrew(update, crewId);
 
         // then
         assertEquals(crewEntity.getId(), response.getCrewId());
-        assertEquals(crewEntity.getCrewImage(), "http://example.com/default");
-        verify(s3FileUtil, times(0)).putObject(any(), any());
-        verify(s3FileUtil, times(1)).getImgUrl("crew-default");
+        assertEquals("signedOldImage", response.getCrewImage());
     }
 
     @Test
