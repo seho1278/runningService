@@ -29,12 +29,13 @@ public class CrewUpdateRequestDto {
     private final Integer minYear;
     private final Integer maxYear;
     private final Gender gender;
+    private final Boolean deleteCrewImage;
 
     @ConstructorProperties({"description", "crewCapacity", "activityRegion", "crewImage",
         "runRecordOpen", "leaderRequired", "minYear", "maxYear", "gender"})
     public CrewUpdateRequestDto(String description, Integer crewCapacity, Region activityRegion,
         MultipartFile crewImage, Boolean runRecordOpen, Boolean leaderRequired,
-        Integer minYear, Integer maxYear, Gender gender) {
+        Integer minYear, Integer maxYear, Gender gender, Boolean deleteCrewImage) {
         this.description = description;
         this.crewCapacity = crewCapacity;
         this.activityRegion = activityRegion;
@@ -44,5 +45,6 @@ public class CrewUpdateRequestDto {
         this.minYear = minYear;
         this.maxYear = maxYear;
         this.gender = gender;
+        this.deleteCrewImage = deleteCrewImage;
     }
 }
