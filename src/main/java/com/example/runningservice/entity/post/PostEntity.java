@@ -1,6 +1,7 @@
 package com.example.runningservice.entity.post;
 
-import com.example.runningservice.dto.post.CreatePostRequestDto;
+import com.example.runningservice.dto.post.PostRequestDto;
+import com.example.runningservice.dto.post.UpdatePostRequestDto;
 import com.example.runningservice.entity.BaseEntity;
 import com.example.runningservice.enums.PostCategory;
 import jakarta.annotation.Nullable;
@@ -18,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,7 +56,7 @@ public class PostEntity extends BaseEntity {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "post_images", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "images")
-    private List<String> imageUrls = new ArrayList<>();
+    private List<String> images = new ArrayList<>();
 
     private Boolean isNotice;
 
@@ -63,22 +65,33 @@ public class PostEntity extends BaseEntity {
     private List<CommentEntity> comment = new ArrayList<>();
 
 
-    public static PostEntity of(Long memberId, Long crewId, CreatePostRequestDto createPostRequestDto) {
+    public static PostEntity of(Long memberId, Long crewId, PostRequestDto postRequestDto) {
         return PostEntity.builder()
-            .title(createPostRequestDto.getTitle())
+            .title(postRequestDto.getTitle())
             .memberId(memberId)
             .crewId(crewId)
-            .postCategory(createPostRequestDto.getPostCategory())
-            .activityId(createPostRequestDto.getActivityId())
-            .content(createPostRequestDto.getContent())
-            .isNotice(createPostRequestDto.getIsNotice())
+            .postCategory(postRequestDto.getPostCategory())
+            .activityId(postRequestDto.getActivityId())
+            .content(postRequestDto.getContent())
+            .isNotice(postRequestDto.getIsNotice())
             .build();
     }
 
-    public void savePostImages(List<String> imageUrls) {
-        if (this.imageUrls == null) {
-            this.imageUrls = new ArrayList<>(); // 명시적으로 다시 초기화
+    public void addPostImages(Collection<String> imageUrls) {
+        if (this.images == null) {
+            this.images = new ArrayList<>(); // 명시적으로 다시 초기화
         }
-        this.imageUrls.addAll(imageUrls);
+        this.images.addAll(imageUrls);
+    }
+
+    public void savePostImages(Collection<String> imageUrls) {
+        this.images = new ArrayList<>(imageUrls);
+    }
+
+    public void updatePost(UpdatePostRequestDto updatePostRequestDto) {
+        this.title = updatePostRequestDto.getTitle();
+        this.content = updatePostRequestDto.getContent();
+        this.activityId = updatePostRequestDto.getActivityId();
+        this.isNotice = updatePostRequestDto.getIsNotice();
     }
 }

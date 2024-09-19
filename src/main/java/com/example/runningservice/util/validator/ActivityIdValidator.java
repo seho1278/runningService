@@ -3,7 +3,9 @@ package com.example.runningservice.util.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ActivityIdValidator implements ConstraintValidator<RequiredActivityId, Object> {
 
     private String categoryFieldName;
@@ -23,9 +25,11 @@ public class ActivityIdValidator implements ConstraintValidator<RequiredActivity
     @Override
     public boolean isValid(Object dto, ConstraintValidatorContext context) {
         try {
+            log.info("Dto class : {}", dto.getClass());
+
             // Reflection으로 필드를 가져옴
-            Field postCategoryField = dto.getClass().getDeclaredField(categoryFieldName);
-            Field activityIdField = dto.getClass().getDeclaredField(idFieldName);
+            Field postCategoryField = getFieldFromHierarchy(dto.getClass(), categoryFieldName);
+            Field activityIdField = getFieldFromHierarchy(dto.getClass(), idFieldName);
 
             // 필드에 접근 가능하도록 설정
             postCategoryField.setAccessible(true);
@@ -34,6 +38,9 @@ public class ActivityIdValidator implements ConstraintValidator<RequiredActivity
             // 필드 값과 타입 가져오기
             Object postCategory = postCategoryField.get(dto);
             Object activityId = activityIdField.get(dto);
+
+            log.info("PostCategory : {}", postCategory);
+            log.info("ActivityId : {}", activityId);
 
             // 필드 타입이 어노테이션에서 지정한 타입과 일치하는지 확인
             if (!postCategoryField.getType().equals(categoryFieldType) || !activityIdField.getType().equals(idFieldType)) {
@@ -51,5 +58,17 @@ public class ActivityIdValidator implements ConstraintValidator<RequiredActivity
         }
 
         return true;
+    }
+
+    private Field getFieldFromHierarchy(Class<?> clazz, String fieldName) throws NoSuchFieldException {
+        Class<?> currentClass = clazz;
+        while (currentClass != null) {
+            try {
+                return currentClass.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException e) {
+                currentClass = currentClass.getSuperclass();  // 상위 클래스에서 필드를 찾음
+            }
+        }
+        throw new NoSuchFieldException("Field '" + fieldName + "' not found in class hierarchy.");
     }
 }

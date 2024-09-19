@@ -143,7 +143,6 @@ public class S3FileUtil {
 
         List<String> fileUrls = new ArrayList<>();
         if (!images.isEmpty()) {
-
             for (MultipartFile image : images) {
                 String fileName = prefix + "-" + id + "-" + images.indexOf(image);
                 putObject(fileName, image);

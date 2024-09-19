@@ -1,12 +1,15 @@
 package com.example.runningservice.service.post;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
-import com.example.runningservice.dto.post.CreatePostRequestDto;
+import com.example.runningservice.dto.post.PostRequestDto;
+import com.example.runningservice.dto.post.UpdatePostRequestDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
@@ -65,11 +68,11 @@ class PostServiceTest {
             "Test image content 2".getBytes()
         );
 
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("title")
             .content("content")
             .postCategory(PostCategory.PERSONAL)
-            .images(List.of(mockFile1, mockFile2))
+            .imagesToUpload(List.of(mockFile1, mockFile2))
             .isNotice(false)
             .build();
 
@@ -98,15 +101,15 @@ class PostServiceTest {
             i.getIsNotice().equals(postEntity.getIsNotice())))).thenReturn(postEntity);
 
         when(s3FileUtil.uploadFilesAndReturnFileNames("post", postId,
-            requestDto.getImages())).thenReturn(List.of("post-1-0", "post-1-1"));
+            requestDto.getImagesToUpload())).thenReturn(List.of("post-1-0", "post-1-1"));
 
         //when
         PostEntity result = postService.savePost(userId, crewId, requestDto);
 
         //then
-        assertEquals(2, result.getImageUrls().size());
-        assertEquals("post-1-0", result.getImageUrls().get(0));
-        assertEquals("post-1-1", result.getImageUrls().get(1));
+        assertEquals(2, result.getImages().size());
+        assertTrue(result.getImages().contains("post-1-0"));
+        assertTrue(result.getImages().contains("post-1-1"));
         assertEquals("title", result.getTitle());
         assertEquals("content", result.getContent());
         assertEquals(PostCategory.PERSONAL, result.getPostCategory());
@@ -134,11 +137,11 @@ class PostServiceTest {
             "Test image content 2".getBytes()
         );
 
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("title")
             .content("content")
             .postCategory(PostCategory.PERSONAL)
-            .images(List.of(mockFile1, mockFile2))
+            .imagesToUpload(List.of(mockFile1, mockFile2))
             .isNotice(false)
             .build();
 
@@ -176,14 +179,13 @@ class PostServiceTest {
             "Test image content 2".getBytes()
         );
 
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("title")
             .content("content")
             .postCategory(PostCategory.PERSONAL)
-            .images(List.of(mockFile1, mockFile2))
+            .imagesToUpload(List.of(mockFile1, mockFile2))
             .isNotice(true)
             .build();
-
 
         CrewMemberEntity crewMember = CrewMemberEntity.builder()
             .id(crewMemberId)
@@ -226,12 +228,12 @@ class PostServiceTest {
             "Test image content 2".getBytes()
         );
 
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("title")
             .content("content")
             .postCategory(PostCategory.PERSONAL)
             .activityId(100L)
-            .images(List.of(mockFile1, mockFile2))
+            .imagesToUpload(List.of(mockFile1, mockFile2))
             .isNotice(false)
             .build();
 
@@ -260,18 +262,228 @@ class PostServiceTest {
             i.getIsNotice().equals(postEntity.getIsNotice())))).thenReturn(postEntity);
 
         when(s3FileUtil.uploadFilesAndReturnFileNames("post", postId,
-            requestDto.getImages())).thenReturn(List.of("post-1-0", "post-1-1"));
+            requestDto.getImagesToUpload())).thenReturn(List.of("post-1-0", "post-1-1"));
 
         //when
         PostEntity result = postService.savePost(userId, crewId, requestDto);
 
         //then
-        assertEquals(2, result.getImageUrls().size());
-        assertEquals("post-1-0", result.getImageUrls().get(0));
-        assertEquals("post-1-1", result.getImageUrls().get(1));
+        assertEquals(2, result.getImages().size());
+        assertTrue(result.getImages().contains("post-1-0"));
+        assertTrue(result.getImages().contains("post-1-1"));
         assertEquals("title", result.getTitle());
         assertEquals("content", result.getContent());
         assertEquals(PostCategory.PERSONAL, result.getPostCategory());
         assertNull(result.getActivityId());
+    }
+
+    @Test
+    @DisplayName("이미지 일부 삭제")
+    void testUpdatePost_Success_DeleteSomeImages() {
+        //given
+        Long userId = 1L;
+        Long crewId = 2L;
+        Long postId = 3L;
+        Long crewMemberId = 4L;
+
+        UpdatePostRequestDto requestDto = UpdatePostRequestDto.builder()
+            .postId(postId)
+            .title("title")
+            .content("content")
+            .postCategory(PostCategory.PERSONAL)
+            .deleteAllImages(false)
+            .imagesToDelete(List.of("test1"))
+            .isNotice(false)
+            .build();
+
+        PostEntity postEntity = PostEntity.builder()
+            .id(postId)
+            .crewId(crewId)
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .postCategory(requestDto.getPostCategory())
+            .isNotice(requestDto.getIsNotice())
+            .images(List.of("test1", "test2"))
+            .build();
+
+        CrewMemberEntity crewMember = CrewMemberEntity.builder()
+            .id(crewMemberId)
+            .crew(CrewEntity.builder().id(crewId).build())
+            .member(MemberEntity.builder().id(userId).build())
+            .role(CrewRole.MEMBER)
+            .roleOrder(CrewRole.MEMBER.getOrder())
+            .build();
+
+        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
+            Optional.of(crewMember));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        //when
+        PostEntity result = postService.updatePost(userId, crewId, requestDto);
+
+        //then
+        assertEquals(1, result.getImages().size());
+        assertFalse(result.getImages().contains("test1"));
+        assertTrue(result.getImages().contains("test2"));
+    }
+
+    @Test
+    @DisplayName("이미지 전체 삭제")
+    void testUpdatePost_Success_DeleteAllImages() {
+        //given
+        Long userId = 1L;
+        Long crewId = 2L;
+        Long postId = 3L;
+        Long crewMemberId = 4L;
+
+        UpdatePostRequestDto requestDto = UpdatePostRequestDto.builder()
+            .postId(postId)
+            .title("title")
+            .content("content")
+            .postCategory(PostCategory.PERSONAL)
+            .deleteAllImages(true)
+            .imagesToDelete(List.of("test1"))
+            .isNotice(false)
+            .build();
+
+        PostEntity postEntity = PostEntity.builder()
+            .id(postId)
+            .crewId(crewId)
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .postCategory(requestDto.getPostCategory())
+            .isNotice(requestDto.getIsNotice())
+            .images(List.of("test1", "test2"))
+            .build();
+
+        CrewMemberEntity crewMember = CrewMemberEntity.builder()
+            .id(crewMemberId)
+            .crew(CrewEntity.builder().id(crewId).build())
+            .member(MemberEntity.builder().id(userId).build())
+            .role(CrewRole.MEMBER)
+            .roleOrder(CrewRole.MEMBER.getOrder())
+            .build();
+
+        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
+            Optional.of(crewMember));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        //when
+        PostEntity result = postService.updatePost(userId, crewId, requestDto);
+
+        //then
+        assertEquals(0, result.getImages().size());
+        assertFalse(result.getImages().contains("test1"));
+        assertFalse(result.getImages().contains("test2"));
+    }
+
+    @Test
+    @DisplayName("이미지 일부 삭제, 일부 추가")
+    void testUpdatePost_Success_DeleteSomeImages_AddSomeImages() {
+        //given
+        Long userId = 1L;
+        Long crewId = 2L;
+        Long postId = 3L;
+        Long crewMemberId = 4L;
+
+        MockMultipartFile mockFile1 = new MockMultipartFile(
+            "file",                         // 필드 이름
+            "testImage1.jpg",                // 파일 이름
+            "image/jpeg",                    // 파일 타입
+            "Test image content 1".getBytes() // 파일 내용
+        );
+
+        UpdatePostRequestDto requestDto = UpdatePostRequestDto.builder()
+            .postId(postId)
+            .title("title_수정")
+            .content("content_수정")
+            .postCategory(PostCategory.PERSONAL)
+            .deleteAllImages(false)
+            .imagesToDelete(List.of("test1"))
+            .imagesToUpload(List.of(mockFile1))
+            .isNotice(false)
+            .build();
+
+        PostEntity postEntity = PostEntity.builder()
+            .id(postId)
+            .crewId(crewId)
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .postCategory(requestDto.getPostCategory())
+            .isNotice(requestDto.getIsNotice())
+            .images(List.of("test1", "test2"))
+            .build();
+
+        CrewMemberEntity crewMember = CrewMemberEntity.builder()
+            .id(crewMemberId)
+            .crew(CrewEntity.builder().id(crewId).build())
+            .member(MemberEntity.builder().id(userId).build())
+            .role(CrewRole.MEMBER)
+            .roleOrder(CrewRole.MEMBER.getOrder())
+            .build();
+
+        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
+            Optional.of(crewMember));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        when(s3FileUtil.uploadFilesAndReturnFileNames("post", postId,
+            requestDto.getImagesToUpload())).thenReturn(List.of("test3"));
+        //when
+        PostEntity result = postService.updatePost(userId, crewId, requestDto);
+
+        //then
+        assertEquals(2, result.getImages().size());
+        assertTrue(result.getImages().contains("test2"));
+        assertTrue(result.getImages().contains("test3"));
+        assertFalse(result.getImages().contains("test1"));
+        assertEquals("title_수정", result.getTitle());
+    }
+
+    @Test
+    @DisplayName("이미지는 아무 변경 하지 않음")
+    void testUpdatePost_Success_NoChangeWithImages() {
+        //given
+        Long userId = 1L;
+        Long crewId = 2L;
+        Long postId = 3L;
+        Long crewMemberId = 4L;
+
+        UpdatePostRequestDto requestDto = UpdatePostRequestDto.builder()
+            .postId(postId)
+            .title("title_수정")
+            .content("content_수정")
+            .postCategory(PostCategory.PERSONAL)
+            .deleteAllImages(false)
+            .isNotice(false)
+            .build();
+
+        PostEntity postEntity = PostEntity.builder()
+            .id(postId)
+            .crewId(crewId)
+            .title(requestDto.getTitle())
+            .content(requestDto.getContent())
+            .postCategory(requestDto.getPostCategory())
+            .isNotice(requestDto.getIsNotice())
+            .images(List.of("test1", "test2"))
+            .build();
+
+        CrewMemberEntity crewMember = CrewMemberEntity.builder()
+            .id(crewMemberId)
+            .crew(CrewEntity.builder().id(crewId).build())
+            .member(MemberEntity.builder().id(userId).build())
+            .role(CrewRole.MEMBER)
+            .roleOrder(CrewRole.MEMBER.getOrder())
+            .build();
+
+        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
+            Optional.of(crewMember));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        //when
+        PostEntity result = postService.updatePost(userId, crewId, requestDto);
+
+        //then
+        assertEquals(2, result.getImages().size());
+        assertTrue(result.getImages().contains("test2"));
+        assertTrue(result.getImages().contains("test1"));
+        assertEquals("title_수정", result.getTitle());
     }
 }

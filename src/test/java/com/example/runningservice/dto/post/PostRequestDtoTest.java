@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class CreatePostRequestDtoTest {
+class PostRequestDtoTest {
 
     private Validator validator;
 
@@ -28,7 +28,7 @@ class CreatePostRequestDtoTest {
     @DisplayName("활동후기 게시판일 때 activityId가 null_실패")
     void testValidActivityId_WhenPostCategoryIsActivityReview_AndActivityIdIsNull_Failed() {
         // given
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("Test Post")
             .content("This is a test post.")
             .postCategory(PostCategory.ACTIVITY_REVIEW) // 활동 리뷰일 때
@@ -36,7 +36,7 @@ class CreatePostRequestDtoTest {
             .build();
 
         // when
-        Set<ConstraintViolation<CreatePostRequestDto>> violations = validator.validate(requestDto);
+        Set<ConstraintViolation<PostRequestDto>> violations = validator.validate(requestDto);
 
         // then
         assertEquals(1, violations.size()); // 1개의 유효성 검증 실패
@@ -48,7 +48,7 @@ class CreatePostRequestDtoTest {
     @Test
     void testValidActivityId_WhenPostCategoryIsActivityReview_AndActivityIdIsProvided_Success() {
         // given
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("Test Post")
             .content("This is a test post.")
             .postCategory(PostCategory.ACTIVITY_REVIEW) // 활동 리뷰일 때
@@ -56,7 +56,7 @@ class CreatePostRequestDtoTest {
             .build();
 
         // when
-        Set<ConstraintViolation<CreatePostRequestDto>> violations = validator.validate(requestDto);
+        Set<ConstraintViolation<PostRequestDto>> violations = validator.validate(requestDto);
 
         // then
         assertTrue(violations.isEmpty()); // 유효성 검증 성공
@@ -65,7 +65,7 @@ class CreatePostRequestDtoTest {
     @Test
     void testValidActivityId_WhenPostCategoryIsNotActivityReview_AndActivityIdIsNull_ShouldPass() {
         // given
-        CreatePostRequestDto requestDto = CreatePostRequestDto.builder()
+        PostRequestDto requestDto = PostRequestDto.builder()
             .title("Test Post")
             .content("This is a test post.")
             .postCategory(PostCategory.PERSONAL) // 개인 게시물
@@ -73,7 +73,7 @@ class CreatePostRequestDtoTest {
             .build();
 
         // when
-        Set<ConstraintViolation<CreatePostRequestDto>> violations = validator.validate(requestDto);
+        Set<ConstraintViolation<PostRequestDto>> violations = validator.validate(requestDto);
 
         // then
         assertTrue(violations.isEmpty()); // 유효성 검증 성공

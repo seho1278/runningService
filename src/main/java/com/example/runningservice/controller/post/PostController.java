@@ -1,8 +1,8 @@
 package com.example.runningservice.controller.post;
 
-import com.example.runningservice.aop.CrewRoleCheck;
-import com.example.runningservice.dto.post.CreatePostRequestDto;
+import com.example.runningservice.dto.post.PostRequestDto;
 import com.example.runningservice.dto.post.PostResponseDto;
+import com.example.runningservice.dto.post.UpdatePostRequestDto;
 import com.example.runningservice.service.post.PostService;
 import com.example.runningservice.util.LoginUser;
 import com.example.runningservice.util.S3FileUtil;
@@ -27,18 +27,19 @@ public class PostController {
     @PostMapping("/{crewId}/post")
     public ResponseEntity<PostResponseDto> createPost(@LoginUser Long userId,
         @PathVariable Long crewId,
-        @ModelAttribute @Valid CreatePostRequestDto createPostRequestDto) {
+        @ModelAttribute @Valid PostRequestDto postRequestDto) {
 
         return ResponseEntity.ok(PostResponseDto.of(
-            postService.savePost(userId, crewId, createPostRequestDto), s3FileUtil));
+            postService.savePost(userId, crewId, postRequestDto), s3FileUtil));
     }
 
     @PutMapping("/{crewId}/post")
-    @CrewRoleCheck(role = {"LEADER", "STAFF", "MEMBER"})
-    public ResponseEntity<?> updatePost(@LoginUser Long userId,
-        @PathVariable("crewId") Long crewId) {
+    public ResponseEntity<PostResponseDto> updatePost(@LoginUser Long userId,
+        @PathVariable("crewId") Long crewId,
+        @ModelAttribute @Valid UpdatePostRequestDto requestDto) {
 
-        return null;
+        return ResponseEntity.ok(
+            PostResponseDto.of(postService.updatePost(userId, crewId, requestDto), s3FileUtil));
     }
 
 }

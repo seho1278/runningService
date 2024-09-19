@@ -33,7 +33,7 @@ public class PostResponseDto {
             .title(postEntity.getTitle())
             .postCategory(postEntity.getPostCategory())
             .content(postEntity.getContent())
-            .imageUrls(postEntity.getImageUrls().stream().map(s3FileUtil::createPresignedUrl).collect(
+            .imageUrls(postEntity.getImages().stream().map(s3FileUtil::createPresignedUrl).collect(
                 Collectors.toList()))
             .isNotice(postEntity.getIsNotice())
             .comment(postEntity.getComment())

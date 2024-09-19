@@ -44,6 +44,7 @@ public enum ErrorCode {
     NOT_FOUND_RUN_RECORD(HttpStatus.NOT_FOUND, "러닝 기록을 찾을 수 없습니다."),
     NOT_FOUND_RUN_GOAL(HttpStatus.NOT_FOUND, "러닝 목표를 찾을 수 없습니다."),
     INVALID_RUN_ARGUMENT(HttpStatus.BAD_REQUEST, "러닝 기록이 없거나 유저정보가 없습니다."),
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 게시물을 찾을 수 없습니다."),
 
     //크루가입
     ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),
