@@ -49,7 +49,7 @@ public class PostService {
 
         requestDto.setActivityIdNullNotWithActivityReview();
 
-        PostEntity postEntity = postRepository.findById(requestDto.getPostId())
+        PostEntity postEntity = postRepository.findByIdAndMemberId(requestDto.getPostId(), userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_POST));
 
         postEntity.updatePost(requestDto);
