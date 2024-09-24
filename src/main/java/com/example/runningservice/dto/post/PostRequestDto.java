@@ -25,6 +25,7 @@ public class PostRequestDto {
     @NotBlank
     @Size(max = 50)
     private String title;
+    private String memberNickName;
 
     @NotNull
     private PostCategory postCategory;

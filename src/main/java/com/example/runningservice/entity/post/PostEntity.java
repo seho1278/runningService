@@ -3,6 +3,7 @@ package com.example.runningservice.entity.post;
 import com.example.runningservice.dto.post.PostRequestDto;
 import com.example.runningservice.dto.post.UpdatePostRequestDto;
 import com.example.runningservice.entity.BaseEntity;
+import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.enums.PostCategory;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.CollectionTable;
@@ -16,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -39,8 +41,9 @@ public class PostEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private Long memberId;
+    @JoinColumn(name = "member_id")
+    @ManyToOne
+    private MemberEntity member;
     @NotNull
     private Long crewId;
     @Nullable
@@ -65,10 +68,10 @@ public class PostEntity extends BaseEntity {
     private List<CommentEntity> comment = new ArrayList<>();
 
 
-    public static PostEntity of(Long memberId, Long crewId, PostRequestDto postRequestDto) {
+    public static PostEntity of(Long crewId, PostRequestDto postRequestDto, MemberEntity memberEntity) {
         return PostEntity.builder()
             .title(postRequestDto.getTitle())
-            .memberId(memberId)
+            .member(memberEntity)
             .crewId(crewId)
             .postCategory(postRequestDto.getPostCategory())
             .activityId(postRequestDto.getActivityId())

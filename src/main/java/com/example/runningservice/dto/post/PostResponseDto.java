@@ -27,7 +27,7 @@ public class PostResponseDto {
     public static PostResponseDto of(PostEntity postEntity, S3FileUtil s3FileUtil) {
         return PostResponseDto.builder()
             .postId(postEntity.getId())
-            .memberId(postEntity.getMemberId())
+            .memberId(postEntity.getMember().getId())
             .crewId(postEntity.getCrewId())
             .activityId(postEntity.getActivityId())
             .title(postEntity.getTitle())
