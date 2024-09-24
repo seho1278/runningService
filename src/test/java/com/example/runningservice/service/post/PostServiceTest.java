@@ -21,6 +21,7 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.PostCategory;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
+import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.repository.post.PostRepository;
 import com.example.runningservice.util.S3FileUtil;
@@ -48,6 +49,9 @@ class PostServiceTest {
 
     @Mock
     CrewMemberRepository crewMemberRepository;
+
+    @Mock
+    MemberRepository memberRepository;
 
     @Mock
     S3FileUtil s3FileUtil;
@@ -94,10 +98,14 @@ class PostServiceTest {
             .isNotice(requestDto.getIsNotice())
             .build();
 
+        MemberEntity member = MemberEntity.builder()
+            .id(userId)
+            .build();
+
         CrewMemberEntity crewMember = CrewMemberEntity.builder()
             .id(crewMemberId)
             .crew(CrewEntity.builder().id(crewId).build())
-            .member(MemberEntity.builder().id(userId).build())
+            .member(member)
             .role(CrewRole.MEMBER)
             .roleOrder(CrewRole.MEMBER.getOrder())
             .build();
@@ -109,6 +117,7 @@ class PostServiceTest {
             i.getPostCategory().equals(postEntity.getPostCategory()) &&
             i.getIsNotice().equals(postEntity.getIsNotice())))).thenReturn(postEntity);
 
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
         when(s3FileUtil.uploadFilesAndReturnFileNames("post", postId,
             requestDto.getImagesToUpload())).thenReturn(List.of("post-1-0", "post-1-1"));
 
@@ -255,10 +264,12 @@ class PostServiceTest {
             .isNotice(requestDto.getIsNotice())
             .build();
 
+        MemberEntity member = MemberEntity.builder().id(userId).build();
+
         CrewMemberEntity crewMember = CrewMemberEntity.builder()
             .id(crewMemberId)
             .crew(CrewEntity.builder().id(crewId).build())
-            .member(MemberEntity.builder().id(userId).build())
+            .member(member)
             .role(CrewRole.MEMBER)
             .roleOrder(CrewRole.MEMBER.getOrder())
             .build();
@@ -272,6 +283,7 @@ class PostServiceTest {
 
         when(s3FileUtil.uploadFilesAndReturnFileNames("post", postId,
             requestDto.getImagesToUpload())).thenReturn(List.of("post-1-0", "post-1-1"));
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
 
         //when
         PostEntity result = postService.savePost(userId, crewId, requestDto);
@@ -325,7 +337,7 @@ class PostServiceTest {
 
         when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             Optional.of(crewMember));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        when(postRepository.findByIdAndMember_Id(postId, userId)).thenReturn(Optional.of(postEntity));
 
         //when
         PostEntity result = postService.updatePost(userId, crewId, requestDto);
@@ -375,7 +387,7 @@ class PostServiceTest {
 
         when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             Optional.of(crewMember));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        when(postRepository.findByIdAndMember_Id(postId, userId)).thenReturn(Optional.of(postEntity));
 
         //when
         PostEntity result = postService.updatePost(userId, crewId, requestDto);
@@ -433,7 +445,7 @@ class PostServiceTest {
 
         when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             Optional.of(crewMember));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        when(postRepository.findByIdAndMember_Id(postId, userId)).thenReturn(Optional.of(postEntity));
         when(s3FileUtil.uploadFilesAndReturnFileNames("post", postId,
             requestDto.getImagesToUpload())).thenReturn(List.of("test3"));
         //when
@@ -485,7 +497,7 @@ class PostServiceTest {
 
         when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
             Optional.of(crewMember));
-        when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+        when(postRepository.findByIdAndMember_Id(postId, userId)).thenReturn(Optional.of(postEntity));
         //when
         PostEntity result = postService.updatePost(userId, crewId, requestDto);
 
