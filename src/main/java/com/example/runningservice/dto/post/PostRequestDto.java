@@ -8,23 +8,24 @@ import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @RequiredActivityId(categoryType = PostCategory.class, category = "postCategory", idType = Long.class, id = "activityId")
-public class CreatePostRequestDto {
+public class PostRequestDto {
 
     @NotBlank
     @Size(max = 50)
     private String title;
+    private String memberNickName;
 
     @NotNull
     private PostCategory postCategory;
@@ -35,7 +36,7 @@ public class CreatePostRequestDto {
     @Size(max = 500)
     private String content;
 
-    private List<MultipartFile> images = new ArrayList<>();
+    private List<MultipartFile> imagesToUpload = new ArrayList<>();
 
     private Boolean isNotice = false;
 

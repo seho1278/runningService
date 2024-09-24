@@ -1,6 +1,7 @@
 package com.example.runningservice.util;
 
 import com.example.runningservice.entity.QCrewMemberEntity;
+import com.example.runningservice.entity.post.QPostEntity;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -21,6 +22,7 @@ public class QueryDslUtil {
 
     static {
         ENTITY_PATH_MAP.put("crewMemberEntity", new PathBuilder<>(QCrewMemberEntity.class, "crewMemberEntity"));
+        ENTITY_PATH_MAP.put("postEntity", new PathBuilder<>(QPostEntity.class, "postEntity"));
         // 새로운 엔티티가 추가될 때마다 여기에 추가
     }
 

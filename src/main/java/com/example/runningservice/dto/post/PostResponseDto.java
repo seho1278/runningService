@@ -27,13 +27,13 @@ public class PostResponseDto {
     public static PostResponseDto of(PostEntity postEntity, S3FileUtil s3FileUtil) {
         return PostResponseDto.builder()
             .postId(postEntity.getId())
-            .memberId(postEntity.getMemberId())
+            .memberId(postEntity.getMember().getId())
             .crewId(postEntity.getCrewId())
             .activityId(postEntity.getActivityId())
             .title(postEntity.getTitle())
             .postCategory(postEntity.getPostCategory())
             .content(postEntity.getContent())
-            .imageUrls(postEntity.getImageUrls().stream().map(s3FileUtil::createPresignedUrl).collect(
+            .imageUrls(postEntity.getImages().stream().map(s3FileUtil::createPresignedUrl).collect(
                 Collectors.toList()))
             .isNotice(postEntity.getIsNotice())
             .comment(postEntity.getComment())
