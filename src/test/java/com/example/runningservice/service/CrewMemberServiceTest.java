@@ -3,6 +3,7 @@ package com.example.runningservice.service;
 import static com.example.runningservice.entity.QCrewMemberEntity.crewMemberEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -16,6 +17,7 @@ import com.example.runningservice.dto.crewMember.ChangeCrewRoleRequestDto;
 import com.example.runningservice.dto.crewMember.ChangedLeaderResponseDto;
 import com.example.runningservice.dto.crewMember.CrewMemberResponseDetailDto;
 import com.example.runningservice.dto.crewMember.GetCrewMemberRequestDto;
+import com.example.runningservice.dto.runProfile.RunProfile;
 import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberBlackListEntity;
@@ -23,6 +25,7 @@ import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
 import com.example.runningservice.entity.MemberEntity;
 import com.example.runningservice.entity.RunGoalEntity;
+import com.example.runningservice.entity.RunRecordEntity;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.JoinStatus;
@@ -30,14 +33,12 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.JoinApplicationRepository;
-import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
 import com.example.runningservice.util.AESUtil;
 import com.example.runningservice.util.PageUtil;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,22 +65,13 @@ class CrewMemberServiceTest {
     private JoinApplicationRepository joinApplicationRepository;
 
     @Mock
-    private RunGoalRepository runGoalRepository;
-
-    @Mock
-    private RunRecordService runRecordService;
+    private ProfileWithRunService profileWithRunService;
 
     @Mock
     private CrewMemberBlackListRepository crewMemberBlackListRepository;
 
     @Mock
     private ChatJoinRepository chatJoinRepository;
-
-    @Mock
-    private JPAQueryFactory queryFactory;
-
-    @Mock
-    private PageUtil pageUtil;
 
     @Mock
     private AESUtil aesUtil;
@@ -179,7 +171,7 @@ class CrewMemberServiceTest {
         CrewMemberEntity crewMember = CrewMemberEntity.builder()
             .crew(CrewEntity.builder().id(1L).crewName("crew1").build())
             .member(MemberEntity.builder().id(1L).nickName("nick1").name("name1").nameVisibility(
-                Visibility.PRIVATE)
+                    Visibility.PRIVATE)
                 .runProfileVisibility(Visibility.PRIVATE).build())
             .role(CrewRole.MEMBER)
             .build();
@@ -189,7 +181,11 @@ class CrewMemberServiceTest {
             .id(1L)
             .build();
 
+        CrewMemberResponseDetailDto response = CrewMemberResponseDetailDto.of(crewMember, aesUtil);
+        response.addRunProfile(RunProfile.of(runGoalEntity, runRecordResponseDto));
+
         when(crewMemberRepository.findById(crewMember.getId())).thenReturn(Optional.of(crewMember));
+        when(profileWithRunService.getCrewMemberWithEntity(crewMember)).thenReturn(response);
 
         // when
         CrewMemberResponseDetailDto result = crewMemberService.getCrewMember(crewMember.getId());
@@ -351,6 +347,38 @@ class CrewMemberServiceTest {
     }
 
     @Test
+    @DisplayName("권한 변경 실패_같은 권한 입력")
+    void testChangeRole_Failed_InvalidCrewRoleToChange() {
+        // given
+        Long crewMemberId = 1L;
+        CrewRole newRole = CrewRole.MEMBER;
+        Long crewId = 2L;
+        Long memberId = 3L;
+        ChangeCrewRoleRequestDto requestDto = ChangeCrewRoleRequestDto.builder()
+            .crewMemberId(crewMemberId)
+            .newRole(newRole)
+            .build();
+
+        CrewMemberEntity crewMember = CrewMemberEntity.builder()
+            .crew(CrewEntity.builder().id(crewId).crewName("crew1").build())
+            .member(
+                MemberEntity.builder().id(memberId).nickName("nick1").name("name1").build())
+            .role(CrewRole.MEMBER)
+            .build();
+
+        when(crewMemberRepository.findById(crewMemberId)).thenReturn(Optional.of(crewMember));
+
+        // when
+        CustomException exception = assertThrows(CustomException.class,
+            () -> crewMemberService.changeRole(requestDto));
+
+        // then
+        assertEquals(ErrorCode.NOT_ALLOWED_CHANGE_TO_SAME_ROLE, exception.getErrorCode());
+
+        verify(crewMemberRepository, times(1)).findById(crewMemberId);
+    }
+
+    @Test
     @DisplayName("권한변경 실패_크루멤버를 찾을 수 없음")
     void testChangeRole_CrewMemberNotFound() {
         // given
@@ -401,9 +429,8 @@ class CrewMemberServiceTest {
         Long crewId = 1L;
         Long crewMemberId = 2L;
 
-        when(crewMemberRepository.findById(crewMemberId)).thenReturn(Optional.of(newLeader));
-        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
-            Optional.of(oldLeader));
+        when(crewMemberRepository.findNewLeaderAndOldLeader(crewMemberId, userId,
+            crewId)).thenReturn(List.of(newLeader, oldLeader));
 
         // when
         ChangedLeaderResponseDto result = crewMemberService.transferLeaderRole(userId, crewId,
@@ -415,8 +442,6 @@ class CrewMemberServiceTest {
         assertEquals(CrewRole.MEMBER, result.getOldLeaderRole());
         assertEquals("NewLeader", result.getNewLeaderNickName());
         assertEquals(CrewRole.LEADER, result.getNewLeaderRole());
-        verify(crewMemberRepository, times(1)).findById(crewMemberId);
-        verify(crewMemberRepository, times(1)).findByMember_IdAndCrew_Id(userId, crewId);
 
         // Verify that roles were changed
         assertEquals(CrewRole.MEMBER, oldLeader.getRole());
@@ -443,7 +468,8 @@ class CrewMemberServiceTest {
         Long crewId = 1L;
         Long crewMemberId = 2L;
 
-        when(crewMemberRepository.findById(crewMemberId)).thenReturn(Optional.empty());
+        when(crewMemberRepository.findNewLeaderAndOldLeader(crewMemberId, userId,
+            crewId)).thenReturn(List.of(oldLeader));
 
         // when
         CustomException exception = assertThrows(CustomException.class, () -> {
@@ -452,8 +478,6 @@ class CrewMemberServiceTest {
 
         // then
         assertEquals(ErrorCode.NOT_FOUND_CREW_MEMBER, exception.getErrorCode());
-        verify(crewMemberRepository, times(1)).findById(crewMemberId);
-        verify(crewMemberRepository, never()).findByMember_IdAndCrew_Id(anyLong(), anyLong());
     }
 
     @Test
@@ -476,9 +500,8 @@ class CrewMemberServiceTest {
         Long crewId = 1L;
         Long crewMemberId = 2L;
 
-        when(crewMemberRepository.findById(crewMemberId)).thenReturn(Optional.of(newLeader));
-        when(crewMemberRepository.findByMember_IdAndCrew_Id(userId, crewId)).thenReturn(
-            Optional.empty());
+        when(crewMemberRepository.findNewLeaderAndOldLeader(crewMemberId, userId,
+            crewId)).thenReturn(List.of(newLeader));
 
         // when
         CustomException exception = assertThrows(CustomException.class, () -> {
@@ -487,9 +510,6 @@ class CrewMemberServiceTest {
 
         //then
         assertEquals(ErrorCode.NOT_FOUND_CREW_MEMBER, exception.getErrorCode());
-
-        verify(crewMemberRepository, times(1)).findById(crewMemberId);
-        verify(crewMemberRepository, times(1)).findByMember_IdAndCrew_Id(userId, crewId);
 
         // not changed
         assertEquals(CrewRole.LEADER, oldLeader.getRole());
@@ -628,5 +648,54 @@ class CrewMemberServiceTest {
             .findTopByMember_IdAndCrew_IdOrderByCreatedAtDesc(crewMember.getMember().getId(),
                 crewId);
         verify(crewMemberRepository, never()).delete(any(CrewMemberEntity.class));
+    }
+
+    @Test
+    void getCrewMember_RunGoal_Null() {
+        //given
+        Long userId = 1L;
+
+        RunRecordEntity runRecord = RunRecordEntity.builder()
+            .id(1L)
+            .runningTime(100)
+            .runningDate(LocalDateTime.of(2024, 1, 1, 1, 1))
+            .pace(100)
+            .distance(1.0)
+            .build();
+
+        CrewMemberEntity crewMember = CrewMemberEntity.builder()
+            .id(1L)
+            .member(MemberEntity.builder()
+                .id(userId)
+                .runGoalEntities(null)
+                .runRecordEntities(List.of(runRecord))
+                .runProfileVisibility(Visibility.PUBLIC)
+                .build())
+            .build();
+
+        RunRecordResponseDto runRecordResponseDto = RunRecordResponseDto.builder()
+            .id(1L)
+            .runCount(1)
+            .runningDate(LocalDateTime.of(2024, 1, 1, 1, 1))
+            .distance(1.0)
+            .pace(100)
+            .runningTime(100)
+            .build();
+
+        RunGoalEntity runGoalEntity = new RunGoalEntity();
+
+        CrewMemberResponseDetailDto response = CrewMemberResponseDetailDto.of(crewMember, aesUtil);
+
+        response.addRunProfile(RunProfile.of(runGoalEntity, runRecordResponseDto));
+
+        when(crewMemberRepository.findById(crewMember.getId())).thenReturn(Optional.of(crewMember));
+        when(profileWithRunService.getCrewMemberWithEntity(crewMember)).thenReturn(response);
+        //when
+            CrewMemberResponseDetailDto result = crewMemberService.getCrewMember(
+            crewMember.getId());
+
+        //then
+        assertNull(result.getRunProfile().getTotalDistanceGoal());
+        assertEquals(1.0, result.getRunProfile().getTotalDistance());
     }
 }

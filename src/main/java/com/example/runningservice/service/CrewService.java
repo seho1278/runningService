@@ -104,8 +104,14 @@ public class CrewService {
 
         crewEntity.updateFromDto(updateCrew);
 
-        crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getId(),
-            updateCrew.getCrewImage()));
+        if (Boolean.TRUE.equals(updateCrew.getDeleteCrewImage())) {
+            s3FileUtil.deleteObject("crew-" + crewId);
+            crewEntity.updateCrewImageUrl(
+                uploadFileAndReturnFileName(crewEntity.getId(), updateCrew.getCrewImage()));
+        } else if (updateCrew.getCrewImage() != null) {
+            crewEntity.updateCrewImageUrl(uploadFileAndReturnFileName(crewEntity.getId(),
+                updateCrew.getCrewImage()));
+        }
 
         return CrewBaseResponseDto.fromEntity(crewEntity, s3FileUtil);
     }

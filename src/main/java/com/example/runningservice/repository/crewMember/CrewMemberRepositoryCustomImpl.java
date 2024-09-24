@@ -1,5 +1,7 @@
 package com.example.runningservice.repository.crewMember;
 
+import static com.example.runningservice.entity.QCrewMemberEntity.crewMemberEntity;
+
 import com.example.runningservice.dto.crewMember.GetCrewMemberRequestDto;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.QCrewMemberEntity;
@@ -24,7 +26,7 @@ public class CrewMemberRepositoryCustomImpl implements CrewMemberRepositoryCusto
         GetCrewMemberRequestDto.Filter filterDto,
         Pageable pageable) {
 
-        QCrewMemberEntity crewMember = QCrewMemberEntity.crewMemberEntity;
+        QCrewMemberEntity crewMember = crewMemberEntity;
         // 쿼리 작성
 
         List<CrewMemberEntity> crewMembers = queryFactory.selectFrom(crewMember)
@@ -56,29 +58,39 @@ public class CrewMemberRepositoryCustomImpl implements CrewMemberRepositoryCusto
         return new PageImpl<>(crewMembers, pageable, total != null ? total : 0);
     }
 
+    @Override
+    public List<CrewMemberEntity> findNewLeaderAndOldLeader(Long crewMemberId, Long userId,
+        Long crewId) {
+        return queryFactory.selectFrom(crewMemberEntity)
+            .where(crewMemberEntity.id.eq(crewMemberId)
+                .or(crewMemberEntity.member.id.eq(userId)
+                    .and(crewMemberEntity.crew.id.eq(crewId))))
+            .fetch();
+    }
+
     private BooleanExpression crewIdEq(Long crewId) {
-        return crewId != null ? QCrewMemberEntity.crewMemberEntity.crew.id.eq(crewId) : null;
+        return crewId != null ? crewMemberEntity.crew.id.eq(crewId) : null;
     }
 
     private BooleanExpression genderEq(Gender gender) {
-        return gender != null ? QCrewMemberEntity.crewMemberEntity.member.gender.eq(gender) : null;
+        return gender != null ? crewMemberEntity.member.gender.eq(gender) : null;
     }
 
     private BooleanExpression roleEq(CrewRole crewRole) {
-        return crewRole != null ? QCrewMemberEntity.crewMemberEntity.role.eq(crewRole) : null;
+        return crewRole != null ? crewMemberEntity.role.eq(crewRole) : null;
     }
 
     private BooleanExpression birthYearGoe(Integer maxYear) {
         if (maxYear == null) {
             return null;
         }
-        return QCrewMemberEntity.crewMemberEntity.member.birthYear.goe(maxYear);
+        return crewMemberEntity.member.birthYear.goe(maxYear);
     }
 
     private BooleanExpression birthYearLoe(Integer minYear) {
         if (minYear == null) {
             return null;
         }
-        return QCrewMemberEntity.crewMemberEntity.member.birthYear.loe(minYear);
+        return crewMemberEntity.member.birthYear.loe(minYear);
     }
 }
