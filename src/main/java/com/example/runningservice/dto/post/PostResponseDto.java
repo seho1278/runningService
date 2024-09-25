@@ -1,6 +1,6 @@
 package com.example.runningservice.dto.post;
 
-import com.example.runningservice.entity.post.CommentEntity;
+import com.example.runningservice.entity.post.ReplyEntity;
 import com.example.runningservice.entity.post.PostEntity;
 import com.example.runningservice.enums.PostCategory;
 import com.example.runningservice.util.S3FileUtil;
@@ -22,7 +22,7 @@ public class PostResponseDto {
     private String content;
     private List<String> imageUrls;
     private Boolean isNotice;
-    private List<CommentEntity> comment;
+    private List<ReplyEntity> comment;
 
     public static PostResponseDto of(PostEntity postEntity, S3FileUtil s3FileUtil) {
         return PostResponseDto.builder()

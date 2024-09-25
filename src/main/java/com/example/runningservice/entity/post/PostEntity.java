@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,9 +64,9 @@ public class PostEntity extends BaseEntity {
 
     private Boolean isNotice;
 
-    @OneToMany
-    @JoinColumn(name = "comment_id")
-    private List<CommentEntity> comment = new ArrayList<>();
+    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
+    @OrderBy("id desc")
+    private List<ReplyEntity> comment = new ArrayList<>();
 
 
     public static PostEntity of(Long crewId, PostRequestDto postRequestDto, MemberEntity memberEntity) {
