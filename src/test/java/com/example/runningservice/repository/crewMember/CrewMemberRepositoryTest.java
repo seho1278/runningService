@@ -10,6 +10,7 @@ import com.example.runningservice.repository.crew.CrewRepository;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -22,6 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 @DataJpaTest
 @Import(QueryDslConfig.class)
 @ActiveProfiles("test")
+@EntityScan(basePackages = "com.example.runningservice.entity")
 public class CrewMemberRepositoryTest {
 
     @Autowired
