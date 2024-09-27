@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -19,11 +20,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
 @ActiveProfiles("test")
-@EntityScan(basePackages = "com.example.runningservice.*")
+@EntityScan(basePackages = "com.example.runningservice.entity")
+@TestPropertySource(locations = "classpath:application-test.yml")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CrewMemberRepositoryTest {
 
     @Autowired
