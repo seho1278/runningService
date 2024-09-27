@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest
 @Import(QueryDslConfig.class)
 @ActiveProfiles("test")
-@EntityScan(basePackages = "com.example.runningservice.entity")
+@EntityScan(basePackages = "com.example.runningservice.*")
 class ReplyRepositoryTest {
     @Autowired
     private ReplyRepository replyRepository;
