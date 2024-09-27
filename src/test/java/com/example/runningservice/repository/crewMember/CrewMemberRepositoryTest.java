@@ -23,7 +23,7 @@ import org.springframework.test.context.ActiveProfiles;
 @DataJpaTest
 @Import(QueryDslConfig.class)
 @ActiveProfiles("test")
-@EntityScan(basePackages = "com.example.runningservice.entity")
+@EntityScan(basePackages = "com.example.runningservice.*")
 public class CrewMemberRepositoryTest {
 
     @Autowired
