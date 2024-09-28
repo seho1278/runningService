@@ -24,6 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
+@ActiveProfiles("test")
 public class CrewMemberRepositoryTest {
 
     @Autowired
