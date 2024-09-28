@@ -24,10 +24,6 @@ import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
-@ActiveProfiles("test")
-@EntityScan(basePackages = "com.example.runningservice.entity")
-@TestPropertySource(locations = "classpath:application-test.yml")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CrewMemberRepositoryTest {
 
     @Autowired
