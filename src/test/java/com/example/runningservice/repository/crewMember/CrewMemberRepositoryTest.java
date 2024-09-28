@@ -24,6 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 
 @DataJpaTest
 @Import(QueryDslConfig.class)
+@EntityScan(basePackages = {"com.example.runningservice.entity"})
 @ActiveProfiles("test")
 public class CrewMemberRepositoryTest {
 
