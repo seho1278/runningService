@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Import(QueryDslConfig.class)
 @EntityScan(basePackages = {"com.example.runningservice.entity"})
 @ActiveProfiles("test")
+@TestPropertySource(locations = "classpath:application-test.yml")
 class ReplyRepositoryTest {
     @Autowired
     private ReplyRepository replyRepository;
