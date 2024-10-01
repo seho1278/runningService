@@ -61,6 +61,7 @@ dependencies {
     //database
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
 
     //envers
     implementation 'org.springframework.data:spring-data-envers:3.3.2'
@@ -89,7 +90,14 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 }
 
-
+//디버깅 시 사용
+//test {
+//    testLogging {
+//        showStandardStreams = true
+//        events "passed", "skipped", "failed"
+//        exceptionFormat "full"
+//    }
+//}
 
 tasks.named('test') {
     useJUnitPlatform()

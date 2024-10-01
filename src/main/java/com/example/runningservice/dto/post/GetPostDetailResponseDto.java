@@ -1,6 +1,6 @@
 package com.example.runningservice.dto.post;
 
-import com.example.runningservice.entity.post.CommentEntity;
+import com.example.runningservice.entity.post.ReplyEntity;
 import com.example.runningservice.entity.post.PostEntity;
 import com.example.runningservice.enums.PostCategory;
 import com.example.runningservice.util.S3FileUtil;
@@ -28,7 +28,7 @@ public class GetPostDetailResponseDto {
     private String content;
     private List<String> images = new ArrayList<>();
     private Boolean isNotice;
-    private List<CommentEntity> comment = new ArrayList<>();
+    private List<ReplyEntity> comment = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

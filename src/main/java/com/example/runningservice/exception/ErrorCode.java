@@ -45,10 +45,11 @@ public enum ErrorCode {
     NOT_FOUND_RUN_GOAL(HttpStatus.NOT_FOUND, "러닝 목표를 찾을 수 없습니다."),
     INVALID_RUN_ARGUMENT(HttpStatus.BAD_REQUEST, "러닝 기록이 없거나 유저정보가 없습니다."),
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 게시물을 찾을 수 없습니다."),
-    NOT_FOUND_SOME_POST(HttpStatus.BAD_REQUEST, "일부 게시물을 찾을 수 없습니다."),
     MAX_DELETE_SIZE_OVER(HttpStatus.BAD_REQUEST, "삭제할 수 있는 게시물 최대 개수를 초과했습니다"),
+    NOT_FOUND_SOME_POST(HttpStatus.NOT_FOUND, "일부 게시물을 찾을 수 없습니다."),
     NOT_ALLOWED_CHANGE_TO_LEADER(HttpStatus.BAD_REQUEST, "리더로 권한을 변경할 수 없습니다."),
-
+    NOT_FOUND_REPLY(HttpStatus.NOT_FOUND, "해당 댓글을 찾을 수 없습니다"),
+    NOT_FOUND_SOME_Reply(HttpStatus.NOT_FOUND, "일부 댓글을 찾을 수 없습니다."),
 
     //크루가입
     ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),

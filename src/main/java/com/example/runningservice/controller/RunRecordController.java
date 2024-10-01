@@ -5,6 +5,7 @@ import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.RunRecordEntity;
 import com.example.runningservice.service.RunRecordService;
 import com.example.runningservice.util.LoginUser;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -116,7 +117,7 @@ public class RunRecordController {
      * 기간 동안의 모든 기록 조회 API
      */
     @GetMapping("/records")
-    public List<RunRecordEntity> getRunningRecords(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+    public List<RunRecordEntity> getRunningRecords(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
         return runRecordService.getRecordsForPeriod(startDate, endDate);
     }
 
