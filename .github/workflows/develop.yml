@@ -37,7 +37,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build --no-build-cache -Dspring.profiles.active=test
+        run: ./gradlew clean build --debug
 
       - name: Upload test report
         if: always()
