@@ -2,6 +2,7 @@ package com.example.runningservice.controller;
 
 import com.example.runningservice.dto.runRecord.RunRecordRequestDto;
 import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
+import com.example.runningservice.entity.RunRecordEntity;
 import com.example.runningservice.service.RunRecordService;
 import com.example.runningservice.util.LoginUser;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -93,4 +95,30 @@ public class RunRecordController {
         @PathVariable Long runRecordId, @RequestBody RunRecordRequestDto updatedRunRecord) {
         return ResponseEntity.ok(runRecordService.updateRunRecord(runRecordId, updatedRunRecord));
     }
+
+    /**
+     * 기간 동안의 총 거리 API
+     */
+    @GetMapping("/total-distance")
+    public double getTotalDistance(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+        return runRecordService.getTotalDistanceForPeriod(startDate, endDate);
+    }
+
+    /**
+     * 기간 동안의 총 시간 API
+     */
+    @GetMapping("/total-time")
+    public int getTotalTime(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+        return runRecordService.getTotalTimeForPeriod(startDate, endDate);
+    }
+
+    /**
+     * 기간 동안의 모든 기록 조회 API
+     */
+    @GetMapping("/records")
+    public List<RunRecordEntity> getRunningRecords(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
+        return runRecordService.getRecordsForPeriod(startDate, endDate);
+    }
+
+
 }
