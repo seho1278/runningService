@@ -173,8 +173,7 @@ public class RunRecordService {
     }
 
     // 특정 기간 동안의 모든 기록 조회
-    public List<RunRecordEntity> getRecordsForPeriod(LocalDate startDate, LocalDate endDate) {
-        return runRecordRepository.findByDateBetween(startDate, endDate);
+    public List<RunRecordEntity> getRecordsForPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        return runRecordRepository.findAllByRunningDateBetween(startDate, endDate);
     }
-
 }
