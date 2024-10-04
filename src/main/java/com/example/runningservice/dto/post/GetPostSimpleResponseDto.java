@@ -1,6 +1,7 @@
 package com.example.runningservice.dto.post;
 
 import com.example.runningservice.entity.post.PostEntity;
+import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class GetPostSimpleResponseDto {
 
@@ -27,5 +27,16 @@ public class GetPostSimpleResponseDto {
             .createdAt(postEntity.getCreatedAt())
             .updatedAt(postEntity.getUpdatedAt())
             .build();
+    }
+
+    @QueryProjection
+    public GetPostSimpleResponseDto(Long postId, String postTitle, String writerName,
+        LocalDateTime createdAt, LocalDateTime updatedAt) {
+
+        this.postId = postId;
+        this.postTitle = postTitle;
+        this.writerName = writerName;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }

@@ -1,6 +1,8 @@
 package com.example.runningservice.repository.post;
 
 import com.example.runningservice.dto.post.GetPostRequestDto.Filter;
+import com.example.runningservice.dto.post.GetPostSimpleResponseDto;
+import com.example.runningservice.dto.post.QGetPostSimpleResponseDto;
 import com.example.runningservice.entity.post.PostEntity;
 import com.example.runningservice.entity.post.QPostEntity;
 import com.example.runningservice.enums.PostCategory;
@@ -9,12 +11,14 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
-public class PostRepositoryCustomImpl implements PostRepositoryCustom{
+@Slf4j
+public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -50,7 +54,50 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
         return new PageImpl<>(posts, pageable, total != null ? total : 0);
     }
 
+    @Override
+    public Page<GetPostSimpleResponseDto> searchPostsByCrewIdAndKeywordAndAuthor(Long crewId, String keyword,
+        String author, Pageable pageable) {
+        QPostEntity post = QPostEntity.postEntity;
+
+        List<GetPostSimpleResponseDto> results = queryFactory
+            .select(new QGetPostSimpleResponseDto(post.id, post.title, post.member.nickName,
+                post.createdAt, post.updatedAt))
+            .from(post)
+            .where(post.crewId.eq(crewId),
+                keywordContainsIgnoreCase(keyword),
+                authorContainsIgnoreCase(author))
+            .orderBy(QueryDslUtil.getAllOrderSpecifiers(pageable, "postEntity"))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        // 개별 결과 로그
+        results.forEach(
+            result -> log.info("PostResponseDto: postId={}, title={}", result.getPostId(),
+                result.getPostTitle()));
+
+        long total = queryFactory
+            .select(post.count())
+            .from(post)
+            .where(post.crewId.eq(crewId),
+                keywordContainsIgnoreCase(keyword),
+                authorContainsIgnoreCase(author))
+            .fetchOne();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
     private BooleanExpression postCategoryEq(PostCategory postCategory) {
         return postCategory != null ? QPostEntity.postEntity.postCategory.eq(postCategory) : null;
+    }
+
+    private BooleanExpression keywordContainsIgnoreCase(String keyword) {
+        return keyword != null ? QPostEntity.postEntity.title.containsIgnoreCase(keyword)
+            .or(QPostEntity.postEntity.content.containsIgnoreCase(keyword)) : null;
+    }
+
+    private BooleanExpression authorContainsIgnoreCase(String author) {
+        return author != null ? QPostEntity.postEntity.member.nickName.containsIgnoreCase(author)
+            : null;
     }
 }
