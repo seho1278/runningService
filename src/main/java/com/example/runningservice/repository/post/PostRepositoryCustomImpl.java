@@ -6,7 +6,9 @@ import com.example.runningservice.dto.post.QGetPostSimpleResponseDto;
 import com.example.runningservice.entity.post.PostEntity;
 import com.example.runningservice.entity.post.QPostEntity;
 import com.example.runningservice.enums.PostCategory;
+import com.example.runningservice.enums.SearchType;
 import com.example.runningservice.util.QueryDslUtil;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -56,16 +58,16 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
     @Override
     public Page<GetPostSimpleResponseDto> searchPostsByCrewIdAndKeywordAndAuthor(Long crewId, String keyword,
-        String author, Pageable pageable) {
+        SearchType searchType, Pageable pageable) {
         QPostEntity post = QPostEntity.postEntity;
+
+        BooleanBuilder searchCondition = buildSearchCondition(crewId, keyword, searchType);
 
         List<GetPostSimpleResponseDto> results = queryFactory
             .select(new QGetPostSimpleResponseDto(post.id, post.title, post.member.nickName,
                 post.createdAt, post.updatedAt))
             .from(post)
-            .where(post.crewId.eq(crewId),
-                keywordContainsIgnoreCase(keyword),
-                authorContainsIgnoreCase(author))
+            .where(searchCondition)
             .orderBy(QueryDslUtil.getAllOrderSpecifiers(pageable, "postEntity"))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -79,9 +81,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         long total = queryFactory
             .select(post.count())
             .from(post)
-            .where(post.crewId.eq(crewId),
-                keywordContainsIgnoreCase(keyword),
-                authorContainsIgnoreCase(author))
+            .where(searchCondition)
             .fetchOne();
 
         return new PageImpl<>(results, pageable, total);
@@ -91,7 +91,19 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return postCategory != null ? QPostEntity.postEntity.postCategory.eq(postCategory) : null;
     }
 
-    private BooleanExpression keywordContainsIgnoreCase(String keyword) {
+    private BooleanBuilder buildSearchCondition(Long crewId, String keyword, SearchType searchType) {
+        QPostEntity post = QPostEntity.postEntity;
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(post.crewId.eq(crewId));
+        if (searchType == SearchType.TITLE_CONTENT && keyword != null) {
+            builder.and(titleContentContainsIgnoreCase(keyword));
+        } else if (searchType == SearchType.AUTHOR && keyword != null) {
+            builder.and(authorContainsIgnoreCase(keyword));
+        }
+        return builder;
+    }
+
+    private BooleanExpression titleContentContainsIgnoreCase(String keyword) {
         return keyword != null ? QPostEntity.postEntity.title.containsIgnoreCase(keyword)
             .or(QPostEntity.postEntity.content.containsIgnoreCase(keyword)) : null;
     }

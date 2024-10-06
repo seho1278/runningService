@@ -31,7 +31,7 @@ class SearchRepositoryTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("keyword만 입력")
+    @DisplayName("keyword만 입력_searchtype은 기본값")
     void searchPostsByCrewIdAndKeywordAndAuthor() {
         //given
         Long crewId = 1L;

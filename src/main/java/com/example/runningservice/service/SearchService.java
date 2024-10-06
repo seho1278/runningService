@@ -3,6 +3,7 @@ package com.example.runningservice.service;
 import com.example.runningservice.dto.post.GetPostSimpleResponseDto;
 import com.example.runningservice.dto.post.PostResponseDto;
 import com.example.runningservice.dto.search.SearchPostRequestDto;
+import com.example.runningservice.enums.SearchType;
 import com.example.runningservice.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,11 +21,11 @@ public class SearchService {
     public Page<GetPostSimpleResponseDto> searchPost(SearchPostRequestDto requestDto, Pageable pageable) {
 
         String keyword = requestDto.getKeyword();
-        String author = requestDto.getAuthor();
+        SearchType searchType = requestDto.getSearchType();
         Long crewId = requestDto.getCrewId();
 
         return postRepository.searchPostsByCrewIdAndKeywordAndAuthor(
-            crewId, keyword, author, pageable);
+            crewId, keyword, searchType, pageable);
     }
 
     @Transactional(readOnly = true)
