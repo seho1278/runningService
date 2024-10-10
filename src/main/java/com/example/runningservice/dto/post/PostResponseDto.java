@@ -1,16 +1,20 @@
 package com.example.runningservice.dto.post;
 
-import com.example.runningservice.entity.post.ReplyEntity;
 import com.example.runningservice.entity.post.PostEntity;
+import com.example.runningservice.entity.post.ReplyEntity;
 import com.example.runningservice.enums.PostCategory;
 import com.example.runningservice.util.S3FileUtil;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostResponseDto {
 
     private Long postId;
