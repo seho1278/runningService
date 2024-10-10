@@ -12,5 +12,6 @@ public interface PostRepositoryCustom {
     Page<PostEntity> findAllNotNoticeByCrewIdAndFilter(Long crewId, GetPostRequestDto.Filter filter,
         Pageable pageable);
 
-    Page<GetPostSimpleResponseDto> searchPostsByCrewIdAndKeywordAndAuthor(Long crewId, String keyword, SearchType searchType, Pageable pageable);
+    Page<GetPostSimpleResponseDto> searchPostsByCrewIdAndKeyword(Long crewId,
+        String keyword, SearchType searchType, Pageable pageable);
 }

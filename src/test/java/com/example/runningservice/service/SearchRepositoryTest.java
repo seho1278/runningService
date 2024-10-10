@@ -77,7 +77,7 @@ class SearchRepositoryTest {
         postRepository.saveAll(List.of(post1, post2, post3));
         System.out.println(postRepository.findAll().size() + "개 저장");
         //when
-        Page<GetPostSimpleResponseDto> result = postRepository.searchPostsByCrewIdAndKeywordAndAuthor(
+        Page<GetPostSimpleResponseDto> result = postRepository.searchPostsByCrewIdAndKeyword(
             crewId, keyword, null, pageable);
 
         System.out.println("result size: " + result.getTotalElements());

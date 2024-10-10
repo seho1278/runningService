@@ -57,7 +57,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Page<GetPostSimpleResponseDto> searchPostsByCrewIdAndKeywordAndAuthor(Long crewId, String keyword,
+    public Page<GetPostSimpleResponseDto> searchPostsByCrewIdAndKeyword(Long crewId,
+        String keyword,
         SearchType searchType, Pageable pageable) {
         QPostEntity post = QPostEntity.postEntity;
 
@@ -73,11 +74,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             .limit(pageable.getPageSize())
             .fetch();
 
-        // 개별 결과 로그
-        results.forEach(
-            result -> log.info("PostResponseDto: postId={}, title={}", result.getPostId(),
-                result.getPostTitle()));
-
         long total = queryFactory
             .select(post.count())
             .from(post)
@@ -91,19 +87,20 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return postCategory != null ? QPostEntity.postEntity.postCategory.eq(postCategory) : null;
     }
 
-    private BooleanBuilder buildSearchCondition(Long crewId, String keyword, SearchType searchType) {
+    private BooleanBuilder buildSearchCondition(Long crewId, String keyword,
+        SearchType searchType) {
         QPostEntity post = QPostEntity.postEntity;
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(post.crewId.eq(crewId));
         if (searchType == SearchType.TITLE_CONTENT && keyword != null) {
-            builder.and(titleContentContainsIgnoreCase(keyword));
+            builder.and(titleContentContains(keyword));
         } else if (searchType == SearchType.AUTHOR && keyword != null) {
             builder.and(authorContainsIgnoreCase(keyword));
         }
         return builder;
     }
 
-    private BooleanExpression titleContentContainsIgnoreCase(String keyword) {
+    private BooleanExpression titleContentContains(String keyword) {
         return keyword != null ? QPostEntity.postEntity.title.containsIgnoreCase(keyword)
             .or(QPostEntity.postEntity.content.containsIgnoreCase(keyword)) : null;
     }
