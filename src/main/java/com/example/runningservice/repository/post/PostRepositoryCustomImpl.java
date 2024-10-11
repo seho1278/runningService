@@ -106,7 +106,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     private BooleanExpression authorContainsIgnoreCase(String author) {
-        return author != null ? QPostEntity.postEntity.member.nickName.containsIgnoreCase(author)
+        return author != null ? QPostEntity.postEntity.member.nickName.contains(author)
             : null;
     }
 }

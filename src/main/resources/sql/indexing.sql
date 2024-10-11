@@ -8,3 +8,7 @@ using gin (title gin_bigm_ops);
 create index idx_bigm_content
 on post
 using gin (content gin_bigm_ops);
+--- 칼럼에 bigm 인덱스 추가
+create index idx_bigm_nickName
+on member
+using gin (nick_name gin_bigm_ops);
