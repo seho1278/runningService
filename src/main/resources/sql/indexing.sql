@@ -12,3 +12,7 @@ using gin (content gin_bigm_ops);
 create index idx_bigm_nickName
 on member
 using gin (nick_name gin_bigm_ops);
+--- 칼럼에 btree 인덱스 추가
+create index idx_post_member_id
+on post
+using gin (member_id);
