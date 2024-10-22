@@ -7,21 +7,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.example.runningservice.dto.crewMember.CrewMemberResponseDto;
 import com.example.runningservice.dto.join.CrewApplicantDetailResponseDto;
-import com.example.runningservice.dto.join.CrewApplicantResponseDto;
+import com.example.runningservice.dto.join.CrewApplicantSimpleResponseDto;
 import com.example.runningservice.dto.join.GetApplicantsRequestDto;
+import com.example.runningservice.dto.runProfile.RunProfile;
+import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.CrewEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
 import com.example.runningservice.entity.MemberEntity;
+import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.enums.JoinStatus;
 import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.repository.JoinApplicationRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
-import com.example.runningservice.util.AESUtil;
-import com.example.runningservice.util.PageUtil;
-import com.example.runningservice.util.S3FileUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -46,10 +45,8 @@ class CrewApplicantServiceTest {
     private JoinApplicationRepository joinApplicationRepository;
 
     @Mock
-    private AESUtil aesUtil;
+    private ProfileWithRunService profileWithRunService;
 
-    @Mock
-    private S3FileUtil s3FileUtil;
 
     @InjectMocks
     private CrewApplicantService crewApplicantService;
@@ -60,7 +57,7 @@ class CrewApplicantServiceTest {
         Long crewId = 1L;
         GetApplicantsRequestDto request = GetApplicantsRequestDto.builder()
             .status(JoinStatus.PENDING)
-            .pageable(PageRequest.of(0, 5))
+            .pageable(PageRequest.of(0, 5, Direction.ASC, "createdAt"))
             .build();
 
         JoinApplyEntity joinApplyEntity1 = JoinApplyEntity.builder()
@@ -85,14 +82,15 @@ class CrewApplicantServiceTest {
             request.getPageable(),
             2);
 
-        Pageable sortedPageable = PageUtil.getSortedPageable(request.getPageable(), "createdAt", Direction.ASC, 0,
-                10);
+        Pageable sortedPageable = PageRequest.of(request.getPageable().getPageNumber(),
+            request.getPageable().getPageSize(), Direction.ASC, "createdAt");
         when(joinApplicationRepository.findAllByCrew_IdAndStatus(eq(crewId),
             eq(JoinStatus.PENDING), eq(sortedPageable)))
             .thenReturn(page);
 
         // when
-        Page<CrewApplicantResponseDto> result = crewApplicantService.getAllJoinApplications(crewId,
+        Page<CrewApplicantSimpleResponseDto> result = crewApplicantService.getAllJoinApplications(
+            crewId,
             request);
 
         // then
@@ -106,16 +104,30 @@ class CrewApplicantServiceTest {
         // given
         Long crewId = 1L;
         Long joinApplyId = 2L;
+        Long userId = 1L;
 
         JoinApplyEntity joinApplyEntity = JoinApplyEntity.builder()
             .id(joinApplyId)
-            .member(MemberEntity.builder().nickName("testNick").build())
+            .member(MemberEntity.builder().id(userId).nickName("testNick").build())
             .crew(CrewEntity.builder().crewName("testCrew").build())
             .createdAt(LocalDateTime.now())
             .build();
 
+        RunRecordResponseDto runRecordResponseDto = RunRecordResponseDto.builder()
+            .runningTime(1000)
+            .pace(100)
+            .distance(10.1)
+            .runCount(10)
+            .build();
+
+        RunGoalEntity runGoalEntity = new RunGoalEntity();
+
+        CrewApplicantDetailResponseDto response = CrewApplicantDetailResponseDto.of(joinApplyEntity);
+        response.addRunProfile(RunProfile.of(runGoalEntity, runRecordResponseDto));
+
         when(joinApplicationRepository.findByIdAndCrew_Id(joinApplyId, crewId))
             .thenReturn(Optional.of(joinApplyEntity));
+        when(profileWithRunService.getJoinApplicationDetail(joinApplyEntity)).thenReturn(response);
 
         // when
         CrewApplicantDetailResponseDto result = crewApplicantService.getJoinApplicationDetail(
@@ -130,7 +142,6 @@ class CrewApplicantServiceTest {
     void approveJoinApplication_Success() {
         // given
         Long joinApplyId = 1L;
-        String signedUrl = "signedUrl";
 
         MemberEntity memberEntity = MemberEntity.builder()
             .nickName("testNick")
@@ -162,15 +173,13 @@ class CrewApplicantServiceTest {
         when(crewMemberRepository.save(any(CrewMemberEntity.class)))
             .thenReturn(newCrewMember);
 
-        when(s3FileUtil.createPresignedUrl(memberEntity.getProfileImageUrl())).thenReturn(signedUrl);
-
         // when
-        CrewMemberResponseDto result = crewApplicantService.approveJoinApplication(joinApplyId);
+        CrewMemberEntity result = crewApplicantService.approveJoinApplication(joinApplyId);
 
         // then
         assertNotNull(result);
-        assertEquals(memberEntity.getNickName(), result.getMemberNickName());
-        assertEquals(signedUrl, result.getMemberProfileImage());
+        assertEquals(memberEntity.getNickName(), result.getMember().getNickName());
+        assertEquals("testImageUrl", result.getMember().getProfileImageUrl());
     }
 
     @Test
@@ -201,16 +210,14 @@ class CrewApplicantServiceTest {
             .status(JoinStatus.PENDING)
             .build();
 
-
         when(joinApplicationRepository.findByIdAndStatus(joinApplyId, JoinStatus.PENDING))
             .thenReturn(Optional.of(joinApplyEntity));
 
         // when
-        String result = crewApplicantService.rejectJoinApplication(joinApplyId);
+        JoinApplyEntity result = crewApplicantService.rejectJoinApplication(joinApplyId);
 
         // then
         assertNotNull(result);
-        assertEquals("testEmail님의 가입신청이 거부되었습니다.", result);
         assertEquals(JoinStatus.REJECTED, joinApplyEntity.getStatus());
 
         verify(joinApplicationRepository).findByIdAndStatus(joinApplyId, JoinStatus.PENDING);

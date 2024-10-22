@@ -27,7 +27,7 @@ public enum ErrorCode {
     UNAUTHORIZED_CREW_ACCESS(HttpStatus.FORBIDDEN, "크루 접근 권한이 없습니다."),
     DECRYPTION_ERROR(HttpStatus.BAD_REQUEST, "복호화 과정 중 에러가 발생하였습니다."),
     NOT_FOUND_CREW_MEMBER(HttpStatus.BAD_REQUEST, "해당 크루원을 찾을 수 없습니다."),
-    ROLE_NOT_CHANGED(HttpStatus.BAD_REQUEST, "새로운 역할이 현재 역할과 동일합니다."),
+    NOT_ALLOWED_CHANGE_TO_SAME_ROLE(HttpStatus.BAD_REQUEST, "새로운 역할이 현재 역할과 동일합니다."),
     UNAUTHORIZED_REGULAR_ACCESS(HttpStatus.FORBIDDEN, "정기러닝 접근 권한이 없습니다."),
     NOT_FOUND_ACTIVITY(HttpStatus.BAD_REQUEST, "활동이 존재하지 않습니다."),
     UNAUTHORIZED_ACTIVITY(HttpStatus.FORBIDDEN, "활동 접근 권한이 없습니다."),
@@ -44,6 +44,12 @@ public enum ErrorCode {
     NOT_FOUND_RUN_RECORD(HttpStatus.NOT_FOUND, "러닝 기록을 찾을 수 없습니다."),
     NOT_FOUND_RUN_GOAL(HttpStatus.NOT_FOUND, "러닝 목표를 찾을 수 없습니다."),
     INVALID_RUN_ARGUMENT(HttpStatus.BAD_REQUEST, "러닝 기록이 없거나 유저정보가 없습니다."),
+    NOT_FOUND_POST(HttpStatus.NOT_FOUND, "해당 게시물을 찾을 수 없습니다."),
+    MAX_DELETE_SIZE_OVER(HttpStatus.BAD_REQUEST, "삭제할 수 있는 게시물 최대 개수를 초과했습니다"),
+    NOT_FOUND_SOME_POST(HttpStatus.NOT_FOUND, "일부 게시물을 찾을 수 없습니다."),
+    NOT_ALLOWED_CHANGE_TO_LEADER(HttpStatus.BAD_REQUEST, "리더로 권한을 변경할 수 없습니다."),
+    NOT_FOUND_REPLY(HttpStatus.NOT_FOUND, "해당 댓글을 찾을 수 없습니다"),
+    NOT_FOUND_SOME_Reply(HttpStatus.NOT_FOUND, "일부 댓글을 찾을 수 없습니다."),
 
     //크루가입
     ALREADY_EXIST_PENDING_JOIN_APPLY(HttpStatus.BAD_REQUEST, "이미 거압 숭안 대기중입니다."),

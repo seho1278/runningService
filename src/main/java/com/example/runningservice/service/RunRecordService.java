@@ -10,6 +10,8 @@ import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.MemberRepository;
 import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.RunRecordRepository;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -160,4 +162,18 @@ public class RunRecordService {
         return map;
     }
 
+    // 특정 기간 동안의 총 거리 구하기
+    public double getTotalDistanceForPeriod(LocalDate startDate, LocalDate endDate) {
+        return runRecordRepository.findTotalDistanceBetweenDates(startDate, endDate);
+    }
+
+    // 특정 기간 동안의 총 러닝 시간 구하기
+    public int getTotalTimeForPeriod(LocalDate startDate, LocalDate endDate) {
+        return runRecordRepository.findTotalTimeBetweenDates(startDate, endDate);
+    }
+
+    // 특정 기간 동안의 모든 기록 조회
+    public List<RunRecordEntity> getRecordsForPeriod(LocalDateTime startDate, LocalDateTime endDate) {
+        return runRecordRepository.findAllByRunningDateBetween(startDate, endDate);
+    }
 }

@@ -1,27 +1,35 @@
 package com.example.runningservice.dto.join;
 
+import com.example.runningservice.dto.runProfile.RunProfile;
 import com.example.runningservice.entity.JoinApplyEntity;
+import com.example.runningservice.enums.JoinStatus;
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
-public class CrewApplicantDetailResponseDto extends CrewApplicantResponseDto {
+@Getter
+public class CrewApplicantDetailResponseDto extends CrewApplicantSimpleResponseDto {
 
-    //RunRecordDto, RunGoalDto 추가
+    private JoinStatus status;
+    private RunProfile runProfile;
 
     public static CrewApplicantDetailResponseDto of(JoinApplyEntity entity) {
 
-        CrewApplicantDetailResponseDto crewApplicantDetailResponseDto = CrewApplicantDetailResponseDto.builder()
-            .nickName(entity.getMember().getNickName())
-            .profileImage(entity.getMember().getProfileImageUrl())
-            .message(entity.getMessage())
-            .appliedAt(entity.getCreatedAt())
+        CrewApplicantSimpleResponseDto simpleDto = CrewApplicantSimpleResponseDto.of(entity);
+
+        return CrewApplicantDetailResponseDto.builder()
+            .id(simpleDto.getId())
+            .nickName(simpleDto.getNickName())
+            .profileImage(simpleDto.getProfileImage())
+            .message(simpleDto.getMessage())
+            .appliedAt(simpleDto.getAppliedAt())
+            .status(entity.getStatus())
             .build();
-        //setRunRecordDto(runRecordDto, runGoalDto)
-        return crewApplicantDetailResponseDto;
     }
 
-    //private void setRunRecordDto(RunRecordDto runRecordDto, RunGoalDto runGoalDto) {
-    //      this.runRecordDto = runRecordDto;
-    //      this.runGoalDto = runGoalDto;
-    // }
+    public void addRunProfile(RunProfile runProfile) {
+        this.runProfile = runProfile;
+    }
+
+
 }

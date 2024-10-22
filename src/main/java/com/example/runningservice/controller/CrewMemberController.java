@@ -83,7 +83,7 @@ public class CrewMemberController {
      */
     @PatchMapping("/{crew_id}/change-role")
     @CrewRoleCheck(role = {"LEADER", "STAFF"})
-    public ResponseEntity<ChangeCrewRoleResponseDto> changeRole(@LoginUser Long userID,
+    public ResponseEntity<ChangeCrewRoleResponseDto> changeRole(@LoginUser Long userId,
         @PathVariable("crew_id") Long crewId,
         @RequestBody @Valid ChangeCrewRoleRequestDto requestDto) {
 

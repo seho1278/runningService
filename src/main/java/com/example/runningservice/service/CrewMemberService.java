@@ -4,18 +4,13 @@ import com.example.runningservice.dto.crewMember.ChangeCrewRoleRequestDto;
 import com.example.runningservice.dto.crewMember.ChangedLeaderResponseDto;
 import com.example.runningservice.dto.crewMember.CrewMemberResponseDetailDto;
 import com.example.runningservice.dto.crewMember.GetCrewMemberRequestDto;
-import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
 import com.example.runningservice.entity.CrewMemberBlackListEntity;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.JoinApplyEntity;
-import com.example.runningservice.entity.MemberEntity;
-import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.enums.CrewRole;
-import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import com.example.runningservice.repository.JoinApplicationRepository;
-import com.example.runningservice.repository.RunGoalRepository;
 import com.example.runningservice.repository.chat.ChatJoinRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberBlackListRepository;
 import com.example.runningservice.repository.crewMember.CrewMemberRepository;
@@ -37,8 +32,7 @@ public class CrewMemberService {
     private final JoinApplicationRepository joinApplicationRepository;
     private final CrewMemberBlackListRepository crewMemberBlackListRepository;
     private final ChatJoinRepository chatJoinRepository;
-    private final RunGoalRepository runGoalRepository;
-    private final RunRecordService runRecordService;
+    private final ProfileWithRunService profileWithRunService;
     private final AESUtil aesUtil;
 
     /**
@@ -74,25 +68,7 @@ public class CrewMemberService {
         CrewMemberEntity crewMemberEntity = crewMemberRepository.findById(crewMemberId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
 
-        MemberEntity memberEntity = crewMemberEntity.getMember();
-        if (memberEntity.getRunProfileVisibility() == Visibility.PRIVATE) {
-            return CrewMemberResponseDetailDto.of(crewMemberEntity, aesUtil);
-        }
-
-        Long userId = memberEntity.getId();
-        RunGoalEntity runGoalEntity = runGoalRepository.findFirstByUserId_IdOrderByCreatedAtDesc(
-                userId)
-            .orElseThrow(() -> new CustomException(
-                ErrorCode.NOT_FOUND_RUN_GOAL));
-        RunRecordResponseDto runRecordResponseDto = runRecordService.calculateTotalRunRecords(
-            userId);
-
-        CrewMemberResponseDetailDto crewMemberResponseDetailDto = CrewMemberResponseDetailDto.of(
-            crewMemberEntity, aesUtil);
-
-        crewMemberResponseDetailDto.addRunProfile(runGoalEntity, runRecordResponseDto);
-
-        return crewMemberResponseDetailDto;
+        return profileWithRunService.getCrewMemberWithEntity(crewMemberEntity);
     }
 
     /**
@@ -177,22 +153,22 @@ public class CrewMemberService {
     @Transactional
     public ChangedLeaderResponseDto transferLeaderRole(Long userId, Long crewId,
         Long crewMemberId) {
-        CrewMemberEntity newLeader = crewMemberRepository.findById(crewMemberId)
+        List<CrewMemberEntity> newLeaderAndOldLeader = crewMemberRepository.findNewLeaderAndOldLeader(
+            crewMemberId, userId, crewId);
+
+        CrewMemberEntity newLeader = newLeaderAndOldLeader.stream()
+            .filter(e -> e.getId().equals(crewMemberId)).findFirst()
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
 
-        CrewMemberEntity oldLeader = crewMemberRepository.findByMember_IdAndCrew_Id(
-            userId, crewId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
+        CrewMemberEntity oldLeader = newLeaderAndOldLeader.stream()
+            .filter(e -> e.getMember().getId().equals(userId)).findFirst()
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CREW_MEMBER));
 
         newLeader.acceptLeaderRole();
 
         oldLeader.changeRoleTo(CrewRole.MEMBER);
 
-        return ChangedLeaderResponseDto.builder()
-            .oldLeaderNickName(oldLeader.getMember().getNickName())
-            .oldLeaderRole(oldLeader.getRole())
-            .newLeaderNickName(newLeader.getMember().getNickName())
-            .newLeaderRole(newLeader.getRole())
-            .build();
+        return ChangedLeaderResponseDto.of(oldLeader, newLeader);
     }
 
     private final List<String> ALLOWED_SORT_FIELDS = List.of(

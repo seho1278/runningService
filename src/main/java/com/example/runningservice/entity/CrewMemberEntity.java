@@ -4,7 +4,6 @@ import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.exception.CustomException;
 import com.example.runningservice.exception.ErrorCode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @AllArgsConstructor
@@ -30,7 +28,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table(name = "crew_member", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"member_id", "crew_id"})
 })
-@EntityListeners(AuditingEntityListener.class)
 public class CrewMemberEntity {
 
     @Id
@@ -70,8 +67,12 @@ public class CrewMemberEntity {
 
     public void changeRoleTo(CrewRole newRole) {
         if (newRole == this.role) {
-            throw new CustomException(ErrorCode.ROLE_NOT_CHANGED);
+            throw new CustomException(ErrorCode.NOT_ALLOWED_CHANGE_TO_SAME_ROLE);
         }
+        if (newRole == CrewRole.LEADER) {
+            throw new CustomException(ErrorCode.NOT_ALLOWED_CHANGE_TO_LEADER);
+        }
+
         this.role = newRole;
         this.roleOrder = newRole.getOrder();
     }

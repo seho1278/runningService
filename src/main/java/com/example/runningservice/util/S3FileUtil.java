@@ -5,7 +5,9 @@ import com.example.runningservice.exception.ErrorCode;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -122,4 +124,33 @@ public class S3FileUtil {
         return presignedUrl != null &&
             presignedUrl.expiration.isAfter(LocalDateTime.now().plusMinutes(1));
     }
+
+    public String uploadFileAndReturnFileName(String prefix, Long id, MultipartFile image) {
+
+        String defaultImageName = prefix + "-default";
+
+        if (image != null && !image.isEmpty()) {
+            String fileName = prefix + "-" + id;
+            putObject(fileName, image);
+
+            return getImgUrl(fileName);
+        } else { // 크루 이미지가 없으면 기본 이미지로 사용
+            return getImgUrl(defaultImageName);
+        }
+    }
+
+    public List<String> uploadFilesAndReturnFileNames(String prefix, Long id, List<MultipartFile> images) {
+
+        List<String> fileUrls = new ArrayList<>();
+        if (!images.isEmpty()) {
+            for (MultipartFile image : images) {
+                String fileName = prefix + "-" + id + "-" + images.indexOf(image);
+                putObject(fileName, image);
+                fileUrls.add(getImgUrl(fileName));
+            }
+        }
+        return fileUrls;
+    }
+
+
 }

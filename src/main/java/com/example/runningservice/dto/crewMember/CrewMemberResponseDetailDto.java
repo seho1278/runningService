@@ -1,9 +1,8 @@
 package com.example.runningservice.dto.crewMember;
 
-import com.example.runningservice.dto.runRecord.RunRecordResponseDto;
+import com.example.runningservice.dto.runProfile.RunProfile;
 import com.example.runningservice.entity.CrewMemberEntity;
 import com.example.runningservice.entity.MemberEntity;
-import com.example.runningservice.entity.RunGoalEntity;
 import com.example.runningservice.enums.CrewRole;
 import com.example.runningservice.enums.Gender;
 import com.example.runningservice.enums.Region;
@@ -11,9 +10,7 @@ import com.example.runningservice.enums.Visibility;
 import com.example.runningservice.util.AESUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
@@ -29,21 +26,6 @@ public class CrewMemberResponseDetailDto extends CrewMemberResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime joinedAt;
     private RunProfile runProfile;
-
-    @Builder
-    @Getter
-    @Setter
-    private static class RunProfile {
-        private Double totalDistanceGoal;
-        private Integer totalRunningTimeGoal;
-        private Integer averagePaceGoal;
-        private Integer runCountGoal;
-
-        private Double totalDistance;
-        private Integer totalRunningTime;
-        private Integer averagePace;
-        private Integer runCount;
-    }
 
     public static CrewMemberResponseDetailDto of(CrewMemberEntity crewMemberEntity,
         AESUtil aesUtil) {
@@ -76,18 +58,7 @@ public class CrewMemberResponseDetailDto extends CrewMemberResponseDto {
         return dtoBuilder.build();
     }
 
-    public void addRunProfile(RunGoalEntity runGoal,
-        RunRecordResponseDto runRecord) {
-
-        this.runProfile = RunProfile.builder()
-            .totalDistanceGoal(runGoal.getTotalDistance())
-            .runCountGoal(runGoal.getRunCount())
-            .averagePaceGoal(runGoal.getAveragePace())
-            .totalRunningTimeGoal(runGoal.getTotalRunningTime())
-            .totalDistance(runRecord.getDistance())
-            .totalRunningTime(runRecord.getRunningTime())
-            .averagePace(runRecord.getPace())
-            .runCount(runRecord.getRunCount())
-            .build();
+    public void addRunProfile(RunProfile runProfile) {
+        this.runProfile = runProfile;
     }
 }
