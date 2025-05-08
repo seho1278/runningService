@@ -1,0 +1,63 @@
+name: RunningService server CI/CD
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  S3_BUCKET_NAME: running-service
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build
+
+      - name: Make Directory
+        run: mkdir -p deploy
+
+      - name: Copy Jar
+        run: cp ./build/libs/*.jar ./deploy
+
+      - name: Copy appspec.yml
+        run: cp appspec.yml ./deploy
+
+      - name: Copy script
+        run: cp ./scripts/*.sh ./deploy
+
+      - name: Make zip file
+        run: zip -r ./runningservice.zip ./deploy
+        shell: bash
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./runningservice.zip s3://$S3_BUCKET_NAME/
+
+      - name: Deploy
+        env:
+          AWS-ACCESS-KEY-ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS-SECRET-ACCESS-KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run:
+          aws deploy create-deployment --application-name RunningServiceCodeDeployApplication --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name RunningServiceCodeDeployGroup --file-exists-behavior OVERWRITE --s3-location bucket=running-service,bundleType=zip,key=runningservice.zip --region ap-northeast-2

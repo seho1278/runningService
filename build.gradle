@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(18)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -26,16 +26,78 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    compileOnly 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'org.postgresql:postgresql'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation ('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'com.mashape.unirest:unirest-java:1.4.9'
+    implementation 'org.apache.commons:commons-lang3:3.16.0'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    // websocket stomp
+    implementation 'io.projectreactor.netty:reactor-netty:1.1.7' // spring boot 3.3.2와 호환
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+//    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    //jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+
+    //open feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.3'
+    implementation 'io.github.openfeign.form:feign-form:3.8.0'
+    implementation 'io.github.openfeign:feign-core:13.3'
+
+    //lombok
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    //jpa
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //database
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
+
+    //envers
+    implementation 'org.springframework.data:spring-data-envers:3.3.2'
+
+    //jwt
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+
+    //jasypt
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+    implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+
+    // image server :: s3
+    implementation platform('software.amazon.awssdk:bom:2.21.1')
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:sts'
+
+    //queryDsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 }
+
+//디버깅 시 사용
+//test {
+//    testLogging {
+//        showStandardStreams = true
+//        events "passed", "skipped", "failed"
+//        exceptionFormat "full"
+//    }
+//}
 
 tasks.named('test') {
     useJUnitPlatform()
